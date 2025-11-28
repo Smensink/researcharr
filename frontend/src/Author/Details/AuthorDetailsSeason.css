@@ -80,6 +80,15 @@
   border-top: 1px solid var(--borderColor);
 }
 
+.filterRow {
+  padding: 10px 15px 0 15px;
+}
+
+.pager {
+  margin-top: 10px;
+  padding: 0 10px 10px;
+}
+
 .collapseButtonContainer {
   display: flex;
   align-items: center;
