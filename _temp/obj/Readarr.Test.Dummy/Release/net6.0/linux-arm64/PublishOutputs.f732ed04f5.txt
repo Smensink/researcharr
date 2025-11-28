@@ -1,0 +1,7 @@
+/Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/linux-arm64/publish/Readarr.Test.Dummy
+/Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/linux-arm64/publish/Readarr.Test.Dummy.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/linux-arm64/publish/Readarr.Test.Dummy.runtimeconfig.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/linux-arm64/publish/Readarr.Test.Dummy.dll.config
+/Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/linux-arm64/publish/Readarr.Test.Dummy.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/linux-arm64/publish/Readarr.Test.Dummy.xml
+/Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/linux-arm64/publish/Readarr.Test.Dummy.deps.json

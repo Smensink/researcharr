@@ -1,0 +1,15 @@
+.labelIcon {
+  margin-left: 8px;
+}
+
+.hideMetadataProfile {
+  composes: group from '~Components/Form/FormGroup.css';
+
+  display: none;
+}
+
+.hideQualityProfile {
+  composes: group from '~Components/Form/FormGroup.css';
+
+  display: none;
+}

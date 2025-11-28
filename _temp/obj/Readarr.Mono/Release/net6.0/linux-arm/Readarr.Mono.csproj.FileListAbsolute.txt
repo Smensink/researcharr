@@ -1,0 +1,17 @@
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-arm/Readarr.Mono.deps.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-arm/Readarr.Mono.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-arm/Readarr.Mono.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-arm/Readarr.Mono.xml
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.csproj.AssemblyReference.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Sentry.Attributes.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.AssemblyInfoInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.AssemblyInfo.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.csproj.CoreCompileInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.sourcelink.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.csproj.CopyComplete
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/refint/Readarr.Mono.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.xml
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/Readarr.Mono.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/linux-arm/ref/Readarr.Mono.dll

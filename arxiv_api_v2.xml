@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/Wa7+ETXzs5HDG5NO3n/no0G+S2Q</id>
+  <title>arXiv Query: search_query=all:all&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2025-11-23T06:32:41Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:all&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>412374</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16674v1</id>
+    <title>Dataset Distillation for Pre-Trained Self-Supervised Vision Models</title>
+    <updated>2025-11-20T18:59:57Z</updated>
+    <link href="https://arxiv.org/abs/2511.16674v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16674v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The task of dataset distillation aims to find a small set of synthetic images such that training a model on them reproduces the performance of the same model trained on a much larger dataset of real samples. Existing distillation methods focus on synthesizing datasets that enable training randomly initialized models. In contrast, state-of-the-art vision approaches are increasingly building on large, pre-trained self-supervised models rather than training from scratch. In this paper, we investigate the problem of distilling datasets that enable us to optimally train linear probes on top of such large, pre-trained vision models. We introduce a method of dataset distillation for this task called Linear Gradient Matching that optimizes the synthetic images such that, when passed through a pre-trained feature extractor, they induce gradients in the linear classifier similar to those produced by the real data. Our method yields synthetic data that outperform all real-image baselines and, remarkably, generalize across pre-trained vision models, enabling us, for instance, to train a linear CLIP probe that performs competitively using a dataset distilled via a DINO backbone. Further, we show that our distilled datasets are exceptionally effective for fine-grained classification and provide a valuable tool for model interpretability, predicting, among other things, how similar two models' embedding spaces are under the platonic representation hypothesis or whether a model is sensitive to spurious correlations in adversarial datasets.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:59:57Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2025. Project page: https://linear-gradient-matching.github.io/ Code: https://github.com/GeorgeCazenavette/linear-gradient-matching</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>George Cazenavette</name>
+    </author>
+    <author>
+      <name>Antonio Torralba</name>
+    </author>
+    <author>
+      <name>Vincent Sitzmann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16667v1</id>
+    <title>Strained hyperbolic Dirac fermions: Zero modes, flat bands, and competing orders</title>
+    <updated>2025-11-20T18:59:38Z</updated>
+    <link href="https://arxiv.org/abs/2511.16667v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16667v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Starting from the nearest-neighbor tight-binding model on {10,3} and {14,3} hyperbolic lattices that, for a uniform hopping amplitude, gives rise to emergent Dirac fermions on a curved space with a constant negative curvature, displaying a vanishing density of states, we propose spatially modulated hopping pattern therein that preserve the underlying 5- and 7-fold rotational symmetries, respectively, and effectively couples fermions to time-reversal symmetric axial magnetic fields. Such strain-induced axial fields produce a flat band near zero-energy, triggering nucleation of a charge density-wave, featuring a staggered pattern of fermionic density between two sublattices, and the Haldane phase fostering intra-sublattice circulating currents with a net zero magnetic flux for weak nearest- and next-nearest-neighbor Coulomb repulsions, respectively. Sufficiently weak on-site Hubbard repulsion destabilizes such flat bands toward the formation of a magnetic phase that simultaneously supports antiferromagnetic and ferromagnetic orders in the whole system. While the magnetization in the bulk and boundary cancel each other, the Neél order is of the same sign everywhere, thereby yielding a global antiferromagnet. Throughout, we draw parallels between these findings and the well-studied qualitatively similar results on a 3-fold rotational symmetric strained honeycomb lattice, thereby unifying the phenomenon of axial magnetic catalysis for Dirac fermions, encompassing the ones living on the Euclidean plane. Finally, we show that with a specific class of non-Hermiticity, manifesting via an imbalance in the hopping amplitudes between two sublattices in the opposite directions, magnitudes of all these orders can be boosted substantially when all the eigenvalues in the noninteracting systems are real, staging a non-Hermitian amplification of axial magnetic catalysis.</summary>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:59:38Z</published>
+    <arxiv:comment>19 Pages, 11 Figures, and 1 Table (For full Abstract see manuscript)</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.str-el"/>
+    <author>
+      <name>Christopher A. Leong</name>
+    </author>
+    <author>
+      <name>Bitan Roy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16655v1</id>
+    <title>Solving Spatial Supersensing Without Spatial Supersensing</title>
+    <updated>2025-11-20T18:57:05Z</updated>
+    <link href="https://arxiv.org/abs/2511.16655v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16655v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cambrian-S aims to take the first steps towards improving video world models with spatial supersensing by introducing (i) two benchmarks, VSI-Super-Recall (VSR) and VSI-Super-Counting (VSC), and (ii) bespoke predictive sensing inference strategies tailored to each benchmark. In this work, we conduct a critical analysis of Cambrian-S across both these fronts. First, we introduce a simple baseline, NoSense, which discards almost all temporal structure and uses only a bag-of-words SigLIP model, yet near-perfectly solves VSR, achieving 95% accuracy even on 4-hour videos. This shows benchmarks like VSR can be nearly solved without spatial cognition, world modeling or spatial supersensing. Second, we hypothesize that the tailored inference methods proposed by Cambrian-S likely exploit shortcut heuristics in the benchmark. We illustrate this with a simple sanity check on the VSC benchmark, called VSC-Repeat: We concatenate each video with itself 1-5 times, which does not change the number of unique objects. However, this simple perturbation entirely collapses the mean relative accuracy of Cambrian-S from 42% to 0%. A system that performs spatial supersensing and integrates information across experiences should recognize views of the same scene and keep object-count predictions unchanged; instead, Cambrian-S inference algorithm relies largely on a shortcut in the VSC benchmark that rooms are never revisited. Taken together, our findings suggest that (i) current VSI-Super benchmarks do not yet reliably measure spatial supersensing, and (ii) predictive-sensing inference recipes used by Cambrian-S improve performance by inadvertently exploiting shortcuts rather than from robust spatial supersensing. We include the response from the Cambrian-S authors (in Appendix A) to provide a balanced perspective alongside our claims. We release our code at: https://github.com/bethgelab/supersanity</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:57:05Z</published>
+    <arxiv:comment>Tech Report</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Vishaal Udandarao</name>
+    </author>
+    <author>
+      <name>Shyamgopal Karthik</name>
+    </author>
+    <author>
+      <name>Surabhi S. Nath</name>
+    </author>
+    <author>
+      <name>Andreas Hochlehnert</name>
+    </author>
+    <author>
+      <name>Matthias Bethge</name>
+    </author>
+    <author>
+      <name>Ameya Prabhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16654v1</id>
+    <title>Comparison of Text-Based and Image-Based Retrieval in Multimodal Retrieval Augmented Generation Large Language Model Systems</title>
+    <updated>2025-11-20T18:56:49Z</updated>
+    <link href="https://arxiv.org/abs/2511.16654v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16654v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent advancements in Retrieval-Augmented Generation (RAG) have enabled Large Language Models (LLMs) to access multimodal knowledge bases containing both text and visual information such as charts, diagrams, and tables in financial documents. However, existing multimodal RAG systems rely on LLM-based summarization to convert images into text during preprocessing, storing only text representations in vector databases, which causes loss of contextual information and visual details critical for downstream retrieval and question answering. To address this limitation, we present a comprehensive comparative analysis of two retrieval approaches for multimodal RAG systems, including text-based chunk retrieval (where images are summarized into text before embedding) and direct multimodal embedding retrieval (where images are stored natively in the vector space). We evaluate all three approaches across 6 LLM models and a two multi-modal embedding models on a newly created financial earnings call benchmark comprising 40 question-answer pairs, each paired with 2 documents (1 image and 1 text chunk). Experimental results demonstrate that direct multimodal embedding retrieval significantly outperforms LLM-summary-based approaches, achieving absolute improvements of 13% in mean average precision (mAP@5) and 11% in normalized discounted cumulative gain. These gains correspond to relative improvements of 32% in mAP@5 and 20% in nDCG@5, providing stronger evidence of their practical impact. We additionally find that direct multimodal retrieval produces more accurate and factually consistent answers as measured by LLM-as-a-judge pairwise comparisons. We demonstrate that LLM summarization introduces information loss during preprocessing, whereas direct multimodal embeddings preserve visual context for retrieval and inference.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:56:49Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Elias Lumer</name>
+    </author>
+    <author>
+      <name>Alex Cardenas</name>
+    </author>
+    <author>
+      <name>Matt Melich</name>
+    </author>
+    <author>
+      <name>Myles Mason</name>
+    </author>
+    <author>
+      <name>Sara Dieter</name>
+    </author>
+    <author>
+      <name>Vamse Kumar Subbiah</name>
+    </author>
+    <author>
+      <name>Pradeep Honaganahalli Basavaraju</name>
+    </author>
+    <author>
+      <name>Roberto Hernandez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16645v1</id>
+    <title>Measurement incompatibility in Bayesian multiparameter quantum estimation</title>
+    <updated>2025-11-20T18:51:18Z</updated>
+    <link href="https://arxiv.org/abs/2511.16645v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16645v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a comprehensive and pedagogical formulation of Bayesian multiparameter quantum estimation, providing explicit conditions for achieving minimum quadratic losses. Within this framework, we analyse the role of measurement incompatibility and establish its quantitative effect on attainable precision. We achieve this by deriving upper bounds based on the pretty good measurement -- a notion originally developed for hypothesis testing -- combined with the evaluation of the Nagaoka-Hayashi lower bound. In general, we prove that, as in the many-copy regime of local estimation theory, incompatibility can at most double the minimum loss relative to the idealised scenario in which individually optimal measurements are assumed jointly implementable. This result implies that, in many practical situations, the latter may provide a sufficient and computationally efficient benchmark without solving the full optimisation problem. Our results, which we illustrate through a range of applications, including discrete quantum phase imaging, phase and dephasing estimation, and qubit sensing, provide analytical and numerical tools for assessing ultimate precision limits and the role of measurement incompatibility in Bayesian multiparameter quantum metrology. We also provide an open-source package that implements all bounds discussed here, enabling practical evaluation and comparison across quantum metrological models.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:51:18Z</published>
+    <arxiv:comment>24 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Francesco Albarelli</name>
+    </author>
+    <author>
+      <name>Dominic Branford</name>
+    </author>
+    <author>
+      <name>Jesús Rubio</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16638v1</id>
+    <title>Commuting maps on the Heisenberg algebra</title>
+    <updated>2025-11-20T18:46:11Z</updated>
+    <link href="https://arxiv.org/abs/2511.16638v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16638v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Given a ring $R$ with center $Z(R)$, we say a linear map $f:R\rightarrow R$ is commuting if $[f(x),x]=0$ for all $x\in R$. Such a map has a standard form if there exists $λ\in R$ and additive $μ:R\rightarrow Z(R)$ such that $f(x)=λx+μ(x)$ for all $x\in R$. We characterize the linear commuting maps over the $n\times n$ Heisenberg algebra, showing that such maps need not be of the standard form.</summary>
+    <category term="math.RA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:46:11Z</published>
+    <arxiv:primary_category term="math.RA"/>
+    <author>
+      <name>Jordan Bounds</name>
+    </author>
+    <author>
+      <name>Ellis Edinkrah</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16636v1</id>
+    <title>Riesz products and the Lonely Runner Conjecture: A wider gap of loneliness</title>
+    <updated>2025-11-20T18:42:05Z</updated>
+    <link href="https://arxiv.org/abs/2511.16636v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16636v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The lonely runner conjecture of Wills and Cusick asserts that if $n$ runners with distinct constant speeds run around a a circular unit length track, starting at a common time and place, then each runner will at some time be separated by a distance of at least $\frac{1}{n}$ from all other runners. A weaker lower bound of $\frac{1}{2n-2}$ follows from the so-called trivial union bound, and subsequent work upgraded this to bounds of the form $\frac{1}{2n}+\frac{c}{n^2}$ for various constants $c&gt;0$. Tao strengthened this to $\frac{1}{2n}+\frac{(\log n)^{1-o(1)}}{n^2}$. In this paper, we obtain a polynomial improvement of the form $$\frac{1}{2n}+\frac{1}{n^{5/3+o(1)}}.$$</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:42:05Z</published>
+    <arxiv:comment>22 pages</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Benjamin Bedert</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16632v1</id>
+    <title>Correction of chain losses in trapped ion quantum computers</title>
+    <updated>2025-11-20T18:37:38Z</updated>
+    <link href="https://arxiv.org/abs/2511.16632v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16632v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Neutral atom quantum computers and to a lesser extent trapped ions may suffer from atom loss. In this work, we investigate the impact of atom loss in long chains of trapped ions. Even though this is a relatively rare event, ion loss in long chains must be addressed because it destabilizes the entire chain resulting in the loss of all the qubits of the chain. We propose a solution to the chain loss problem based on (1) a quantum error correction code distributed over multiple long chains, (2) beacon qubits within each long chain to detect the loss of a chain, and (3) a decoder adapted to correct a combination of circuit faults and erasures after beacon qubits convert chain losses into erasures. We verify the chain loss correction capability of our scheme through circuit level simulations with a distributed $[[72,12,6]]$ BB code with beacon qubits.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:37:38Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Nolan J. Coble</name>
+    </author>
+    <author>
+      <name>Min Ye</name>
+    </author>
+    <author>
+      <name>Nicolas Delfosse</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16627v1</id>
+    <title>TFCDiff: Robust ECG Denoising via Time-Frequency Complementary Diffusion</title>
+    <updated>2025-11-20T18:33:54Z</updated>
+    <link href="https://arxiv.org/abs/2511.16627v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16627v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Ambulatory electrocardiogram (ECG) readings are prone to mixed noise from physical activities, including baseline wander (BW), muscle artifact (MA), and electrode motion artifact (EM). Developing a method to remove such complex noise and reconstruct high-fidelity signals is clinically valuable for diagnostic accuracy. However, denoising of multi-beat ECG segments remains understudied and poses technical challenges. To address this, we propose Time-Frequency Complementary Diffusion (TFCDiff), a novel approach that operates in the Discrete Cosine Transform (DCT) domain and uses the DCT coefficients of noisy signals as conditioning input. To refine waveform details, we incorporate Temporal Feature Enhancement Mechanism (TFEM) to reinforce temporal representations and preserve key physiological information. Comparative experiments on a synthesized dataset demonstrate that TFCDiff achieves state-of-the-art performance across five evaluation metrics. Furthermore, TFCDiff shows superior generalization on the unseen SimEMG Database, outperforming all benchmark models. Notably, TFCDiff processes raw 10-second sequences and maintains robustness under flexible random mixed noise (fRMN), enabling plug-and-play deployment in wearable ECG monitors for high-motion scenarios. Source code is available at https://github.com/Miroircivil/TFCDiff.</summary>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:33:54Z</published>
+    <arxiv:primary_category term="eess.SP"/>
+    <author>
+      <name>Pengxin Li</name>
+    </author>
+    <author>
+      <name>Yimin Zhou</name>
+    </author>
+    <author>
+      <name>Jie Min</name>
+    </author>
+    <author>
+      <name>Yirong Wang</name>
+    </author>
+    <author>
+      <name>Wei Liang</name>
+    </author>
+    <author>
+      <name>Wang Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.16621v1</id>
+    <title>k-inflation: Non-separable case meets ACT measurements</title>
+    <updated>2025-11-20T18:23:01Z</updated>
+    <link href="https://arxiv.org/abs/2511.16621v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.16621v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate a non-separable subset of $k$-essence in which the kinetic and potential sectors interact through an $X^ρV(φ)$ coupling, implemented via a potential-dependent prefactor $f(φ)=1+2\mathcal{K}V$. In slow roll, this structure preserves a constant sound speed $c_s^2=1/(2ρ-1)$ while modifying the Hubble flow in a controlled way, thereby shifting the inflationary observables relative to the separable template. For monomial potentials $V=Aφ^n$ (with $n=2$ and $n=2/3$ as representative cases) we derive closed analytic expressions for $n_s(N_\ast)$ and $r(N_\ast)$ to $\mathcal{O}(ε_{\rm mix}^2)$, where $ε_{\rm mix}\propto\mathcal{K}$ encodes the non-separable $X^ρV$ mixing, and we validate them against exact background integrations. The analytic and numerical predictions agree at the sub-per-mille level for $n_s$ and at the percent level for $r$, confirming the accuracy of the small-mixing expansion. For $\mathcal{K}&lt;0$ the mixing systematically lowers both $n_s$ and $r$ at fixed $N_\ast$, allowing otherwise marginal monomials to fall within the region favored by recent ACT+{\it Planck}+BAO constraints (P--ACT--LB). All solutions shown satisfy the health conditions $f(φ)&gt;0$, $ρ&gt;\tfrac12$, and the positivity bound $V&lt;1/(2|\mathcal K|)$ (from $f&gt;0$). We also discuss parameter dependence and the expected equilateral-type non-Gaussianity, which remains comfortably within current bounds for the benchmarks considered.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-20T18:23:01Z</published>
+    <arxiv:comment>8 pages, 3 figures, and 1 table</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Tahere Fallahi Serish</name>
+    </author>
+    <author>
+      <name>Seyed Ali Hosseini Mansoori</name>
+    </author>
+    <author>
+      <name>Fereshteh Felegary</name>
+    </author>
+    <author>
+      <name>Özgür Akarsu</name>
+    </author>
+    <author>
+      <name>Mohamad Sami</name>
+    </author>
+  </entry>
+</feed>

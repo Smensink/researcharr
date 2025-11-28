@@ -1,0 +1,258 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/NfcQhhc+OyP7qp9Rplut1Wc/jHM</id>
+  <title>arXiv Query: search_query=all:Linformer&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2025-11-23T06:57:16Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:Linformer&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>22</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2101.10277v1</id>
+    <title>Revisiting Linformer with a modified self-attention with linear complexity</title>
+    <updated>2020-12-16T13:23:29Z</updated>
+    <link href="https://arxiv.org/abs/2101.10277v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2101.10277v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Although Transformer models such as Google's BERT and OpenAI's GPT-3 are successful in many natural language processing tasks, training and deploying these models are costly and inefficient.Even if pre-trained models are used, deploying these models still remained a challenge due to their large size. Apart from deployment, these models take higher time during inference restricting user-friendliness. The main bottleneck is self-attention which uses quadratic time and space with respect to the sequence length. In order to reduce the quadratic time complexity of the self-attention mechanism, Linformer by Facebook's AI research team was introduced where they showed that the self-attention mechanism can be approximated by a low-rank matrix and exploiting this finding, a new method for self-attention with linear time and space complexity was proposed by them. In the Linformer, the time complexity depends on the projection mapping dimension which acts as a hyperparameter and affects the performance of the model, tuning this hyperparameter can be time-consuming. In this paper, I proposed an alternative method for self-attention with linear complexity in time and space and is independent of the projection mapping dimension. Since this method works for long sequences this can be used for images as well as audios.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-12-16T13:23:29Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Madhusudan Verma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2410.21351v1</id>
+    <title>LinFormer: A Linear-based Lightweight Transformer Architecture For Time-Aware MIMO Channel Prediction</title>
+    <updated>2024-10-28T13:04:23Z</updated>
+    <link href="https://arxiv.org/abs/2410.21351v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.21351v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The emergence of 6th generation (6G) mobile networks brings new challenges in supporting high-mobility communications, particularly in addressing the issue of channel aging. While existing channel prediction methods offer improved accuracy at the expense of increased computational complexity, limiting their practical application in mobile networks. To address these challenges, we present LinFormer, an innovative channel prediction framework based on a scalable, all-linear, encoder-only Transformer model. Our approach, inspired by natural language processing (NLP) models such as BERT, adapts an encoder-only architecture specifically for channel prediction tasks. We propose replacing the computationally intensive attention mechanism commonly used in Transformers with a time-aware multi-layer perceptron (TMLP), significantly reducing computational demands. The inherent time awareness of TMLP module makes it particularly suitable for channel prediction tasks. We enhance LinFormer's training process by employing a weighted mean squared error loss (WMSELoss) function and data augmentation techniques, leveraging larger, readily available communication datasets. Our approach achieves a substantial reduction in computational complexity while maintaining high prediction accuracy, making it more suitable for deployment in cost-effective base stations (BS). Comprehensive experiments using both simulated and measured data demonstrate that LinFormer outperforms existing methods across various mobility scenarios, offering a promising solution for future wireless communication systems.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-28T13:04:23Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yanliang Jin</name>
+    </author>
+    <author>
+      <name>Yifan Wu</name>
+    </author>
+    <author>
+      <name>Yuan Gao</name>
+    </author>
+    <author>
+      <name>Shunqing Zhang</name>
+    </author>
+    <author>
+      <name>Shugong Xu</name>
+    </author>
+    <author>
+      <name>Cheng-Xiang Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2006.04768v3</id>
+    <title>Linformer: Self-Attention with Linear Complexity</title>
+    <updated>2020-06-14T08:15:54Z</updated>
+    <link href="https://arxiv.org/abs/2006.04768v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2006.04768v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large transformer models have shown extraordinary success in achieving state-of-the-art results in many natural language processing applications. However, training and deploying these models can be prohibitively costly for long sequences, as the standard self-attention mechanism of the Transformer uses $O(n^2)$ time and space with respect to sequence length. In this paper, we demonstrate that the self-attention mechanism can be approximated by a low-rank matrix. We further exploit this finding to propose a new self-attention mechanism, which reduces the overall self-attention complexity from $O(n^2)$ to $O(n)$ in both time and space. The resulting linear transformer, the \textit{Linformer}, performs on par with standard Transformer models, while being much more memory- and time-efficient.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-06-08T17:37:52Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Sinong Wang</name>
+    </author>
+    <author>
+      <name>Belinda Z. Li</name>
+    </author>
+    <author>
+      <name>Madian Khabsa</name>
+    </author>
+    <author>
+      <name>Han Fang</name>
+    </author>
+    <author>
+      <name>Hao Ma</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2307.02301v1</id>
+    <title>Sumformer: Universal Approximation for Efficient Transformers</title>
+    <updated>2023-07-05T13:59:35Z</updated>
+    <link href="https://arxiv.org/abs/2307.02301v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2307.02301v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Natural language processing (NLP) made an impressive jump with the introduction of Transformers. ChatGPT is one of the most famous examples, changing the perception of the possibilities of AI even outside the research community. However, besides the impressive performance, the quadratic time and space complexity of Transformers with respect to sequence length pose significant limitations for handling long sequences. While efficient Transformer architectures like Linformer and Performer with linear complexity have emerged as promising solutions, their theoretical understanding remains limited. In this paper, we introduce Sumformer, a novel and simple architecture capable of universally approximating equivariant sequence-to-sequence functions. We use Sumformer to give the first universal approximation results for Linformer and Performer. Moreover, we derive a new proof for Transformers, showing that just one attention layer is sufficient for universal approximation.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-07-05T13:59:35Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Silas Alberti</name>
+    </author>
+    <author>
+      <name>Niclas Dern</name>
+    </author>
+    <author>
+      <name>Laura Thesing</name>
+    </author>
+    <author>
+      <name>Gitta Kutyniok</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2510.23641v1</id>
+    <title>Spatially Aware Linear Transformer (SAL-T) for Particle Jet Tagging</title>
+    <updated>2025-10-24T18:00:01Z</updated>
+    <link href="https://arxiv.org/abs/2510.23641v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2510.23641v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Transformers are very effective in capturing both global and local correlations within high-energy particle collisions, but they present deployment challenges in high-data-throughput environments, such as the CERN LHC. The quadratic complexity of transformer models demands substantial resources and increases latency during inference. In order to address these issues, we introduce the Spatially Aware Linear Transformer (SAL-T), a physics-inspired enhancement of the linformer architecture that maintains linear attention. Our method incorporates spatially aware partitioning of particles based on kinematic features, thereby computing attention between regions of physical significance. Additionally, we employ convolutional layers to capture local correlations, informed by insights from jet physics. In addition to outperforming the standard linformer in jet classification tasks, SAL-T also achieves classification results comparable to full-attention transformers, while using considerably fewer resources with lower latency during inference. Experiments on a generic point cloud classification dataset (ModelNet10) further confirm this trend. Our code is available at https://github.com/aaronw5/SAL-T4HEP.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-10-24T18:00:01Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aaron Wang</name>
+    </author>
+    <author>
+      <name>Zihan Zhao</name>
+    </author>
+    <author>
+      <name>Subash Katel</name>
+    </author>
+    <author>
+      <name>Vivekanand Gyanchand Sahu</name>
+    </author>
+    <author>
+      <name>Elham E Khoda</name>
+    </author>
+    <author>
+      <name>Abhijith Gandrakota</name>
+    </author>
+    <author>
+      <name>Jennifer Ngadiuba</name>
+    </author>
+    <author>
+      <name>Richard Cavanaugh</name>
+    </author>
+    <author>
+      <name>Javier Duarte</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2203.12644v4</id>
+    <title>Linearizing Transformer with Key-Value Memory</title>
+    <updated>2022-10-13T03:05:05Z</updated>
+    <link href="https://arxiv.org/abs/2203.12644v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2203.12644v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Efficient transformer variants with linear time complexity have been developed to mitigate the quadratic computational overhead of the vanilla transformer. Among them are low-rank projection methods such as Linformer and kernel-based Transformers. Despite their unique merits, they usually suffer from a performance drop comparing with the vanilla transformer on many sequence generation tasks, and often fail to obtain computation gain when the generation is short. We propose MemSizer, an approach towards closing the performance gap while improving the efficiency even with short generation. It projects the source sequences into lower dimension representations like Linformer, while enjoying efficient recurrent-style incremental computation similar to kernel-based transformers. This yields linear computation time and constant memory complexity at inference time. MemSizer also employs a lightweight multi-head mechanism which renders the computation as light as a single-head model. We demonstrate that MemSizer provides an improved balance between efficiency and accuracy over the vanilla transformer and other efficient transformer variants in three typical sequence generation tasks, including machine translation, abstractive text summarization, and language modeling.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-03-23T18:10:18Z</published>
+    <arxiv:comment>EMNLP2022. The two authors contributed equally</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yizhe Zhang</name>
+    </author>
+    <author>
+      <name>Deng Cai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2106.03505v1</id>
+    <title>Self-supervised Depth Estimation Leveraging Global Perception and Geometric Smoothness Using On-board Videos</title>
+    <updated>2021-06-07T10:53:27Z</updated>
+    <link href="https://arxiv.org/abs/2106.03505v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2106.03505v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Self-supervised depth estimation has drawn much attention in recent years as it does not require labeled data but image sequences. Moreover, it can be conveniently used in various applications, such as autonomous driving, robotics, realistic navigation, and smart cities. However, extracting global contextual information from images and predicting a geometrically natural depth map remain challenging. In this paper, we present DLNet for pixel-wise depth estimation, which simultaneously extracts global and local features with the aid of our depth Linformer block. This block consists of the Linformer and innovative soft split multi-layer perceptron blocks. Moreover, a three-dimensional geometry smoothness loss is proposed to predict a geometrically natural depth map by imposing the second-order smoothness constraint on the predicted three-dimensional point clouds, thereby realizing improved performance as a byproduct. Finally, we explore the multi-scale prediction strategy and propose the maximum margin dual-scale prediction strategy for further performance improvement. In experiments on the KITTI and Make3D benchmarks, the proposed DLNet achieves performance competitive to those of the state-of-the-art methods, reducing time and space complexities by more than $62\%$ and $56\%$, respectively. Extensive testing on various real-world situations further demonstrates the strong practicality and generalization capability of the proposed model.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-06-07T10:53:27Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Shaocheng Jia</name>
+    </author>
+    <author>
+      <name>Xin Pei</name>
+    </author>
+    <author>
+      <name>Wei Yao</name>
+    </author>
+    <author>
+      <name>S. C. Wong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2108.10808v1</id>
+    <title>Greenformers: Improving Computation and Memory Efficiency in Transformer Models via Low-Rank Approximation</title>
+    <updated>2021-08-24T15:51:40Z</updated>
+    <link href="https://arxiv.org/abs/2108.10808v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2108.10808v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this thesis, we introduce Greenformers, a collection of model efficiency methods to improve the model efficiency of the recently renowned transformer models with a low-rank approximation approach. The development trend of deep learning models tends to results in a more complex and larger model. Although it leads to a better and more accurate prediction, the resulting model becomes even more costly, as it requires weeks of training with a huge amount of GPU resources. Particularly, the size and computational cost of transformer-based models have increased tremendously since its first debut in 2017 from ~100 million parameters up to ~1.6 trillion parameters in early 2021. This computationally hungry model also incurs a substantial cost to the environment and even reaches an alarming level of carbon footprint. Some of these models are so massive that it is even impossible to run the model without a GPU cluster.
+  Greenformers improve the model efficiency of transformer models by applying low-rank approximation approaches. Specifically, we propose a low-rank factorization approach to improve the efficiency of the transformer model called Low-Rank Transformer. We further compare our model with an existing low-rank factorization approach called Linformer. Based on our analysis, the Low-Rank Transformer model is suitable for improving both the time and memory efficiency in processing short-sequence (&lt;= 512) input data, while the Linformer model is suitable for improving the efficiency in processing long-sequence input data (&gt;= 512). We also show that Low-Rank Transformer is more suitable for on-device deployment, as it significantly reduces the model size. Additionally, we estimate that applying LRT to the existing BERT-base model can significantly reduce the computational, economical, and environmental costs for developing such models by more than 30% of its original costs.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-08-24T15:51:40Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Samuel Cahyawijaya</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2410.06846v4</id>
+    <title>Joint Fine-tuning and Conversion of Pretrained Speech and Language Models towards Linear Complexity</title>
+    <updated>2025-03-13T16:17:19Z</updated>
+    <link href="https://arxiv.org/abs/2410.06846v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.06846v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Architectures such as Linformer and Mamba have recently emerged as competitive linear time replacements for transformers. However, corresponding large pretrained models are often unavailable, especially in non-text domains. To remedy this, we present a Cross-Architecture Layerwise Distillation (CALD) approach that jointly converts a transformer model to a linear time substitute and fine-tunes it to a target task. We also compare several means to guide the fine-tuning to optimally retain the desired inference capability from the original model. The methods differ in their use of the target model and the trajectory of the parameters. In a series of empirical studies on language processing, language modeling, and speech processing, we show that CALD can effectively recover the result of the original model, and that the guiding strategy contributes to the result. Some reasons for the variation are suggested.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SD" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.AS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-09T13:06:43Z</published>
+    <arxiv:comment>18 pages, 5 figures; ICLR 2025 camera ready. Code: https://github.com/idiap/linearize-distill-pretrained-transformers</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Mutian He</name>
+    </author>
+    <author>
+      <name>Philip N. Garner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2009.06732v3</id>
+    <title>Efficient Transformers: A Survey</title>
+    <updated>2022-03-14T10:35:35Z</updated>
+    <link href="https://arxiv.org/abs/2009.06732v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2009.06732v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Transformer model architectures have garnered immense interest lately due to their effectiveness across a range of domains like language, vision and reinforcement learning. In the field of natural language processing for example, Transformers have become an indispensable staple in the modern deep learning stack. Recently, a dizzying number of "X-former" models have been proposed - Reformer, Linformer, Performer, Longformer, to name a few - which improve upon the original Transformer architecture, many of which make improvements around computational and memory efficiency. With the aim of helping the avid researcher navigate this flurry, this paper characterizes a large and thoughtful selection of recent efficiency-flavored "X-former" models, providing an organized and comprehensive overview of existing work and models across multiple domains.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-09-14T20:38:14Z</published>
+    <arxiv:comment>Version 2: 2022 edition</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yi Tay</name>
+    </author>
+    <author>
+      <name>Mostafa Dehghani</name>
+    </author>
+    <author>
+      <name>Dara Bahri</name>
+    </author>
+    <author>
+      <name>Donald Metzler</name>
+    </author>
+  </entry>
+</feed>

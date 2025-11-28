@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/9v4hOEf+9SpovwK9n4jz3fNWgZ4</id>
+  <title>arXiv Query: search_query=all:Linformer AND all:Convolution&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2025-11-23T06:57:46Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:Linformer+AND+all:Convolution&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>5</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2510.23641v1</id>
+    <title>Spatially Aware Linear Transformer (SAL-T) for Particle Jet Tagging</title>
+    <updated>2025-10-24T18:00:01Z</updated>
+    <link href="https://arxiv.org/abs/2510.23641v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2510.23641v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Transformers are very effective in capturing both global and local correlations within high-energy particle collisions, but they present deployment challenges in high-data-throughput environments, such as the CERN LHC. The quadratic complexity of transformer models demands substantial resources and increases latency during inference. In order to address these issues, we introduce the Spatially Aware Linear Transformer (SAL-T), a physics-inspired enhancement of the linformer architecture that maintains linear attention. Our method incorporates spatially aware partitioning of particles based on kinematic features, thereby computing attention between regions of physical significance. Additionally, we employ convolutional layers to capture local correlations, informed by insights from jet physics. In addition to outperforming the standard linformer in jet classification tasks, SAL-T also achieves classification results comparable to full-attention transformers, while using considerably fewer resources with lower latency during inference. Experiments on a generic point cloud classification dataset (ModelNet10) further confirm this trend. Our code is available at https://github.com/aaronw5/SAL-T4HEP.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-10-24T18:00:01Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Aaron Wang</name>
+    </author>
+    <author>
+      <name>Zihan Zhao</name>
+    </author>
+    <author>
+      <name>Subash Katel</name>
+    </author>
+    <author>
+      <name>Vivekanand Gyanchand Sahu</name>
+    </author>
+    <author>
+      <name>Elham E Khoda</name>
+    </author>
+    <author>
+      <name>Abhijith Gandrakota</name>
+    </author>
+    <author>
+      <name>Jennifer Ngadiuba</name>
+    </author>
+    <author>
+      <name>Richard Cavanaugh</name>
+    </author>
+    <author>
+      <name>Javier Duarte</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2106.07023v3</id>
+    <title>Styleformer: Transformer based Generative Adversarial Networks with Style Vector</title>
+    <updated>2022-04-05T09:52:11Z</updated>
+    <link href="https://arxiv.org/abs/2106.07023v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2106.07023v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We propose Styleformer, which is a style-based generator for GAN architecture, but a convolution-free transformer-based generator. In our paper, we explain how a transformer can generate high-quality images, overcoming the disadvantage that convolution operations are difficult to capture global features in an image. Furthermore, we change the demodulation of StyleGAN2 and modify the existing transformer structure (e.g., residual connection, layer normalization) to create a strong style-based generator with a convolution-free structure. We also make Styleformer lighter by applying Linformer, enabling Styleformer to generate higher resolution images and result in improvements in terms of speed and memory. We experiment with the low-resolution image dataset such as CIFAR-10, as well as the high-resolution image dataset like LSUN-church. Styleformer records FID 2.82 and IS 9.94 on CIFAR-10, a benchmark dataset, which is comparable performance to the current state-of-the-art and outperforms all GAN-based generative models, including StyleGAN2-ADA with fewer parameters on the unconditional setting. We also both achieve new state-of-the-art with FID 15.17, IS 11.01, and FID 3.66, respectively on STL-10 and CelebA. We release our code at https://github.com/Jeeseung-Park/Styleformer.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-06-13T15:30:39Z</published>
+    <arxiv:comment>CVPR 2022</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Jeeseung Park</name>
+    </author>
+    <author>
+      <name>Younggeun Kim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2107.02239v4</id>
+    <title>Vision Xformers: Efficient Attention for Image Classification</title>
+    <updated>2021-10-01T15:08:54Z</updated>
+    <link href="https://arxiv.org/abs/2107.02239v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2107.02239v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Although transformers have become the neural architectures of choice for natural language processing, they require orders of magnitude more training data, GPU memory, and computations in order to compete with convolutional neural networks for computer vision. The attention mechanism of transformers scales quadratically with the length of the input sequence, and unrolled images have long sequence lengths. Plus, transformers lack an inductive bias that is appropriate for images. We tested three modifications to vision transformer (ViT) architectures that address these shortcomings. Firstly, we alleviate the quadratic bottleneck by using linear attention mechanisms, called X-formers (such that, X in {Performer, Linformer, Nyströmformer}), thereby creating Vision X-formers (ViXs). This resulted in up to a seven times reduction in the GPU memory requirement. We also compared their performance with FNet and multi-layer perceptron mixers, which further reduced the GPU memory requirement. Secondly, we introduced an inductive bias for images by replacing the initial linear embedding layer by convolutional layers in ViX, which significantly increased classification accuracy without increasing the model size. Thirdly, we replaced the learnable 1D position embeddings in ViT with Rotary Position Embedding (RoPE), which increases the classification accuracy for the same model size. We believe that incorporating such changes can democratize transformers by making them accessible to those with limited data and computing resources.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-07-05T19:24:23Z</published>
+    <arxiv:comment>11 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Pranav Jeevan</name>
+      <arxiv:affiliation>Indian Institute of Technology Bombay</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Amit Sethi</name>
+      <arxiv:affiliation>Indian Institute of Technology Bombay</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2202.02884v2</id>
+    <title>Exploring Self-Attention Mechanisms for Speech Separation</title>
+    <updated>2023-05-27T17:44:21Z</updated>
+    <link href="https://arxiv.org/abs/2202.02884v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2202.02884v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Transformers have enabled impressive improvements in deep learning. They often outperform recurrent and convolutional models in many tasks while taking advantage of parallel processing. Recently, we proposed the SepFormer, which obtains state-of-the-art performance in speech separation with the WSJ0-2/3 Mix datasets. This paper studies in-depth Transformers for speech separation. In particular, we extend our previous findings on the SepFormer by providing results on more challenging noisy and noisy-reverberant datasets, such as LibriMix, WHAM!, and WHAMR!. Moreover, we extend our model to perform speech enhancement and provide experimental evidence on denoising and dereverberation tasks. Finally, we investigate, for the first time in speech separation, the use of efficient self-attention mechanisms such as Linformers, Lonformers, and ReFormers. We found that they reduce memory requirements significantly. For example, we show that the Reformer-based attention outperforms the popular Conv-TasNet model on the WSJ0-2Mix dataset while being faster at inference and comparable in terms of memory consumption.</summary>
+    <category term="eess.AS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SD" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-02-06T23:13:27Z</published>
+    <arxiv:comment>Accepted to IEEE/ACM Transactions on Audio, Speech, and Language Processing</arxiv:comment>
+    <arxiv:primary_category term="eess.AS"/>
+    <author>
+      <name>Cem Subakan</name>
+    </author>
+    <author>
+      <name>Mirco Ravanelli</name>
+    </author>
+    <author>
+      <name>Samuele Cornell</name>
+    </author>
+    <author>
+      <name>Francois Grondin</name>
+    </author>
+    <author>
+      <name>Mirko Bronzi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2005.00743v3</id>
+    <title>Synthesizer: Rethinking Self-Attention in Transformer Models</title>
+    <updated>2021-05-24T12:19:35Z</updated>
+    <link href="https://arxiv.org/abs/2005.00743v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2005.00743v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The dot product self-attention is known to be central and indispensable to state-of-the-art Transformer models. But is it really required? This paper investigates the true importance and contribution of the dot product-based self-attention mechanism on the performance of Transformer models. Via extensive experiments, we find that (1) random alignment matrices surprisingly perform quite competitively and (2) learning attention weights from token-token (query-key) interactions is useful but not that important after all. To this end, we propose \textsc{Synthesizer}, a model that learns synthetic attention weights without token-token interactions. In our experiments, we first show that simple Synthesizers achieve highly competitive performance when compared against vanilla Transformer models across a range of tasks, including machine translation, language modeling, text generation and GLUE/SuperGLUE benchmarks. When composed with dot product attention, we find that Synthesizers consistently outperform Transformers. Moreover, we conduct additional comparisons of Synthesizers against Dynamic Convolutions, showing that simple Random Synthesizer is not only $60\%$ faster but also improves perplexity by a relative $3.5\%$. Finally, we show that simple factorized Synthesizers can outperform Linformers on encoding only tasks.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-05-02T08:16:19Z</published>
+    <arxiv:comment>ICML 2021</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yi Tay</name>
+    </author>
+    <author>
+      <name>Dara Bahri</name>
+    </author>
+    <author>
+      <name>Donald Metzler</name>
+    </author>
+    <author>
+      <name>Da-Cheng Juan</name>
+    </author>
+    <author>
+      <name>Zhe Zhao</name>
+    </author>
+    <author>
+      <name>Che Zheng</name>
+    </author>
+  </entry>
+</feed>

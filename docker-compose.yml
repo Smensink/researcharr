@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  researcharr:
+    build: .
+    environment:
+      - FLARESOLVERR_URL=http://flaresolverr:8191
+      - ASPNETCORE_URLS=http://0.0.0.0:7337
+    ports:
+      - "7337:7337"
+    volumes:
+      - researcharr_config:/data
+      - ./books:/books
+      - researcharr_downloads:/downloads
+    depends_on:
+      - flaresolverr
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+      - CAPTCHA_SOLVER=none
+    ports:
+      - "8191:8191"
+
+volumes:
+  researcharr_config:
+  researcharr_root:
+  researcharr_downloads:

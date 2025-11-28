@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Readarr.Core.Test</name>
+    </assembly>
+    <members>
+        <member name="M:NzbDrone.Core.Test.IndexerTests.TorrentRssIndexerTests.TestTorrentRssIndexer.SetupNLog">
+            <summary>
+            Code to quickly debug unit tests
+            </summary>
+        </member>
+    </members>
+</doc>

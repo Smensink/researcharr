@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../buildMultiTargeting/Readarr.Integration.Test.props" />
+</Project>

@@ -1,0 +1,14 @@
+{
+    "name": "Researcharr",
+    "icons": [
+        {
+            "src": "/researcharr.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "../../../../",
+    "theme_color": "#3a3f51",
+    "background_color": "#3a3f51",
+    "display": "standalone"
+}

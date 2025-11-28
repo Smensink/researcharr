@@ -1,0 +1,15 @@
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/libgen_test
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/libgen_test.deps.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/libgen_test.runtimeconfig.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/libgen_test.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/libgen_test.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.csproj.AssemblyReference.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.AssemblyInfoInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.AssemblyInfo.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.csproj.CoreCompileInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/refint/libgen_test.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/libgen_test.genruntimeconfig.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/ref/libgen_test.dll

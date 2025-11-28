@@ -1,0 +1,23 @@
+{
+  "Version": 1,
+  "Hash": "L+B29XdSG/rS7zAmTtLV5w3EvbyXNk9rsFQLqMC4l9Q=",
+  "Source": "Readarr.Integration.Test",
+  "BasePath": "_content/Readarr.Integration.Test",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "/Users/sebastianmensink/Documents/Researcharr-develop/src/NzbDrone.SignalR/Readarr.SignalR.csproj",
+      "Version": 2,
+      "Source": "Readarr.SignalR",
+      "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Release;Platform=AnyCPU;TargetFramework=net6.0",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Release;Platform=AnyCPU;TargetFramework=net6.0",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile"
+    }
+  ],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

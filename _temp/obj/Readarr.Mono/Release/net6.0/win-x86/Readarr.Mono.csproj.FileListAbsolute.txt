@@ -1,0 +1,17 @@
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/win-x86/Readarr.Mono.deps.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/win-x86/Readarr.Mono.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/win-x86/Readarr.Mono.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/win-x86/Readarr.Mono.xml
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.csproj.AssemblyReference.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Sentry.Attributes.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.AssemblyInfoInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.AssemblyInfo.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.csproj.CoreCompileInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.sourcelink.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.csproj.CopyComplete
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/refint/Readarr.Mono.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.xml
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/Readarr.Mono.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Mono/Release/net6.0/win-x86/ref/Readarr.Mono.dll

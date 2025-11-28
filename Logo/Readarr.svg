@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Researcharr">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d3b66"/>
+      <stop offset="100%" stop-color="#0a2f52"/>
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="url(#bg)" />
+
+  <!-- Book -->
+  <rect x="100" y="120" width="120" height="200" rx="10" fill="#f5f7fa" opacity="0.9"/>
+  <path d="M160 120v200" stroke="#0d3b66" stroke-width="10" opacity="0.6"/>
+  <path d="M110 150h100" stroke="#1f6feb" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Computer -->
+  <rect x="292" y="122" width="120" height="90" rx="12" fill="#e6ecf2" opacity="0.9" stroke="#0f4c81" stroke-width="8"/>
+  <rect x="326" y="226" width="52" height="16" rx="4" fill="#0d3b66" opacity="0.8"/>
+  <rect x="312" y="242" width="80" height="12" rx="4" fill="#0f4c81" opacity="0.7"/>
+
+  <!-- Stethoscope -->
+  <path d="M200 340c0 30 22 50 50 50s50-20 50-50v-65" fill="none" stroke="#4cc5d4" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="300" cy="260" r="12" fill="#4cc5d4"/>
+  <path d="M190 280v-36a22 22 0 1 1 44 0v26" fill="none" stroke="#4cc5d4" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Microscope -->
+  <rect x="326" y="292" width="24" height="86" rx="8" fill="#1f6feb" opacity="0.9"/>
+  <rect x="334" y="250" width="16" height="48" rx="6" fill="#0d3b66" opacity="0.9"/>
+  <path d="M360 348h60" stroke="#1f6feb" stroke-width="14" stroke-linecap="round"/>
+  <path d="M400 260l-26 26" stroke="#1f6feb" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Spark accents -->
+  <circle cx="138" cy="112" r="6" fill="#f9be03" opacity="0.9"/>
+  <circle cx="265" cy="100" r="8" fill="#4cc5d4" opacity="0.9"/>
+  <circle cx="410" cy="210" r="7" fill="#f9be03" opacity="0.85"/>
+</svg>

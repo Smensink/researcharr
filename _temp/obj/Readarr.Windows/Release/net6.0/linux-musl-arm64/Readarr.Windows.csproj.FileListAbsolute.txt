@@ -1,0 +1,17 @@
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-musl-arm64/Readarr.Windows.deps.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-musl-arm64/Readarr.Windows.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-musl-arm64/Readarr.Windows.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/linux-musl-arm64/Readarr.Windows.xml
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.csproj.AssemblyReference.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Sentry.Attributes.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.AssemblyInfoInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.AssemblyInfo.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.csproj.CoreCompileInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.sourcelink.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.csproj.CopyComplete
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/refint/Readarr.Windows.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.xml
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/Readarr.Windows.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Windows/Release/net6.0/linux-musl-arm64/ref/Readarr.Windows.dll

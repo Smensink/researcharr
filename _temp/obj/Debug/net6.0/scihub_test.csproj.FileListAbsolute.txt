@@ -1,0 +1,15 @@
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/scihub_test
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/scihub_test.deps.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/scihub_test.runtimeconfig.json
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/scihub_test.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/bin/Debug/net6.0/scihub_test.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.csproj.AssemblyReference.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.AssemblyInfoInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.AssemblyInfo.cs
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.csproj.CoreCompileInputs.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/refint/scihub_test.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.pdb
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/scihub_test.genruntimeconfig.cache
+/Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Debug/net6.0/ref/scihub_test.dll
