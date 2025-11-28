@@ -76,6 +76,9 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
         [JsonProperty("open_access")]
         public OpenAccess OpenAccess { get; set; }
+
+        [JsonProperty("topics")]
+        public List<OpenAlexWorkTopic> Topics { get; set; }
     }
 
     public class OpenAlexIds
@@ -169,5 +172,14 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
         [JsonProperty("works_api_url")]
         public string WorksApiUrl { get; set; }
+    }
+
+    public class OpenAlexWorkTopic
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("display_name")]
+        public string DisplayName { get; set; }
     }
 }

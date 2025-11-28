@@ -134,7 +134,7 @@ class AuthorDetailsSeason extends Component {
       : items.filter((item) => {
           const title = item.title?.toLowerCase() || '';
           const authorName = item.author?.name?.toLowerCase() || '';
-          const topics = (item.topics || []).join(' ').toLowerCase();
+          const topics = (item.topics || item.genres || []).join(' ').toLowerCase();
           return title.includes(lowerFilter) ||
             authorName.includes(lowerFilter) ||
             topics.includes(lowerFilter);

@@ -430,6 +430,7 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 Title = title,
                 TitleSlug = titleSlug,
                 ReleaseDate = ParseDate(source.PublicationDate, source.PublicationYear),
+                Genres = source.Topics?.Select(t => t.DisplayName).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().ToList() ?? new List<string>(),
                 Links = new List<Links>(),
                 Ratings = new Ratings
                 {
