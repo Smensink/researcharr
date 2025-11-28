@@ -160,8 +160,12 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
 
         public List<object> SearchForNewEntity(string title)
         {
-            var books = SearchForNewBook(title, null, false);
-            var authors = SearchForNewAuthor(title);
+            var searchTerm = title?.Trim() ?? string.Empty;
+
+            var isConceptQuery = IsConceptQuery(searchTerm);
+
+            var books = isConceptQuery ? new List<Book>() : SearchForNewBook(searchTerm, null, false);
+            var authors = isConceptQuery ? new List<Author>() : SearchForNewAuthor(searchTerm);
 
             var result = new List<object>();
 
@@ -182,9 +186,9 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
                 result.Add(book);
             }
 
-            if (IsConceptQuery(title))
+            if (isConceptQuery)
             {
-                var concept = ExtractConcept(title);
+                var concept = ExtractConcept(searchTerm);
                 var topicBooks = SearchByConcept(concept);
                 foreach (var book in topicBooks)
                 {

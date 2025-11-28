@@ -155,21 +155,49 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             var cleanedTopic = topic.Trim();
 
-            var request = _requestBuilder.Create()
-                .Resource("works")
-                .AddQueryParam("filter", $"concepts.display_name.search:{cleanedTopic}")
-                .AddQueryParam("sort", "cited_by_count:desc")
-                .AddQueryParam("per_page", "50")
-                .Build();
-
-            var response = ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(request, true);
-
-            if (response?.Results == null)
+            try
             {
+                var topicRequest = _requestBuilder.Create()
+                    .Resource("topics")
+                    .AddQueryParam("search", cleanedTopic)
+                    .AddQueryParam("per_page", "1")
+                    .Build();
+
+                var topicResponse = ExecuteRequest<OpenAlexListResponse<OpenAlexTopic>>(topicRequest, true);
+                var topicResult = topicResponse?.Results?.FirstOrDefault();
+
+                if (topicResult == null)
+                {
+                    return new List<Book>();
+                }
+
+                var topicId = ExtractTopicId(topicResult.Id);
+                if (string.IsNullOrWhiteSpace(topicId))
+                {
+                    return new List<Book>();
+                }
+
+                var request = _requestBuilder.Create()
+                    .Resource("works")
+                    .AddQueryParam("filter", $"topics.id:{topicId}")
+                    .AddQueryParam("sort", "cited_by_count:desc")
+                    .AddQueryParam("per_page", "50")
+                    .Build();
+
+                var response = ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(request, true);
+
+                if (response?.Results == null)
+                {
+                    return new List<Book>();
+                }
+
+                return response.Results.Select(MapBook).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug(ex, "Error searching OpenAlex topics for {0}", cleanedTopic);
                 return new List<Book>();
             }
-
-            return response.Results.Select(MapBook).ToList();
         }
 
         public Tuple<string, Book, List<AuthorMetadata>> GetBookInfo(string id)
@@ -269,6 +297,28 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             }
 
             return id;
+        }
+
+        private string ExtractTopicId(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return null;
+            }
+
+            var lastSegment = id.Substring(id.LastIndexOf('/') + 1);
+
+            if (string.IsNullOrWhiteSpace(lastSegment))
+            {
+                return null;
+            }
+
+            if (lastSegment.StartsWith("T", StringComparison.OrdinalIgnoreCase))
+            {
+                return lastSegment;
+            }
+
+            return $"T{lastSegment}";
         }
 
         private Author MapAuthor(OpenAlexAuthor source)

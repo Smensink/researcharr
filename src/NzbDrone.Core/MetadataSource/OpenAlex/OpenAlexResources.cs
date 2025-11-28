@@ -155,4 +155,16 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
         [JsonProperty("cited_by_count")]
         public int CitedByCount { get; set; }
     }
+
+    public class OpenAlexTopic
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("display_name")]
+        public string DisplayName { get; set; }
+
+        [JsonProperty("works_api_url")]
+        public string WorksApiUrl { get; set; }
+    }
 }
