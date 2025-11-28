@@ -48,9 +48,28 @@ namespace NzbDrone.Core.Indexers.Oamg
 
         private IEnumerable<IndexerRequest> BuildRequests(string query)
         {
-            var encoded = Uri.EscapeDataString(query);
+            var trimmed = query?.Trim();
+            if (trimmed.IsNullOrWhiteSpace())
+            {
+                yield break;
+            }
+
+            var topicSearch = trimmed.StartsWith("topic:", StringComparison.OrdinalIgnoreCase) ||
+                              trimmed.StartsWith("concept:", StringComparison.OrdinalIgnoreCase);
+            var topicTerm = string.Empty;
+            if (topicSearch)
+            {
+                var colonIndex = trimmed.IndexOf(':');
+                topicTerm = colonIndex >= 0 && colonIndex < trimmed.Length - 1
+                    ? trimmed[(colonIndex + 1) ..].Trim()
+                    : string.Empty;
+            }
+
+            var encoded = Uri.EscapeDataString(trimmed);
             var baseUrl = Settings.BaseUrl.TrimEnd('/');
-            var url = $"{baseUrl}/works?search={encoded}&per-page=100&sort=publication_date:desc";
+            var url = topicSearch
+                ? $"{baseUrl}/works?filter=concepts.display_name.search:{Uri.EscapeDataString(topicTerm)}&per-page=100&sort=cited_by_count:desc"
+                : $"{baseUrl}/works?search={encoded}&per-page=100&sort=cited_by_count:desc";
             var request = new IndexerRequest(url, HttpAccept.Json);
             yield return request;
         }

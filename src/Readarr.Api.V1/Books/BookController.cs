@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
@@ -216,8 +217,11 @@ namespace Readarr.Api.V1.Books
         private string GenerateBibTeX(NzbDrone.Core.Books.Book book, NzbDrone.Core.Books.Author author)
         {
             // Generate citation key: FirstAuthorLastName + Year + FirstWordOfTitle
-            var authorLastName = author?.AuthorMetadata?.Value?.Name?.Split(' ')?.LastOrDefault() ?? "Unknown";
-            var year = book.ReleaseDate?.Year.ToString() ?? "0000";
+            var authorName = author?.Metadata?.Value?.Name ?? "Unknown Author";
+            var authorLastName = authorName.Split(' ')?.LastOrDefault() ?? "Unknown";
+
+            var edition = book.Editions?.Value?.FirstOrDefault();
+            var year = (edition?.ReleaseDate ?? book.ReleaseDate)?.Year.ToString() ?? "0000";
             var firstWord = book.Title?.Split(' ')?.FirstOrDefault()?.Replace(",", "").Replace(":", "") ?? "Unknown";
             var citationKey = $"{authorLastName}{year}{firstWord}";
 
@@ -225,22 +229,23 @@ namespace Readarr.Api.V1.Books
             var lines = new List<string>
             {
                 $"@article{{{citationKey},",
-                $"  author = {{{author?.AuthorMetadata?.Value?.Name ?? "Unknown Author"}}},",
+                $"  author = {{{authorName}}},",
                 $"  title = {{{{{book.Title}}}}},",
                 $"  year = {{{year}}},"
             };
 
             // Add DOI if available
-            var doi = book.Links?.FirstOrDefault(l => l.Name?.Equals("doi", System.StringComparison.OrdinalIgnoreCase) == true)?.Url;
+            var doi = book.Links?.FirstOrDefault(l => l.Name?.Equals("doi", StringComparison.OrdinalIgnoreCase) == true)?.Url;
             if (!string.IsNullOrWhiteSpace(doi))
             {
                 lines.Add($"  doi = {{{doi}}},");
             }
 
             // Add ISBN if available
-            if (!string.IsNullOrWhiteSpace(book.Isbn13))
+            var isbn = edition?.Isbn13;
+            if (!string.IsNullOrWhiteSpace(isbn))
             {
-                lines.Add($"  isbn = {{{book.Isbn13}}},");
+                lines.Add($"  isbn = {{{isbn}}},");
             }
 
             // Close the entry

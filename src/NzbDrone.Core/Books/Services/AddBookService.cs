@@ -116,7 +116,7 @@ namespace NzbDrone.Core.Books
 
         private Book AddSkyhookData(Book newBook)
         {
-            var editionId = newBook.Editions.Value.Single(x => x.Monitored).ForeignEditionId;
+            var editionId = newBook.Editions.Value.FirstOrDefault(x => x.Monitored)?.ForeignEditionId;
 
             Tuple<string, Book, List<AuthorMetadata>> tuple = null;
             try
@@ -138,7 +138,15 @@ namespace NzbDrone.Core.Books
 
             newBook.Editions = tuple.Item2.Editions.Value;
             newBook.Editions.Value.ForEach(x => x.Monitored = false);
-            newBook.Editions.Value.Single(x => x.ForeignEditionId == editionId).Monitored = true;
+
+            // Try to re-apply the originally selected edition; otherwise fall back to first
+            var selected = newBook.Editions.Value.FirstOrDefault(x => x.ForeignEditionId == editionId) ??
+                           newBook.Editions.Value.FirstOrDefault();
+
+            if (selected != null)
+            {
+                selected.Monitored = true;
+            }
 
             var authorId = newBook.AuthorMetadata.Value.ForeignAuthorId;
             var metadata = tuple.Item3.FirstOrDefault(x => x.ForeignAuthorId == authorId);

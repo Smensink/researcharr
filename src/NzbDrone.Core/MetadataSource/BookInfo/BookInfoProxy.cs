@@ -182,6 +182,26 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
                 result.Add(book);
             }
 
+            if (IsConceptQuery(title))
+            {
+                var concept = ExtractConcept(title);
+                var topicBooks = SearchByConcept(concept);
+                foreach (var book in topicBooks)
+                {
+                    var author = book.Author.Value;
+
+                    if (!result.Any(r => r is Author a && a.ForeignAuthorId == author.ForeignAuthorId))
+                    {
+                        result.Add(author);
+                    }
+
+                    if (!result.Any(r => r is Book b && b.ForeignBookId == book.ForeignBookId))
+                    {
+                        result.Add(book);
+                    }
+                }
+            }
+
             return result;
         }
 
@@ -284,6 +304,57 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
                 _logger.Warn(e, "Error searching for book: {0}", query);
                 return new List<Book>();
             }
+        }
+
+        private List<Book> SearchByConcept(string topic)
+        {
+            try
+            {
+                var books = _openAlexProxy.SearchByConcept(topic);
+
+                foreach (var book in books)
+                {
+                    if (book.AuthorMetadata != null && book.AuthorMetadata.IsLoaded)
+                    {
+                        var authors = new Dictionary<string, AuthorMetadata> { { book.AuthorMetadata.Value.ForeignAuthorId, book.AuthorMetadata.Value } };
+                        AddDbIds(book.AuthorMetadata.Value.ForeignAuthorId, book, authors);
+                    }
+                }
+
+                return books;
+            }
+            catch (Exception e)
+            {
+                _logger.Warn(e, "Error searching by topic: {0}", topic);
+                return new List<Book>();
+            }
+        }
+
+        private static bool IsConceptQuery(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return false;
+            }
+
+            return query.StartsWith("topic:", StringComparison.OrdinalIgnoreCase) ||
+                   query.StartsWith("concept:", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string ExtractConcept(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return string.Empty;
+            }
+
+            var colonIndex = query.IndexOf(':');
+            if (colonIndex < 0 || colonIndex >= query.Length - 1)
+            {
+                return query;
+            }
+
+            return query[(colonIndex + 1)..].Trim();
         }
 
         private void AddDbIds(string authorId, Book book, Dictionary<string, AuthorMetadata> authors)

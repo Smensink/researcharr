@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "HTItZqwK6NvYa8kHwDdAz2ZD8CL3ys4ZNSyeTQF66Qk2jtmMcD2TWPP8nb9VvA/C1BTakncFohhqUavBhgtOSQ==",
+  "dgSpecHash": "gHP8DhGj9dj59HhFPdDJszSi/shc1CcgAEqm8yH1MJUZKtTSGC9ABtJ4tcYzjS+VzXKxD4/szJqjSTy2AagdMw==",
   "success": true,
   "projectFilePath": "/Users/sebastianmensink/Documents/Researcharr-develop/src/NzbDrone.Integration.Test/Readarr.Integration.Test.csproj",
   "expectedPackageFiles": [

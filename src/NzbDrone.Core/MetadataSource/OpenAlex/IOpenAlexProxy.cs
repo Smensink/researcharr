@@ -10,6 +10,7 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
         HashSet<string> GetChangedAuthors(DateTime startTime);
         List<Author> SearchForNewAuthor(string title);
         List<Book> SearchForNewBook(string query);
+        List<Book> SearchByConcept(string topic);
         Tuple<string, Book, List<AuthorMetadata>> GetBookInfo(string id);
         Book GetBookByDoi(string doi, bool useCache = true);
     }

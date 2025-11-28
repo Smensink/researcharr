@@ -138,9 +138,36 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 .Resource("works")
                 .AddQueryParam("search", query)
                 .AddQueryParam("sort", "relevance_score:desc")
+                .AddQueryParam("per_page", "50")
                 .Build();
 
             var response = ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(request, true);
+
+            return response.Results.Select(MapBook).ToList();
+        }
+
+        public List<Book> SearchByConcept(string topic)
+        {
+            if (string.IsNullOrWhiteSpace(topic))
+            {
+                return new List<Book>();
+            }
+
+            var cleanedTopic = topic.Trim();
+
+            var request = _requestBuilder.Create()
+                .Resource("works")
+                .AddQueryParam("filter", $"concepts.display_name.search:{cleanedTopic}")
+                .AddQueryParam("sort", "cited_by_count:desc")
+                .AddQueryParam("per_page", "50")
+                .Build();
+
+            var response = ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(request, true);
+
+            if (response?.Results == null)
+            {
+                return new List<Book>();
+            }
 
             return response.Results.Select(MapBook).ToList();
         }

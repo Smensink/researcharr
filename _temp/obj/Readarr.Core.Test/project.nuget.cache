@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "iVgKXkzqMTfywVz+Z3EXgMgq+k9ydZFBug2UH75pU0yHiAz6BfYES6KVruTenBoXIYwvQOG5KKa8CBeGiunNwQ==",
+  "dgSpecHash": "VMO50tmordoD0c+zK7BrWy+uE/pNesR5W6BVIOysKKLOx5swPbpLe3UHlpLmd16wa3bK3VSBRnJBmrDv3i61Qw==",
   "success": true,
   "projectFilePath": "/Users/sebastianmensink/Documents/Researcharr-develop/src/NzbDrone.Core.Test/Readarr.Core.Test.csproj",
   "expectedPackageFiles": [

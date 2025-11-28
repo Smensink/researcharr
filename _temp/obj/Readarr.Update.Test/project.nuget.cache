@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "5NfSMeTDcRk1QEUxrWMG/zQXMckd7u3Is05lGuK0SFDDeVSQq9ftSqx7uyiGuS46b0p4IeWt8TUOwixaqwdO+w==",
+  "dgSpecHash": "gyWguzH6mf9wZvSt0k40gVb0DrzNkgE/V2KXO5s2kNfRZ0J6Rnku9cnBMORvdZB2rC3loeUZN4shws6frD1bbQ==",
   "success": true,
   "projectFilePath": "/Users/sebastianmensink/Documents/Researcharr-develop/src/NzbDrone.Update.Test/Readarr.Update.Test.csproj",
   "expectedPackageFiles": [
