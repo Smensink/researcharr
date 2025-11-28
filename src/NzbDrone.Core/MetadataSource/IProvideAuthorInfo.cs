@@ -6,7 +6,7 @@ namespace NzbDrone.Core.MetadataSource
 {
     public interface IProvideAuthorInfo
     {
-        Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false, Action<List<Book>> onWorkBatch = null);
+        Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false, Action<List<Book>, int?> onWorkBatch = null);
         HashSet<string> GetChangedAuthors(DateTime startTime);
     }
 }

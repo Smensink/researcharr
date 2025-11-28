@@ -16,6 +16,7 @@ using NzbDrone.Core.MediaFiles.Commands;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.MetadataSource;
+using NzbDrone.Core.ProgressMessaging;
 using NzbDrone.Core.Profiles.Metadata;
 using NzbDrone.Core.RootFolders;
 
@@ -84,7 +85,7 @@ namespace NzbDrone.Core.Books
             _logger = logger;
         }
 
-        private Author GetSkyhookData(string foreignId, bool limitWorks, Action<List<Book>> onWorkBatch = null)
+        private Author GetSkyhookData(string foreignId, bool limitWorks, Action<List<Book>, int?> onWorkBatch = null)
         {
             try
             {
@@ -303,7 +304,7 @@ namespace NzbDrone.Core.Books
             _eventAggregator.PublishEvent(new BookInfoRefreshedEvent(entity, newChildren, updateChildren, deleteChildren));
         }
 
-        private void PersistWorkBatch(Author localAuthor, List<Book> batch)
+        private void PersistWorkBatch(Author localAuthor, List<Book> batch, int processed, int? total)
         {
             if (batch == null || batch.Count == 0 || localAuthor?.Metadata?.Value == null)
             {
@@ -313,6 +314,7 @@ namespace NzbDrone.Core.Books
             var foreignIds = batch.Select(x => x.ForeignBookId).ToList();
             var existing = _bookService.GetBooksForRefresh(localAuthor.AuthorMetadataId, foreignIds)
                                        .ToDictionary(x => x.ForeignBookId, x => x);
+            var existingList = existing.Values.ToList();
 
             foreach (var book in batch)
             {
@@ -326,16 +328,25 @@ namespace NzbDrone.Core.Books
                 book.AuthorMetadataId = localAuthor.Metadata.Value.Id;
                 book.Added = DateTime.UtcNow;
                 book.LastInfoSync = DateTime.MinValue;
-                book.Monitored = _monitorNewBookService.ShouldMonitorNewBook(book, true, localAuthor.MonitorNewItems);
+                book.Monitored = _monitorNewBookService.ShouldMonitorNewBook(book, existingList, localAuthor.MonitorNewItems);
 
                 try
                 {
                     _bookService.AddBook(book, false);
+                    existingList.Add(book);
                 }
                 catch (Exception ex)
                 {
                     _logger.Warn(ex, "Error inserting book {0} for author {1}", book.ForeignBookId, localAuthor.Name);
                 }
+            }
+
+            var cmd = ProgressMessageContext.CommandModel;
+            if (cmd != null)
+            {
+                var msg = total.HasValue ? $"Fetched {processed:N0}/{total.Value:N0} works for {localAuthor.Name}" : $"Fetched {processed:N0} works for {localAuthor.Name}";
+                _commandQueueManager.SetMessage(cmd, msg);
+                _eventAggregator.PublishEvent(new CommandUpdatedEvent(cmd));
             }
         }
 
@@ -384,11 +395,23 @@ namespace NzbDrone.Core.Books
             {
                 try
                 {
-                    Action<List<Book>> batchHandler = null;
+                    Action<List<Book>, int?> batchHandler = null;
 
                     if (!isNew)
                     {
-                        batchHandler = batch => PersistWorkBatch(author, batch);
+                        var processed = 0;
+                        int? total = null;
+
+                        batchHandler = (batch, count) =>
+                        {
+                            if (count.HasValue && !total.HasValue)
+                            {
+                                total = count;
+                            }
+
+                            processed += batch?.Count ?? 0;
+                            PersistWorkBatch(author, batch, processed, total);
+                        };
                     }
 
                     var data = GetSkyhookData(author.ForeignAuthorId, isNew, batchHandler);
