@@ -84,11 +84,11 @@ namespace NzbDrone.Core.Books
             _logger = logger;
         }
 
-        private Author GetSkyhookData(string foreignId)
+        private Author GetSkyhookData(string foreignId, bool limitWorks)
         {
             try
             {
-                return _authorInfo.GetAuthorInfo(foreignId);
+                return _authorInfo.GetAuthorInfo(foreignId, limitWorks: limitWorks);
             }
             catch (AuthorNotFoundException)
             {
@@ -348,13 +348,19 @@ namespace NzbDrone.Core.Books
             {
                 try
                 {
-                    var data = GetSkyhookData(author.ForeignAuthorId);
+                    var data = GetSkyhookData(author.ForeignAuthorId, message.IsNewAuthor);
                     updated |= RefreshEntityInfo(author, null, data, true, false, null);
                 }
                 catch (Exception e)
                 {
                     _logger.Error(e, "Couldn't refresh info for {0}", author);
                 }
+            }
+
+            if (message.IsNewAuthor)
+            {
+                _logger.Debug("Queuing background refresh for full work catalog for authors: {0}", string.Join(",", authorIds));
+                _commandQueueManager.Push(new BulkRefreshAuthorCommand(authorIds, false));
             }
 
             Rescan(authorIds, isNew, trigger, updated);
@@ -398,7 +404,7 @@ namespace NzbDrone.Core.Books
                         try
                         {
                             LogProgress(author);
-                            var data = GetSkyhookData(author.ForeignAuthorId);
+                            var data = GetSkyhookData(author.ForeignAuthorId, false);
                             updated |= RefreshEntityInfo(author, null, data, manualTrigger, false, message.LastStartTime);
                         }
                         catch (Exception e)

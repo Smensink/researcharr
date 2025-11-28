@@ -31,14 +31,14 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 .CreateFactory();
         }
 
-        public Author GetAuthorInfo(string readarrId, bool useCache = true)
+        public Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false)
         {
             // readarrId is expected to be the OpenAlex ID (e.g. A123456789 or full URL)
             var id = NormalizeId(readarrId);
 
             if (id.StartsWith("S", StringComparison.InvariantCultureIgnoreCase))
             {
-                return GetSourceInfo(id, useCache);
+                return GetSourceInfo(id, useCache, limitWorks);
             }
 
             var request = _requestBuilder.Create()
@@ -51,25 +51,14 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             if (author != null)
             {
-                var worksRequest = _requestBuilder.Create()
-                    .Resource("works")
-                    .AddQueryParam("filter", $"author.id:{id}")
-                    .AddQueryParam("per_page", "200") // Fetch a reasonable number of works
-                    .Build();
-
-                var worksResponse = ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(worksRequest, useCache);
-
-                if (worksResponse?.Results != null)
-                {
-                    var books = worksResponse.Results.Select(MapBook).ToList();
-                    author.Books = new LazyLoaded<List<Book>>(books);
-                }
+                var books = FetchAllWorks($"author.id:{id}", useCache, limitWorks ? 1000 : (int?)null);
+                author.Books = new LazyLoaded<List<Book>>(books);
             }
 
             return author;
         }
 
-        private Author GetSourceInfo(string id, bool useCache)
+        private Author GetSourceInfo(string id, bool useCache, bool limitWorks)
         {
             var request = _requestBuilder.Create()
                 .Resource($"sources/{id}")
@@ -80,22 +69,46 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             if (author != null)
             {
+                var books = FetchAllWorks($"primary_location.source.id:{id}", useCache, limitWorks ? 1000 : (int?)null);
+                author.Books = new LazyLoaded<List<Book>>(books);
+            }
+
+            return author;
+        }
+
+        private List<Book> FetchAllWorks(string filter, bool useCache, int? maxCount = null)
+        {
+            var books = new List<Book>();
+            var cursor = "*";
+
+            while (!string.IsNullOrWhiteSpace(cursor))
+            {
                 var worksRequest = _requestBuilder.Create()
                     .Resource("works")
-                    .AddQueryParam("filter", $"primary_location.source.id:{id}")
+                    .AddQueryParam("filter", filter)
                     .AddQueryParam("per_page", "200")
+                    .AddQueryParam("sort", "cited_by_count:desc")
+                    .AddQueryParam("cursor", cursor)
                     .Build();
 
                 var worksResponse = ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(worksRequest, useCache);
 
-                if (worksResponse?.Results != null)
+                if (worksResponse?.Results == null || worksResponse.Results.Count == 0)
                 {
-                    var books = worksResponse.Results.Select(MapBook).ToList();
-                    author.Books = new LazyLoaded<List<Book>>(books);
+                    break;
                 }
+
+                books.AddRange(worksResponse.Results.Select(MapBook));
+
+                if (maxCount.HasValue && books.Count >= maxCount.Value)
+                {
+                    break;
+                }
+
+                cursor = worksResponse.Meta?.NextCursor;
             }
 
-            return author;
+            return books;
         }
 
         public HashSet<string> GetChangedAuthors(DateTime startTime)

@@ -6,7 +6,7 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 {
     public interface IOpenAlexProxy
     {
-        Author GetAuthorInfo(string readarrId, bool useCache = true);
+        Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false);
         HashSet<string> GetChangedAuthors(DateTime startTime);
         List<Author> SearchForNewAuthor(string title);
         List<Book> SearchForNewBook(string query);

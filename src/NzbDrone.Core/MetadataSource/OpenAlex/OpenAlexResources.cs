@@ -22,6 +22,9 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
         [JsonProperty("per_page")]
         public int PerPage { get; set; }
+
+        [JsonProperty("next_cursor")]
+        public string NextCursor { get; set; }
     }
 
     public class OpenAlexAuthor
