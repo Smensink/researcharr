@@ -1,0 +1,42 @@
+# Build outputs
+_output/
+_artifacts/
+_tests/
+bin/
+obj/
+
+# Package managers
+node_modules/
+packages/
+
+# IDE/editor
+.vs/
+.vscode/
+.idea/
+
+# OS / misc
+.DS_Store
+Thumbs.db
+
+# Logs and caches
+*.log
+*.lock.json
+*.tmp
+*.cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env and runtime
+.env
+.env.*
+*.user
+*.suo
+*.pid
+*.pid.lock
+
+# Tools
+_temp/
+dist/
+coverage/
+reports/
