@@ -218,9 +218,8 @@ class SignalRConnector extends Component {
     const action = body.action;
     const section = 'authors';
 
-    if (action === 'updated') {
-      this.props.dispatchUpdateItem({ section, ...body.resource });
-    } else if (action === 'deleted') {
+    // Avoid live-refreshing large author/journal pages while bulk updates stream in.
+    if (action === 'deleted') {
       this.props.dispatchRemoveItem({ section, id: body.resource.id });
       this.props.dispatchDeleteAuthorBooks({ authorId: body.resource.id });
     }
