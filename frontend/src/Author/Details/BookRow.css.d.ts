@@ -3,6 +3,7 @@
 interface CssExports {
   'indexerFlags': string;
   'monitored': string;
+  'noCitations': string;
   'pageCount': string;
   'position': string;
   'rating': string;

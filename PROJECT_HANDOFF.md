@@ -73,6 +73,26 @@ Transform Readarr into **Researcharr**, a research paper management system with:
 - build.sh now copies built UI into published RID folders automatically after webpack; npm build path works if yarn is missing.
 - Published osx-arm64 build and restarted the app on 7337 (current binary `_output/net6.0/osx-arm64/publish/Readarr`, logs `/tmp/researcharr.log`).
 
+### 6. Journals Management (NEW - 2025-11-28)
+
+- **Type-Based Separation**:
+  - Added `AuthorMetadataType` enum (Person = 0, Journal = 1)
+  - Database migration 042 adds `Type` column to `AuthorMetadata` table
+  - OpenAlex integration automatically tags researchers and journals by type
+- **Journals Page**:
+  - New `/journals` route in sidebar navigation
+  - Dedicated journals management interface
+  - Shows journal statistics (paper count, monitored status)
+  - Clickable journals link to detail pages for paper management
+- **Smart Filtering**:
+  - Backend returns all authors (including journals) via `/api/v1/author`
+  - Frontend filters researchers list to exclude journals client-side
+  - Journals only appear in `/journals` page, not in `/authors` page
+- **Fixed Issues**:
+  - Journals no longer show as "Unknown Journal" (use Disambiguation field)
+  - Journal navigation works correctly (can click and manage papers)
+  - Search returns both researchers and journals with proper typing
+
 ---
 
 ## ⚠️ Current Status & Known Issues
@@ -150,16 +170,30 @@ Transform Readarr into **Researcharr**, a research paper management system with:
 ## 📂 Key File Locations
 
 - **Metadata**: `src/NzbDrone.Core/MetadataSource/OpenAlex/`
-  - `OpenAlexProxy.cs` - Modified to fetch works in `GetAuthorInfo` method
+  - `OpenAlexProxy.cs` - Modified to fetch works in `GetAuthorInfo` method, sets Type field
 - **Proxy Integration**: `src/NzbDrone.Core/MetadataSource/BookInfo/BookInfoProxy.cs`
 - **Indexers**: `src/NzbDrone.Core/Indexers/LibGen/`, `src/NzbDrone.Core/Indexers/SciHub/`
 - **Download Client**: `src/NzbDrone.Core/Download/Clients/HttpDownload/`
 - **Startup Config**: `src/NzbDrone.Host/Startup.cs`
 - **Localization**: `src/NzbDrone.Core/Localization/Core/en.json` - Updated with "Papers" terminology
+- **Type System**:
+  - `src/NzbDrone.Core/Books/Model/AuthorMetadataType.cs` - Person/Journal enum
+  - `src/NzbDrone.Core/Books/Model/AuthorMetadata.cs` - Type field added
+  - `src/NzbDrone.Core/Datastore/Migration/042_add_author_metadata_type.cs` - Database migration
+- **Journals API**:
+  - `src/Readarr.Api.V1/Journals/JournalController.cs` - Journals endpoint
+  - `src/Readarr.Api.V1/Journals/JournalResource.cs` - Journal DTO
+  - `src/Readarr.Api.V1/Author/AuthorResource.cs` - Added Type field
 - **Frontend Search**:
   - `frontend/src/Search/Author/AddNewAuthorModalContent.js` - Author add modal
   - `frontend/src/Search/Common/AddAuthorOptionsForm.js` - Monitoring options form
   - `frontend/src/Search/Author/AddNewAuthorSearchResult.js` - Compact search results
+- **Frontend Journals**:
+  - `frontend/src/Journal/Journals.js` - Main journals page
+  - `frontend/src/Journal/JournalsRow.js` - Journal table rows
+  - `frontend/src/Journal/JournalsConnector.js` - Redux connector
+  - `frontend/src/Store/Actions/journalActions.js` - Journal state management
+  - `frontend/src/Store/Selectors/createAuthorClientSideCollectionItemsSelector.js` - Client-side filtering
 
 ---
 
@@ -181,9 +215,50 @@ Transform Readarr into **Researcharr**, a research paper management system with:
 ./build.sh --backend --runtime osx-arm64 --framework net6.0
 ```
 
-### Recommended: Using dev-build.sh (Development)
+### Recommended: Using Docker Watch Mode (Development) ⭐ NEW
 
-For day-to-day development, use the **`dev-build.sh`** script which automates the entire process:
+For day-to-day development, use the **Docker watch mode** which provides automatic rebuilds:
+
+```bash
+# Start development containers with watch mode
+./dev.sh up
+
+# Stop containers
+./dev.sh down
+
+# View logs
+docker logs researcharr-develop-researcharr-dev-1 -f
+```
+
+**What it does:**
+
+1. Starts Researcharr in Docker container
+2. Starts FlareSolverr service for Cloudflare bypass
+3. Automatically watches for file changes:
+   - **Backend**: `dotnet watch` rebuilds on C# file changes
+   - **Frontend**: `yarn watch` rebuilds on JS/CSS changes
+4. Serves application on http://localhost:7337
+5. Persists data in Docker volumes
+
+**Advantages:**
+
+- ✅ Automatic rebuilds on file changes (no manual builds!)
+- ✅ Consistent development environment
+- ✅ Includes FlareSolverr for indexer testing
+- ✅ No StyleCop build failures
+- ✅ Fastest iteration cycle
+- ✅ Docker volumes for persistent data
+
+**Configuration:**
+
+- Docker Compose file: `docker-compose.dev.yml`
+- Watch script: `dev-watch.sh` (runs inside container)
+- Port: 7337 (Researcharr), 8191 (FlareSolverr)
+- Data volumes: `researcharr_config`, `researcharr_downloads`
+
+### Alternative: Using dev-build.sh (Local Development)
+
+For local development without Docker:
 
 ```bash
 # Build everything and start the app
@@ -203,11 +278,9 @@ For day-to-day development, use the **`dev-build.sh`** script which automates th
 
 **Advantages:**
 
-- ✅ No StyleCop build failures
-- ✅ Automatic UI deployment
-- ✅ One-command workflow
-- ✅ Prevents file lock errors
-- ✅ Faster iteration
+- ✅ No Docker required
+- ✅ Direct access to built files
+- ✅ Familiar dotnet workflow
 
 See `DEV_BUILD.md` for full documentation.
 
@@ -464,6 +537,158 @@ Before deploying to users:
 ---
 
 ## 📥 Updates (Latest Work)
+
+### **Session 2025-11-28 (Journals Page & Type-Based Separation)**
+
+#### **Problem Statement**
+
+Users needed a way to manage journals separately from researchers. Previously:
+1. Journals appeared as "Unknown Journal" in paper metadata
+2. Journals were mixed with researchers in the authors list
+3. No dedicated journals management page existed
+4. Clicking on journals resulted in "Sorry, that author cannot be found" error
+
+#### **What Was Implemented**
+
+**1. Added Type-Based Discrimination**
+
+Created an enum-based system to distinguish between persons and journals:
+
+- **`AuthorMetadataType` enum** (`src/NzbDrone.Core/Books/Model/AuthorMetadataType.cs`):
+  ```csharp
+  public enum AuthorMetadataType
+  {
+      Person = 0,    // Researchers/Authors
+      Journal = 1    // Journals/Sources
+  }
+  ```
+
+- **Database Migration 042** (`src/NzbDrone.Core/Datastore/Migration/042_add_author_metadata_type.cs`):
+  - Added `Type` column to `AuthorMetadata` table (Int32, default 0)
+  - Backwards compatible: existing records default to Person
+
+- **OpenAlex Integration** (`src/NzbDrone.Core/MetadataSource/OpenAlex/OpenAlexProxy.cs`):
+  - `MapAuthor()` sets `Type = AuthorMetadataType.Person`
+  - `MapSource()` sets `Type = AuthorMetadataType.Journal`
+  - Search returns both researchers and journals with proper typing
+
+**2. Created Journals Management Page**
+
+Built a complete journals management interface:
+
+- **Backend API** (`src/Readarr.Api.V1/Journals/JournalController.cs`):
+  - `GET /api/v1/journal` endpoint
+  - Filters authors where `Type == Journal`
+  - Returns journal statistics (paper count, monitored count)
+
+- **Frontend Components**:
+  - `frontend/src/Journal/Journals.js` - Main journals page component
+  - `frontend/src/Journal/JournalsRow.js` - Individual journal rows with clickable links
+  - `frontend/src/Journal/JournalsConnector.js` - Redux connector
+  - `frontend/src/Store/Actions/journalActions.js` - Redux state management
+
+- **Navigation** (`frontend/src/Components/Page/Sidebar/PageSidebar.js`):
+  - Added "Journals" menu item in sidebar
+  - Route: `/journals`
+  - Appears between "Researchers" and "Papers"
+
+**3. Fixed Journal Navigation**
+
+Resolved the "author cannot be found" error:
+
+- **Problem**: `AuthorController.AllAuthors()` was filtering out journals server-side
+- **Solution**:
+  - Removed server-side filtering in `AuthorController.cs`
+  - Added `Type` field to `AuthorResource` API response
+  - Implemented client-side filtering in `createAuthorClientSideCollectionItemsSelector.js`
+
+- **Result**:
+  - Journals clickable from `/journals` page
+  - Navigate to `/author/{titleSlug}` detail pages
+  - Full journal management (monitor papers, view statistics)
+  - Journals excluded from researchers list via frontend filtering
+
+**4. Fixed Journal Data Source**
+
+Corrected journal name display:
+
+- **Problem**: All journals showed as "Unknown Journal"
+- **Root Cause**: `BookResource.cs` was using empty `Publisher` field
+- **Fix**: Changed to use `Disambiguation` field which contains journal name from OpenAlex
+
+#### **Files Modified**
+
+- `src/NzbDrone.Core/Books/Model/AuthorMetadataType.cs` - NEW enum
+- `src/NzbDrone.Core/Books/Model/AuthorMetadata.cs` - Added Type field
+- `src/NzbDrone.Core/Datastore/Migration/042_add_author_metadata_type.cs` - NEW migration
+- `src/NzbDrone.Core/MetadataSource/OpenAlex/OpenAlexProxy.cs` - Type setting in MapAuthor/MapSource
+- `src/Readarr.Api.V1/Author/AuthorResource.cs` - Added Type field to API
+- `src/Readarr.Api.V1/Author/AuthorController.cs` - Removed filtering
+- `src/Readarr.Api.V1/Journals/JournalController.cs` - NEW controller
+- `src/Readarr.Api.V1/Journals/JournalResource.cs` - NEW resource
+- `src/Readarr.Api.V1/Books/BookResource.cs` - Fixed journal data source
+- `frontend/src/Journal/` - NEW directory with all journal components
+- `frontend/src/Store/Actions/journalActions.js` - NEW Redux actions
+- `frontend/src/Store/Selectors/createAuthorClientSideCollectionItemsSelector.js` - Client-side filtering
+- `frontend/src/App/AppRoutes.js` - Added /journals route
+- `frontend/src/Components/Page/Sidebar/PageSidebar.js` - Added menu item
+
+#### **API Endpoints**
+
+```bash
+# Get all journals
+GET /api/v1/journal
+
+# Response example:
+[
+  {
+    "id": 12,
+    "name": "Nature",
+    "titleSlug": "S137773608",
+    "paperCount": 200,
+    "monitoredPaperCount": 200,
+    "monitored": true
+  }
+]
+
+# Get all authors (includes journals with type field)
+GET /api/v1/author
+
+# Response includes:
+{
+  "id": 12,
+  "type": "journal",  // NEW field
+  "authorName": "Nature",
+  "titleSlug": "S137773608",
+  ...
+}
+```
+
+#### **User Experience**
+
+1. **Search**: Users can search for journals (e.g., "Nature") alongside researchers
+2. **Add**: Journals can be added via search modal, tagged as type "Journal"
+3. **Manage**: Dedicated `/journals` page shows all journals with statistics
+4. **Navigate**: Click journal name → view detail page → manage monitored papers
+5. **Separation**: Journals don't appear in researchers list; researchers don't appear in journals list
+
+#### **Migration Notes**
+
+- Existing databases automatically upgrade via migration 042
+- All existing authors default to `Type = Person`
+- New journals from OpenAlex automatically tagged as `Type = Journal`
+- No data loss or manual intervention required
+
+#### **Status**
+
+✅ **Complete and Tested**
+- Backend API functional
+- Frontend pages rendering
+- Navigation working
+- Database migration tested
+- Client-side filtering active
+
+---
 
 ### **Session 2025-11-21 (Paper Addition Bug Fixes & DOI Deduplication)**
 

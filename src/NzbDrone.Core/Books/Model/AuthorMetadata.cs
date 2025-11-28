@@ -30,6 +30,7 @@ namespace NzbDrone.Core.Books
         public DateTime? Born { get; set; }
         public DateTime? Died { get; set; }
         public AuthorStatusType Status { get; set; }
+        public AuthorMetadataType Type { get; set; }
         public List<MediaCover.MediaCover> Images { get; set; }
         public List<Links> Links { get; set; }
         public List<string> Genres { get; set; }
@@ -56,6 +57,7 @@ namespace NzbDrone.Core.Books
             Born = other.Born;
             Died = other.Died;
             Status = other.Status;
+            Type = other.Type;
             Images = other.Images.Any() ? other.Images : Images;
             Links = other.Links;
             Genres = other.Genres;

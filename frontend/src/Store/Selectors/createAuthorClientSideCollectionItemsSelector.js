@@ -6,7 +6,10 @@ function createUnoptimizedSelector(uiSection) {
   return createSelector(
     createClientSideCollectionSelector('authors', uiSection),
     (authors) => {
-      const items = authors.items.map((s) => {
+      // Filter out journals from the authors list (they have their own page)
+      const filteredItems = authors.items.filter((s) => s.type !== 'journal');
+
+      const items = filteredItems.map((s) => {
         const {
           id,
           sortName,

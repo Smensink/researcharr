@@ -1,0 +1,31 @@
+.journalName {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.paperCount {
+  font-weight: 600;
+  color: #3a3f51;
+}
+
+.noCitations {
+  opacity: 0.4;
+  color: #999;
+}
+
+.journalSummary {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  text-align: center;
+  color: #5d5d5d;
+}
+
+.noJournals {
+  padding: 30px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}

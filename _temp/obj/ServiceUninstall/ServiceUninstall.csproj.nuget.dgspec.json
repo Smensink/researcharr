@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "/Users/sebastianmensink/Documents/Researcharr-develop/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj": {}
+    "/workspace/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj": {}
   },
   "projects": {
-    "/Users/sebastianmensink/Documents/Researcharr-develop/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj": {
+    "/workspace/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sebastianmensink/Documents/Researcharr-develop/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj",
+        "projectUniqueName": "/workspace/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj",
         "projectName": "ServiceUninstall",
-        "projectPath": "/Users/sebastianmensink/Documents/Researcharr-develop/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj",
-        "packagesPath": "/Users/sebastianmensink/.nuget/packages/",
-        "outputPath": "/Users/sebastianmensink/Documents/Researcharr-develop/src/ServiceHelpers/ServiceUninstall/../../../_temp/obj/ServiceUninstall/",
+        "projectPath": "/workspace/src/ServiceHelpers/ServiceUninstall/ServiceUninstall.csproj",
+        "packagesPath": "/root/.nuget/packages/",
+        "outputPath": "/workspace/src/ServiceHelpers/ServiceUninstall/../../../_temp/obj/ServiceUninstall/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "centralPackageVersionsManagementEnabled": true,
         "configFilePaths": [
-          "/Users/sebastianmensink/Documents/Researcharr-develop/src/NuGet.Config",
-          "/Users/sebastianmensink/.nuget/NuGet/NuGet.Config"
+          "/workspace/src/nuget.config",
+          "/root/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -149,131 +149,131 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.linux-arm",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.linux-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.linux-musl-arm",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.linux-musl-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.linux-musl-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.osx-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.osx-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.win-x86",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-arm",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-musl-arm",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-musl-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-musl-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.osx-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.osx-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x86",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.linux-arm",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.linux-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.linux-musl-arm",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.linux-musl-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.linux-musl-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.linux-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.osx-arm64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.osx-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.win-x64",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.win-x86",
-              "version": "[6.0.20, 6.0.20]"
+              "version": "[6.0.31, 6.0.31]"
             }
           ],
           "frameworkReferences": {
@@ -281,7 +281,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.306/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.410/RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

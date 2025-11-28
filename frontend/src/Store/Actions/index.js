@@ -16,6 +16,7 @@ import * as customFilters from './customFilterActions';
 import * as editions from './editionActions';
 import * as history from './historyActions';
 import * as interactiveImportActions from './interactiveImportActions';
+import * as journals from './journalActions';
 import * as oAuth from './oAuthActions';
 import * as organizePreview from './organizePreviewActions';
 import * as paths from './pathActions';
@@ -49,6 +50,7 @@ export default [
   editions,
   history,
   interactiveImportActions,
+  journals,
   oAuth,
   organizePreview,
   paths,

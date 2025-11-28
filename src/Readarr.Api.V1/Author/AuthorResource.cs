@@ -17,6 +17,7 @@ namespace Readarr.Api.V1.Author
         [JsonIgnore]
         public int AuthorMetadataId { get; set; }
         public AuthorStatusType Status { get; set; }
+        public AuthorMetadataType Type { get; set; }
 
         public bool Ended => Status == AuthorStatusType.Ended;
 
@@ -81,6 +82,7 @@ namespace Readarr.Api.V1.Author
                 SortNameLastFirst = model.Metadata.Value.SortNameLastFirst,
 
                 Status = model.Metadata.Value.Status,
+                Type = model.Metadata.Value.Type,
                 Overview = model.Metadata.Value.Overview,
                 Disambiguation = model.Metadata.Value.Disambiguation,
 

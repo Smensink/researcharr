@@ -106,7 +106,11 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
         public List<Author> SearchForNewAuthor(string title)
         {
-            // Journals/sources first
+            // Search both journals/sources and researchers
+            // Journals will be marked with Type = Journal, researchers with Type = Person
+            var authors = new List<Author>();
+
+            // Search journals/sources first
             var sourceRequest = _requestBuilder.Create()
                 .Resource("sources")
                 .AddQueryParam("search", title)
@@ -114,12 +118,12 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 .Build();
 
             var sourceResponse = ExecuteRequest<OpenAlexListResponse<OpenAlexSource>>(sourceRequest, true);
-            var authors = new List<Author>();
             if (sourceResponse?.Results != null)
             {
                 authors.AddRange(sourceResponse.Results.Select(MapSource));
             }
 
+            // Then search researchers/authors
             var request = _requestBuilder.Create()
                 .Resource("authors")
                 .AddQueryParam("search", title)
@@ -213,21 +217,8 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             var book = MapBook(response);
             var authors = response.Authorships.Select(a => MapAuthorMetadata(a.Author)).ToList();
 
-            var source = response.PrimaryLocation?.Source;
-            if (source != null)
-            {
-                var mappedSource = MapSource(new OpenAlexSource
-                {
-                    Id = source.Id ?? source.DisplayName ?? string.Empty,
-                    DisplayName = source.DisplayName ?? source.Id ?? "Unknown Source"
-                });
-
-                var sourceMetadata = mappedSource?.Metadata?.Value;
-                if (sourceMetadata != null && !authors.Any(a => a.ForeignAuthorId == sourceMetadata.ForeignAuthorId))
-                {
-                    authors.Add(sourceMetadata);
-                }
-            }
+            // Note: Source/journal information is stored in Edition.Disambiguation, not as an author
+            // Journals should not appear in the authors/researchers list
 
             return new Tuple<string, Book, List<AuthorMetadata>>(workId, book, authors);
         }
@@ -341,6 +332,7 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 NameLastFirst = displayName,
                 SortNameLastFirst = sortName,
                 Status = AuthorStatusType.Continuing,
+                Type = AuthorMetadataType.Person,
                 Links = new List<Links>()
             };
 
@@ -371,6 +363,7 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 NameLastFirst = source.DisplayName,
                 SortNameLastFirst = source.DisplayName?.ToLowerInvariant(),
                 Status = AuthorStatusType.Continuing,
+                Type = AuthorMetadataType.Journal,
                 Links = new List<Links>()
             };
 

@@ -1,0 +1,35 @@
+services:
+  researcharr-dev:
+    image: mcr.microsoft.com/dotnet/sdk:7.0
+    working_dir: /workspace
+    command: bash ./dev-watch.sh
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:7337
+      - FLARESOLVERR_URL=http://flaresolverr:8191
+      - RunAnalyzersDuringBuild=false
+      - TreatWarningsAsErrors=false
+    ports:
+      - "7337:7337"
+    volumes:
+      - .:/workspace
+      - nuget-cache:/root/.nuget/packages
+      - node-modules:/workspace/node_modules
+      - researcharr_config:/data
+      - researcharr_downloads:/downloads
+      - ./books:/books
+    depends_on:
+      - flaresolverr
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+    ports:
+      - "8191:8191"
+
+volumes:
+  nuget-cache:
+  node-modules:
+  researcharr_config:
+  researcharr_downloads:

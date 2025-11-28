@@ -33,3 +33,8 @@
 
   width: 50px;
 }
+
+.noCitations {
+  opacity: 0.4;
+  color: #999;
+}

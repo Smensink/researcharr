@@ -9,6 +9,7 @@ import AuthorIndexConnector from 'Author/Index/AuthorIndexConnector';
 import BookDetailsPageConnector from 'Book/Details/BookDetailsPageConnector';
 import BookIndexConnector from 'Book/Index/BookIndexConnector';
 import BookshelfConnector from 'Bookshelf/BookshelfConnector';
+import JournalsConnector from 'Journal/JournalsConnector';
 import CalendarPageConnector from 'Calendar/CalendarPageConnector';
 import NotFound from 'Components/NotFound';
 import Switch from 'Components/Router/Switch';
@@ -92,6 +93,12 @@ function AppRoutes(props) {
         exact={true}
         path="/books"
         component={BookIndexConnector}
+      />
+
+      <Route
+        exact={true}
+        path="/journals"
+        component={JournalsConnector}
       />
 
       <Route

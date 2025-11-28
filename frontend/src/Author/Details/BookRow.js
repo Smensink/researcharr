@@ -234,12 +234,21 @@ class BookRow extends Component {
             }
 
             if (name === 'citations') {
+              const citationCount = citations ?? 0;
+              const hasCitations = citationCount > 0;
+
               return (
                 <TableRowCell
                   key={name}
                   className={styles.position}
                 >
-                  {citations ?? ''}
+                  {hasCitations ? (
+                    <span title={`${citationCount} citation${citationCount !== 1 ? 's' : ''}`}>
+                      📊 {citationCount}
+                    </span>
+                  ) : (
+                    <span className={styles.noCitations}>—</span>
+                  )}
                 </TableRowCell>
               );
             }

@@ -10,7 +10,12 @@
       "Bash(docker compose:*)",
       "Bash(curl:*)",
       "Bash(docker ps:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(./dev.sh up:*)",
+      "Bash(./dev.sh:*)",
+      "Bash(docker exec:*)",
+      "Bash(find:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

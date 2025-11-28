@@ -1,12 +1,12 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v6.0/osx-x64",
+    "name": ".NETCoreApp,Version=v6.0/linux-arm64",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {},
-    ".NETCoreApp,Version=v6.0/osx-x64": {
+    ".NETCoreApp,Version=v6.0/linux-arm64": {
       "Readarr.SignalR/1.0.0": {
         "dependencies": {
           "Microsoft.SourceLink.GitHub": "1.1.1",
@@ -981,20 +981,6 @@
           "lib/netstandard2.0/System.Data.SQLite.dll": {
             "assemblyVersion": "1.0.115.5",
             "fileVersion": "1.0.115.5"
-          }
-        },
-        "native": {
-          "runtimes/osx-x64/native/net46/System.Data.SQLite.dll.config": {
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/osx-x64/native/net46/libsqlite3.dylib": {
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/osx-x64/native/netstandard2.0/System.Data.SQLite.dll.config": {
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/osx-x64/native/netstandard2.0/libsqlite3.dylib": {
-            "fileVersion": "0.0.0.0"
           }
         }
       },
