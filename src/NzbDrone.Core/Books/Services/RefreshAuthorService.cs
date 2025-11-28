@@ -47,6 +47,7 @@ namespace NzbDrone.Core.Books
         private readonly IConfigService _configService;
         private readonly IImportListExclusionService _importListExclusionService;
         private readonly Logger _logger;
+        private bool _suppressLastInfoSync;
 
         public RefreshAuthorService(IProvideAuthorInfo authorInfo,
                                     IAuthorService authorService,
@@ -85,11 +86,11 @@ namespace NzbDrone.Core.Books
             _logger = logger;
         }
 
-        private Author GetSkyhookData(string foreignId, bool limitWorks, Action<List<Book>, int?> onWorkBatch = null)
+        private Author GetSkyhookData(string foreignId, bool limitWorks, Action<List<Book>, int?> onWorkBatch = null, DateTime? updatedSince = null)
         {
             try
             {
-                return _authorInfo.GetAuthorInfo(foreignId, limitWorks: limitWorks, onWorkBatch: onWorkBatch);
+                return _authorInfo.GetAuthorInfo(foreignId, limitWorks: limitWorks, onWorkBatch: onWorkBatch, updatedSince: updatedSince);
             }
             catch (AuthorNotFoundException)
             {
@@ -140,7 +141,11 @@ namespace NzbDrone.Core.Books
             local.UseMetadataFrom(remote);
             local.Metadata = remote.Metadata;
             local.Series = remote.Series.Value;
-            local.LastInfoSync = DateTime.UtcNow;
+
+            if (!_suppressLastInfoSync)
+            {
+                local.LastInfoSync = DateTime.UtcNow;
+            }
 
             try
             {
@@ -395,6 +400,7 @@ namespace NzbDrone.Core.Books
             {
                 try
                 {
+                    var updatedSince = author.LastInfoSync;
                     Action<List<Book>, int?> batchHandler = null;
 
                     if (!isNew)
@@ -414,8 +420,10 @@ namespace NzbDrone.Core.Books
                         };
                     }
 
-                    var data = GetSkyhookData(author.ForeignAuthorId, isNew, batchHandler);
+                    _suppressLastInfoSync = isNew;
+                    var data = GetSkyhookData(author.ForeignAuthorId, isNew, batchHandler, updatedSince);
                     updated |= RefreshEntityInfo(author, null, data, true, false, null);
+                    _suppressLastInfoSync = false;
                 }
                 catch (Exception e)
                 {

@@ -31,7 +31,7 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 .CreateFactory();
         }
 
-        public Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false, Action<List<Book>, int?> onWorkBatch = null)
+        public Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false, Action<List<Book>, int?> onWorkBatch = null, DateTime? updatedSince = null)
         {
             // readarrId is expected to be the OpenAlex ID (e.g. A123456789 or full URL)
             var id = NormalizeId(readarrId);
@@ -51,14 +51,14 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             if (author != null)
             {
-                var books = FetchAllWorks($"author.id:{id}", useCache, limitWorks ? 1000 : (int?)null, onWorkBatch);
+                var books = FetchAllWorks($"author.id:{id}", useCache, limitWorks ? 1000 : (int?)null, onWorkBatch, updatedSince);
                 author.Books = new LazyLoaded<List<Book>>(books);
             }
 
             return author;
         }
 
-        private Author GetSourceInfo(string id, bool useCache, bool limitWorks, Action<List<Book>, int?> onWorkBatch)
+        private Author GetSourceInfo(string id, bool useCache, bool limitWorks, Action<List<Book>, int?> onWorkBatch, DateTime? updatedSince = null)
         {
             var request = _requestBuilder.Create()
                 .Resource($"sources/{id}")
@@ -69,27 +69,32 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             if (author != null)
             {
-                var books = FetchAllWorks($"primary_location.source.id:{id}", useCache, limitWorks ? 1000 : (int?)null, onWorkBatch);
+                var books = FetchAllWorks($"primary_location.source.id:{id}", useCache, limitWorks ? 1000 : (int?)null, onWorkBatch, updatedSince);
                 author.Books = new LazyLoaded<List<Book>>(books);
             }
 
             return author;
         }
 
-        private List<Book> FetchAllWorks(string filter, bool useCache, int? maxCount = null, Action<List<Book>, int?> onBatch = null)
+        private List<Book> FetchAllWorks(string filter, bool useCache, int? maxCount = null, Action<List<Book>, int?> onBatch = null, DateTime? updatedSince = null)
         {
             var books = new List<Book>();
             var cursor = "*";
 
             while (!string.IsNullOrWhiteSpace(cursor))
             {
-                var worksRequest = _requestBuilder.Create()
+                var worksBuilder = _requestBuilder.Create()
                     .Resource("works")
                     .AddQueryParam("filter", filter)
                     .AddQueryParam("per_page", "200")
                     .AddQueryParam("sort", "cited_by_count:desc")
-                    .AddQueryParam("cursor", cursor)
-                    .Build();
+                    .AddQueryParam("cursor", cursor);
+                if (updatedSince.HasValue)
+                {
+                    worksBuilder.AddQueryParam("from_updated_date", updatedSince.Value.ToString("yyyy-MM-dd"));
+                }
+
+                var worksRequest = worksBuilder.Build();
 
                 var worksResponse = ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(worksRequest, useCache);
 
