@@ -85,13 +85,13 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
             return new HashSet<string>(httpResponse.Resource.Ids.Select(x => x.ToString()));
         }
 
-        public Author GetAuthorInfo(string foreignAuthorId, bool useCache = true, bool limitWorks = false)
+        public Author GetAuthorInfo(string foreignAuthorId, bool useCache = true, bool limitWorks = false, Action<List<Book>> onWorkBatch = null)
         {
             _logger.Debug("Getting Author details for {0}", foreignAuthorId);
 
             try
             {
-                var author = _openAlexProxy.GetAuthorInfo(foreignAuthorId, useCache, limitWorks);
+                var author = _openAlexProxy.GetAuthorInfo(foreignAuthorId, useCache, limitWorks, onWorkBatch);
 
                 if (author.Books != null && author.Books.Value.Any())
                 {

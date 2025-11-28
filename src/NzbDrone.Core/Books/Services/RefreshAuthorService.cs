@@ -84,11 +84,11 @@ namespace NzbDrone.Core.Books
             _logger = logger;
         }
 
-        private Author GetSkyhookData(string foreignId, bool limitWorks)
+        private Author GetSkyhookData(string foreignId, bool limitWorks, Action<List<Book>> onWorkBatch = null)
         {
             try
             {
-                return _authorInfo.GetAuthorInfo(foreignId, limitWorks: limitWorks);
+                return _authorInfo.GetAuthorInfo(foreignId, limitWorks: limitWorks, onWorkBatch: onWorkBatch);
             }
             catch (AuthorNotFoundException)
             {
@@ -303,6 +303,42 @@ namespace NzbDrone.Core.Books
             _eventAggregator.PublishEvent(new BookInfoRefreshedEvent(entity, newChildren, updateChildren, deleteChildren));
         }
 
+        private void PersistWorkBatch(Author localAuthor, List<Book> batch)
+        {
+            if (batch == null || batch.Count == 0 || localAuthor?.Metadata?.Value == null)
+            {
+                return;
+            }
+
+            var foreignIds = batch.Select(x => x.ForeignBookId).ToList();
+            var existing = _bookService.GetBooksForRefresh(localAuthor.AuthorMetadataId, foreignIds)
+                                       .ToDictionary(x => x.ForeignBookId, x => x);
+
+            foreach (var book in batch)
+            {
+                if (existing.ContainsKey(book.ForeignBookId))
+                {
+                    continue;
+                }
+
+                book.Author = localAuthor;
+                book.AuthorMetadata = localAuthor.Metadata.Value;
+                book.AuthorMetadataId = localAuthor.Metadata.Value.Id;
+                book.Added = DateTime.UtcNow;
+                book.LastInfoSync = DateTime.MinValue;
+                book.Monitored = _monitorNewBookService.ShouldMonitorNewBook(book, true, localAuthor.MonitorNewItems);
+
+                try
+                {
+                    _bookService.AddBook(book, false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn(ex, "Error inserting book {0} for author {1}", book.ForeignBookId, localAuthor.Name);
+                }
+            }
+        }
+
         private void Rescan(List<int> authorIds, bool isNew, CommandTrigger trigger, bool infoUpdated)
         {
             var rescanAfterRefresh = _configService.RescanAfterRefresh;
@@ -348,19 +384,20 @@ namespace NzbDrone.Core.Books
             {
                 try
                 {
-                    var data = GetSkyhookData(author.ForeignAuthorId, message.IsNewAuthor);
+                    Action<List<Book>> batchHandler = null;
+
+                    if (!isNew)
+                    {
+                        batchHandler = batch => PersistWorkBatch(author, batch);
+                    }
+
+                    var data = GetSkyhookData(author.ForeignAuthorId, isNew, batchHandler);
                     updated |= RefreshEntityInfo(author, null, data, true, false, null);
                 }
                 catch (Exception e)
                 {
                     _logger.Error(e, "Couldn't refresh info for {0}", author);
                 }
-            }
-
-            if (message.IsNewAuthor)
-            {
-                _logger.Debug("Queuing background refresh for full work catalog for authors: {0}", string.Join(",", authorIds));
-                _commandQueueManager.Push(new BulkRefreshAuthorCommand(authorIds, false));
             }
 
             Rescan(authorIds, isNew, trigger, updated);
@@ -373,12 +410,15 @@ namespace NzbDrone.Core.Books
 
         public void Execute(RefreshAuthorCommand message)
         {
-            var trigger = message.Trigger;
-            var isNew = message.IsNewAuthor;
-
             if (message.AuthorId.HasValue)
             {
-                RefreshSelectedAuthors(new List<int> { message.AuthorId.Value }, isNew, trigger);
+                RefreshSelectedAuthors(new List<int> { message.AuthorId.Value }, message.IsNewAuthor, message.Trigger);
+
+                if (message.IsNewAuthor)
+                {
+                    _logger.Debug("Queuing background refresh for full work catalog for author {0}", message.AuthorId.Value);
+                    _commandQueueManager.Push(new RefreshAuthorCommand(message.AuthorId.Value, false));
+                }
             }
             else
             {
@@ -418,7 +458,7 @@ namespace NzbDrone.Core.Books
                     }
                 }
 
-                Rescan(authorIds, isNew, trigger, updated);
+                Rescan(authorIds, message.IsNewAuthor, message.Trigger, updated);
             }
         }
     }

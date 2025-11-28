@@ -31,14 +31,14 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                 .CreateFactory();
         }
 
-        public Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false)
+        public Author GetAuthorInfo(string readarrId, bool useCache = true, bool limitWorks = false, Action<List<Book>> onWorkBatch = null)
         {
             // readarrId is expected to be the OpenAlex ID (e.g. A123456789 or full URL)
             var id = NormalizeId(readarrId);
 
             if (id.StartsWith("S", StringComparison.InvariantCultureIgnoreCase))
             {
-                return GetSourceInfo(id, useCache, limitWorks);
+                return GetSourceInfo(id, useCache, limitWorks, onWorkBatch);
             }
 
             var request = _requestBuilder.Create()
@@ -51,14 +51,14 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             if (author != null)
             {
-                var books = FetchAllWorks($"author.id:{id}", useCache, limitWorks ? 1000 : (int?)null);
+                var books = FetchAllWorks($"author.id:{id}", useCache, limitWorks ? 1000 : (int?)null, onWorkBatch);
                 author.Books = new LazyLoaded<List<Book>>(books);
             }
 
             return author;
         }
 
-        private Author GetSourceInfo(string id, bool useCache, bool limitWorks)
+        private Author GetSourceInfo(string id, bool useCache, bool limitWorks, Action<List<Book>> onWorkBatch)
         {
             var request = _requestBuilder.Create()
                 .Resource($"sources/{id}")
@@ -69,14 +69,14 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             if (author != null)
             {
-                var books = FetchAllWorks($"primary_location.source.id:{id}", useCache, limitWorks ? 1000 : (int?)null);
+                var books = FetchAllWorks($"primary_location.source.id:{id}", useCache, limitWorks ? 1000 : (int?)null, onWorkBatch);
                 author.Books = new LazyLoaded<List<Book>>(books);
             }
 
             return author;
         }
 
-        private List<Book> FetchAllWorks(string filter, bool useCache, int? maxCount = null)
+        private List<Book> FetchAllWorks(string filter, bool useCache, int? maxCount = null, Action<List<Book>> onBatch = null)
         {
             var books = new List<Book>();
             var cursor = "*";
@@ -98,7 +98,10 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
                     break;
                 }
 
-                books.AddRange(worksResponse.Results.Select(MapBook));
+                var batch = worksResponse.Results.Select(MapBook).ToList();
+                books.AddRange(batch);
+
+                onBatch?.Invoke(batch);
 
                 if (maxCount.HasValue && books.Count >= maxCount.Value)
                 {
