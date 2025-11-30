@@ -1,0 +1,50 @@
+.importSearches__layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+}
+
+.importSearches__jobs {
+  border: 1px solid var(--panel-border-color);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.importSearches__items {
+  border: 1px solid var(--panel-border-color);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.importSearches__jobRow {
+  padding: 8px;
+  border-bottom: 1px solid var(--panel-border-color);
+  cursor: pointer;
+}
+
+.importSearches__jobRow:last-child {
+  border-bottom: none;
+}
+
+.importSearches__jobRow.isActive {
+  background: var(--table-row-hover-background-color);
+}
+
+.importSearches__upload {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.importSearches__itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.importSearches__itemsTable th,
+.importSearches__itemsTable td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--panel-border-color);
+  text-align: left;
+}

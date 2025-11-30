@@ -10,8 +10,8 @@ namespace NzbDrone.Core.Datastore.Migration
         {
             Create.TableForModel("ImportSearchJobs")
                   .WithColumn("Name").AsString().NotNullable()
-                  .WithColumn("Source").AsString().NotNullable()
-                  .WithColumn("Status").AsString().NotNullable()
+                  .WithColumn("Source").AsInt32().NotNullable()
+                  .WithColumn("Status").AsInt32().NotNullable()
                   .WithColumn("Message").AsString().Nullable()
                   .WithColumn("Total").AsInt32().NotNullable()
                   .WithColumn("Matched").AsInt32().NotNullable()
@@ -28,7 +28,7 @@ namespace NzbDrone.Core.Datastore.Migration
                   .WithColumn("Authors").AsString().Nullable()
                   .WithColumn("Doi").AsString().Nullable()
                   .WithColumn("Pmid").AsString().Nullable()
-                  .WithColumn("Status").AsString().NotNullable()
+                  .WithColumn("Status").AsInt32().NotNullable()
                   .WithColumn("Message").AsString().Nullable()
                   .WithColumn("BookId").AsInt32().Nullable();
         }

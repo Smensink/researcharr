@@ -38,6 +38,7 @@ import UnmappedFilesTableConnector from 'UnmappedFiles/UnmappedFilesTableConnect
 import getPathWithUrlBase from 'Utilities/getPathWithUrlBase';
 import CutoffUnmetConnector from 'Wanted/CutoffUnmet/CutoffUnmetConnector';
 import MissingConnector from 'Wanted/Missing/MissingConnector';
+import ImportSearches from 'ImportSearches/ImportSearches';
 
 function AppRoutes(props) {
   const {
@@ -104,6 +105,11 @@ function AppRoutes(props) {
       <Route
         path="/unmapped"
         component={UnmappedFilesTableConnector}
+      />
+
+      <Route
+        path="/search-imports"
+        component={ImportSearches}
       />
 
       <Route

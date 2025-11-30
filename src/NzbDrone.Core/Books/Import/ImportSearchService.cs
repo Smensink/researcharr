@@ -5,9 +5,10 @@ using System.Linq;
 using System.Xml.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Core.Books;
 using NzbDrone.Core.Books.Commands;
 using NzbDrone.Core.Messaging.Commands;
-using NzbDrone.Core.MetadataSource;
+using NzbDrone.Core.MetadataSource.OpenAlex;
 using NzbDrone.Core.Parser;
 
 namespace NzbDrone.Core.Books.Import
@@ -19,28 +20,32 @@ namespace NzbDrone.Core.Books.Import
         List<ImportSearchItem> GetItems(int jobId);
         void ProcessJob(int jobId);
         List<ImportSearchItem> ParseStream(string fileName, Stream stream, out ImportSearchSource source);
+        List<ImportSearchItem> ParseQuery(string query, out ImportSearchSource source);
     }
 
     public class ImportSearchService : IImportSearchService, IExecute<ProcessImportSearchCommand>
     {
         private readonly IImportSearchJobRepository _jobRepo;
         private readonly IImportSearchItemRepository _itemRepo;
-        private readonly IBookInfoProxy _bookInfoProxy;
         private readonly IBookService _bookService;
+        private readonly IAddBookService _addBookService;
+        private readonly IOpenAlexProxy _openAlexProxy;
         private readonly IManageCommandQueue _commandQueueManager;
         private readonly Logger _logger;
 
         public ImportSearchService(IImportSearchJobRepository jobRepo,
                                    IImportSearchItemRepository itemRepo,
-                                   IBookInfoProxy bookInfoProxy,
                                    IBookService bookService,
+                                   IAddBookService addBookService,
+                                   IOpenAlexProxy openAlexProxy,
                                    IManageCommandQueue commandQueueManager,
                                    Logger logger)
         {
             _jobRepo = jobRepo;
             _itemRepo = itemRepo;
-            _bookInfoProxy = bookInfoProxy;
             _bookService = bookService;
+            _addBookService = addBookService;
+            _openAlexProxy = openAlexProxy;
             _commandQueueManager = commandQueueManager;
             _logger = logger;
         }
@@ -98,6 +103,26 @@ namespace NzbDrone.Core.Books.Import
             }
 
             return items;
+        }
+
+        public List<ImportSearchItem> ParseQuery(string query, out ImportSearchSource source)
+        {
+            source = ImportSearchSource.PubMed;
+
+            if (query.IsNullOrWhiteSpace())
+            {
+                return new List<ImportSearchItem>();
+            }
+
+            var works = _openAlexProxy.SearchForNewBook(query);
+            return works.Select(w => new ImportSearchItem
+            {
+                Title = w.Title,
+                Authors = string.Join("; ", w.Authors.Value.Select(a => a.Name)),
+                Doi = w.Editions.Value.FirstOrDefault(e => !e.Isbn13.IsNullOrWhiteSpace())?.Isbn13,
+                Status = ImportSearchItemStatus.Pending,
+                BookId = null
+            }).ToList();
         }
 
         private IEnumerable<ImportSearchItem> ParseRis(string content)
@@ -177,6 +202,12 @@ namespace NzbDrone.Core.Books.Import
             job.Started = DateTime.UtcNow;
             _jobRepo.Update(job);
 
+            job.Matched = 0;
+            job.Queued = 0;
+            job.Completed = 0;
+            job.Failed = 0;
+
+            var allBooks = _bookService.GetAllBooks();
             var items = GetItems(jobId);
 
             foreach (var item in items)
@@ -187,7 +218,12 @@ namespace NzbDrone.Core.Books.Import
                     _itemRepo.Update(item);
 
                     var normalizedDoi = DoiUtility.Normalize(item.Doi);
-                    var matchedBookId = MatchExistingBook(normalizedDoi, item.Title, item.Authors);
+                    var matchedBookId = MatchExistingBook(normalizedDoi, item.Title, item.Authors, allBooks);
+
+                    if (!matchedBookId.HasValue)
+                    {
+                        matchedBookId = AddFromOpenAlex(normalizedDoi, item.Title);
+                    }
 
                     if (matchedBookId.HasValue)
                     {
@@ -197,6 +233,7 @@ namespace NzbDrone.Core.Books.Import
 
                         _commandQueueManager.Push(new BookSearchCommand(new List<int> { matchedBookId.Value }), CommandPriority.Normal, CommandTrigger.Manual);
 
+                        job.Matched++;
                         job.Queued++;
                     }
                     else
@@ -217,17 +254,17 @@ namespace NzbDrone.Core.Books.Import
             }
 
             job.Ended = DateTime.UtcNow;
+            job.Completed = job.Queued;
             job.Status = ImportSearchStatus.Completed;
             _jobRepo.Update(job);
         }
 
-        private int? MatchExistingBook(string doi, string title, string authors)
+        private int? MatchExistingBook(string doi, string title, string authors, List<Book> allBooks)
         {
             // Try DOI first by scanning existing books' links for DOI
             if (!doi.IsNullOrWhiteSpace())
             {
-                var books = _bookService.GetAllBooks();
-                foreach (var book in books)
+                foreach (var book in allBooks)
                 {
                     if (book.Links != null && book.Links.Any(l => l.Name.Equals("DOI", StringComparison.OrdinalIgnoreCase) && string.Equals(DoiUtility.Normalize(l.Url), doi, StringComparison.OrdinalIgnoreCase)))
                     {
@@ -239,12 +276,42 @@ namespace NzbDrone.Core.Books.Import
             // Fallback: search metadata by title
             if (!title.IsNullOrWhiteSpace())
             {
-                var books = _bookService.GetAllBooks();
-                var match = books.FirstOrDefault(b => string.Equals(b.Title, title, StringComparison.OrdinalIgnoreCase));
+                var match = allBooks.FirstOrDefault(b => string.Equals(b.Title, title, StringComparison.OrdinalIgnoreCase));
                 return match?.Id;
             }
 
             return null;
+        }
+
+        private int? AddFromOpenAlex(string normalizedDoi, string title)
+        {
+            try
+            {
+                Book book = null;
+
+                if (!normalizedDoi.IsNullOrWhiteSpace())
+                {
+                    book = _openAlexProxy.GetBookByDoi(normalizedDoi);
+                }
+
+                if (book == null && !title.IsNullOrWhiteSpace())
+                {
+                    book = _openAlexProxy.SearchForNewBook(title)?.FirstOrDefault();
+                }
+
+                if (book == null)
+                {
+                    return null;
+                }
+
+                var added = _addBookService.AddBook(book, false);
+                return added?.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug(ex, "Failed to add book from OpenAlex during import");
+                return null;
+            }
         }
 
         public void Execute(ProcessImportSearchCommand message)
