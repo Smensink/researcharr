@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NzbDrone.Core.Books.Commands;
 using NzbDrone.Core.Books.Import;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Messaging.Commands;
-using NzbDrone.Core.Validation;
 using Readarr.Http;
 
 namespace Readarr.Api.V1.ImportSearch
@@ -44,7 +44,10 @@ namespace Readarr.Api.V1.ImportSearch
         {
             if (file == null || file.Length == 0)
             {
-                throw new ValidationException("file", "A file is required");
+                throw new ValidationException(new List<ValidationFailure>
+                {
+                    new ("file", "A file is required")
+                });
             }
 
             var jobName = string.IsNullOrWhiteSpace(name)
@@ -56,7 +59,10 @@ namespace Readarr.Api.V1.ImportSearch
 
             if (items.Count == 0)
             {
-                throw new ValidationException("file", "No records found in upload");
+                throw new ValidationException(new List<ValidationFailure>
+                {
+                    new ("file", "No records found in upload")
+                });
             }
 
             var job = _importSearchService.CreateJob(jobName, source, items);

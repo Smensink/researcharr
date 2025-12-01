@@ -198,6 +198,9 @@ class AddNewItem extends Component {
                   <Link to="https://openalex.org"> OpenAlex ID </Link>
                   of a book (e.g. works/W2741809805), work (e.g. works/W2741809805) or author (e.g. authors/A5023888391), the doi (e.g. doi:10.1038/d41586-019-03847-7) or the asin (e.g. asin:B00JCDK5ME)
                 </div>
+                <div style={{ marginTop: 12 }}>
+                  Bulk query? You can import a saved PubMed/Ovid/Embase search export (RIS/XML) on the <Link to="/search-imports">Search Imports</Link> page. Upload the export, we match papers by DOI/title, fetch missing ones from OpenAlex, and queue downloads automatically.
+                </div>
               </div>
           }
 

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Button from 'Components/Link/Button';
 import PageContent from 'Components/Page/PageContent';
 import PageContentBody from 'Components/Page/PageContentBody';
-import Spinner from 'Components/Spinner';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import formatDateTime from 'Utilities/Date/formatDateTime';
 import translate from 'Utilities/String/translate';
@@ -148,7 +148,7 @@ function ImportSearches() {
                   <div>Source: {selectedJob.source}</div>
                   <div>Matched: {selectedJob.matched} / {selectedJob.total}</div>
                 </div>
-                {loadingItems && <Spinner />}
+                {loadingItems && <LoadingIndicator />}
                 {!loadingItems && (
                   <table className="importSearches__itemsTable">
                     <thead>

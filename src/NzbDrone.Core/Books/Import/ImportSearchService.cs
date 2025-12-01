@@ -5,8 +5,9 @@ using System.Linq;
 using System.Xml.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Books;
 using NzbDrone.Core.Books.Commands;
+using NzbDrone.Core.Books;
+using NzbDrone.Core.IndexerSearch;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.MetadataSource.OpenAlex;
 using NzbDrone.Core.Parser;
@@ -80,7 +81,7 @@ namespace NzbDrone.Core.Books.Import
 
         public List<ImportSearchItem> GetItems(int jobId)
         {
-            return _itemRepo.GetPaged(0, int.MaxValue, i => i.JobId == jobId).Records;
+            return _itemRepo.All().Where(i => i.JobId == jobId).ToList();
         }
 
         public List<ImportSearchItem> ParseStream(string fileName, Stream stream, out ImportSearchSource source)
@@ -118,7 +119,7 @@ namespace NzbDrone.Core.Books.Import
             return works.Select(w => new ImportSearchItem
             {
                 Title = w.Title,
-                Authors = string.Join("; ", w.Authors.Value.Select(a => a.Name)),
+                Authors = w.Author?.Value != null ? w.Author.Value.Name : null,
                 Doi = w.Editions.Value.FirstOrDefault(e => !e.Isbn13.IsNullOrWhiteSpace())?.Isbn13,
                 Status = ImportSearchItemStatus.Pending,
                 BookId = null
