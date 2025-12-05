@@ -21,6 +21,15 @@ namespace NzbDrone.Core.Indexers.LibGen
 
             if (indexerResponse.HttpResponse.StatusCode != System.Net.HttpStatusCode.OK)
             {
+                var body = indexerResponse.Content ?? string.Empty;
+
+                // LibGen frequently returns 500 with "max_user_connections" when overloaded; treat as empty and back off.
+                if (indexerResponse.HttpResponse.StatusCode == System.Net.HttpStatusCode.InternalServerError &&
+                    body.IndexOf("max_user_connections", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return releases;
+                }
+
                 // LibGen mirrors may return various errors - return empty rather than throwing
                 if (indexerResponse.HttpResponse.StatusCode is System.Net.HttpStatusCode.NotFound
                     or System.Net.HttpStatusCode.Forbidden

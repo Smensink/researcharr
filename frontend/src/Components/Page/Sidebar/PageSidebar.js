@@ -26,11 +26,11 @@ const links = [
     alias: '/authors',
     children: [
       {
-        title: () => translate('Researchers'),
+        title: () => 'Researchers',
         to: '/authors'
       },
       {
-        title: () => translate('Papers'),
+        title: () => 'Papers',
         to: '/books'
       },
       {
@@ -42,7 +42,15 @@ const links = [
         to: '/add/search'
       },
       {
-        title: () => translate('LibraryShelf'),
+        title: () => 'Advanced Search',
+        to: '/advanced-search'
+      },
+      {
+        title: () => 'Search Imports',
+        to: '/search-imports'
+      },
+      {
+        title: () => 'Library shelf',
         to: '/shelf'
       },
       {
@@ -76,10 +84,7 @@ const links = [
         title: () => translate('Blocklist'),
         to: '/activity/blocklist'
       },
-      {
-        title: () => 'Search Imports',
-        to: '/search-imports'
-      }
+      // Search imports and advanced search live under Papers
     ]
   },
 

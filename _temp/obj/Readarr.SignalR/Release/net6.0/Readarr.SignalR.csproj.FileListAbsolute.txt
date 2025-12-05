@@ -128,11 +128,6 @@
 /workspace/_temp/obj/Readarr.SignalR/Release/net6.0/Readarr.SignalR.AssemblyInfo.cs
 /workspace/_temp/obj/Readarr.SignalR/Release/net6.0/Readarr.SignalR.csproj.CoreCompileInputs.cache
 /workspace/_temp/obj/Readarr.SignalR/Release/net6.0/Readarr.SignalR.sourcelink.json
-/workspace/_temp/obj/Readarr.SignalR/Release/net6.0/staticwebassets/msbuild.Readarr.SignalR.Microsoft.AspNetCore.StaticWebAssets.props
-/workspace/_temp/obj/Readarr.SignalR/Release/net6.0/staticwebassets/msbuild.build.Readarr.SignalR.props
-/workspace/_temp/obj/Readarr.SignalR/Release/net6.0/staticwebassets/msbuild.buildMultiTargeting.Readarr.SignalR.props
-/workspace/_temp/obj/Readarr.SignalR/Release/net6.0/staticwebassets/msbuild.buildTransitive.Readarr.SignalR.props
-/workspace/_temp/obj/Readarr.SignalR/Release/net6.0/staticwebassets.pack.json
 /workspace/_temp/obj/Readarr.SignalR/Release/net6.0/staticwebassets.build.json
 /workspace/_temp/obj/Readarr.SignalR/Release/net6.0/staticwebassets.development.json
 /workspace/_temp/obj/Readarr.SignalR/Release/net6.0/scopedcss/bundle/Readarr.SignalR.styles.css

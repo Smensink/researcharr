@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using NLog;
 using NzbDrone.Common.Http;
 using NzbDrone.Common.Serializer;
@@ -171,6 +172,36 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             return response.Results.Select(MapBook).ToList();
         }
 
+        public OpenAlexListResponse<OpenAlexWork> SearchWorksAdvanced(string search, string filter, string sort, int perPage, string cursor)
+        {
+            var builder = _requestBuilder.Create()
+                .Resource("works")
+                .AddQueryParam("per_page", perPage.ToString());
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                builder.AddQueryParam("search", search);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                builder.AddQueryParam("filter", filter);
+            }
+
+            if (!string.IsNullOrWhiteSpace(sort))
+            {
+                builder.AddQueryParam("sort", sort);
+            }
+
+            if (!string.IsNullOrWhiteSpace(cursor))
+            {
+                builder.AddQueryParam("cursor", cursor);
+            }
+
+            var request = builder.Build();
+            return ExecuteRequest<OpenAlexListResponse<OpenAlexWork>>(request, true);
+        }
+
         public List<Book> SearchByConcept(string topic)
         {
             if (string.IsNullOrWhiteSpace(topic))
@@ -225,6 +256,23 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             }
         }
 
+        public List<OpenAlexTopic> SearchConcepts(string query, int perPage = 10)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return new List<OpenAlexTopic>();
+            }
+
+            var request = _requestBuilder.Create()
+                .Resource("concepts")
+                .AddQueryParam("search", query)
+                .AddQueryParam("per_page", perPage.ToString())
+                .Build();
+
+            var response = ExecuteRequest<OpenAlexListResponse<OpenAlexTopic>>(request, true);
+            return response?.Results ?? new List<OpenAlexTopic>();
+        }
+
         public Tuple<string, Book, List<AuthorMetadata>> GetBookInfo(string id)
         {
             var workId = NormalizeId(id);
@@ -235,8 +283,13 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             var response = ExecuteRequest<OpenAlexWork>(request, true);
 
+            if (response == null)
+            {
+                return null;
+            }
+
             var book = MapBook(response);
-            var authors = response.Authorships.Select(a => MapAuthorMetadata(a.Author)).ToList();
+            var authors = response.Authorships?.Select(a => MapAuthorMetadata(a.Author)).ToList() ?? new List<AuthorMetadata>();
 
             // Note: Source/journal information is stored in Edition.Disambiguation, not as an author
             // Journals should not appear in the authors/researchers list
@@ -282,6 +335,27 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             request.SuppressHttpError = true;
 
             var response = _cachedHttpClient.Get(request, useCache, TimeSpan.FromDays(1));
+
+            if (response.HasHttpError)
+            {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return default(T);
+                }
+
+                throw new HttpException(request, response);
+            }
+
+            return Json.Deserialize<T>(response.Content);
+        }
+
+        private async Task<T> ExecuteRequestAsync<T>(HttpRequest request, bool useCache)
+            where T : new()
+        {
+            request.AllowAutoRedirect = true;
+            request.SuppressHttpError = true;
+
+            var response = await _cachedHttpClient.GetAsync(request, useCache, TimeSpan.FromDays(1));
 
             if (response.HasHttpError)
             {
@@ -513,6 +587,105 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             if (year.HasValue)
             {
                 return new DateTime(year.Value, 1, 1);
+            }
+
+            return null;
+        }
+
+        // Async implementations for high-traffic endpoints
+        public async Task<OpenAlexListResponse<OpenAlexWork>> SearchWorksAdvancedAsync(string search, string filter, string sort, int perPage, string cursor)
+        {
+            var builder = _requestBuilder.Create()
+                .Resource("works")
+                .AddQueryParam("per_page", perPage.ToString());
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                builder.AddQueryParam("search", search);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                builder.AddQueryParam("filter", filter);
+            }
+
+            if (!string.IsNullOrWhiteSpace(sort))
+            {
+                builder.AddQueryParam("sort", sort);
+            }
+
+            if (!string.IsNullOrWhiteSpace(cursor))
+            {
+                builder.AddQueryParam("cursor", cursor);
+            }
+
+            var request = builder.Build();
+            return await ExecuteRequestAsync<OpenAlexListResponse<OpenAlexWork>>(request, true);
+        }
+
+        public async Task<List<OpenAlexTopic>> SearchConceptsAsync(string query, int perPage = 10)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return new List<OpenAlexTopic>();
+            }
+
+            var request = _requestBuilder.Create()
+                .Resource("concepts")
+                .AddQueryParam("search", query)
+                .AddQueryParam("per_page", perPage.ToString())
+                .Build();
+
+            var response = await ExecuteRequestAsync<OpenAlexListResponse<OpenAlexTopic>>(request, true);
+            return response?.Results ?? new List<OpenAlexTopic>();
+        }
+
+        public async Task<Tuple<string, Book, List<AuthorMetadata>>> GetBookInfoAsync(string id)
+        {
+            var workId = NormalizeId(id);
+
+            var request = _requestBuilder.Create()
+                .Resource($"works/{workId}")
+                .Build();
+
+            var response = await ExecuteRequestAsync<OpenAlexWork>(request, true);
+
+            if (response == null)
+            {
+                return null;
+            }
+
+            var book = MapBook(response);
+            var authors = response.Authorships?.Select(a => MapAuthorMetadata(a.Author)).ToList() ?? new List<AuthorMetadata>();
+
+            return new Tuple<string, Book, List<AuthorMetadata>>(workId, book, authors);
+        }
+
+        public async Task<Book> GetBookByDoiAsync(string doi, bool useCache = true)
+        {
+            var normalizedDoi = DoiUtility.Normalize(doi);
+            if (string.IsNullOrWhiteSpace(normalizedDoi))
+            {
+                return null;
+            }
+
+            try
+            {
+                var request = _requestBuilder.Create()
+                    .Resource("works")
+                    .AddQueryParam("filter", $"doi:{normalizedDoi}")
+                    .Build();
+
+                var response = await ExecuteRequestAsync<OpenAlexListResponse<OpenAlexWork>>(request, useCache);
+
+                if (response?.Results != null && response.Results.Any())
+                {
+                    return MapBook(response.Results.First());
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug(ex, "Error fetching book from OpenAlex by DOI: {0}", normalizedDoi);
             }
 
             return null;

@@ -105,6 +105,31 @@
             Extract DOI from an Edition's Links or its parent Book's Links
             </summary>
         </member>
+        <member name="M:NzbDrone.Core.MetadataSource.CrossRef.ICrossRefProxy.GetBookByDoi(System.String,System.Boolean)">
+            <summary>
+            Get book/paper information by DOI
+            </summary>
+        </member>
+        <member name="M:NzbDrone.Core.MetadataSource.CrossRef.ICrossRefProxy.SearchBooks(System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Search for books/papers by title and/or author
+            </summary>
+        </member>
+        <member name="M:NzbDrone.Core.MetadataSource.CrossRef.ICrossRefProxy.GetAuthorByOrcid(System.String,System.Boolean)">
+            <summary>
+            Get author information by ORCID
+            </summary>
+        </member>
+        <member name="M:NzbDrone.Core.MetadataSource.IMetadataAggregator.GetEnhancedBookMetadata(System.String,System.Boolean)">
+            <summary>
+            Get book metadata from multiple sources and merge intelligently
+            </summary>
+        </member>
+        <member name="M:NzbDrone.Core.MetadataSource.IMetadataAggregator.MergeBookMetadata(System.Collections.Generic.List{NzbDrone.Core.Books.Book})">
+            <summary>
+            Merge book metadata from multiple sources
+            </summary>
+        </member>
         <member name="M:NzbDrone.Core.Parser.DoiUtility.ExtractFromText(System.String)">
             <summary>
             Extract DOI from text content (PDF text, metadata fields, etc.)

@@ -5,10 +5,8 @@ import QueueOptions from './QueueOptions';
 
 function createMapStateToProps() {
   return createSelector(
-    (state) => state.queue.options,
-    (options) => {
-      return options;
-    }
+    (state) => state.queue && state.queue.options,
+    (options) => options || { includeUnknownAuthorItems: false }
   );
 }
 

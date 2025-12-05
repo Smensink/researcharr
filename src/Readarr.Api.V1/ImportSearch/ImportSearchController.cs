@@ -6,7 +6,6 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NzbDrone.Core.Books.Import;
-using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Messaging.Commands;
 using Readarr.Http;
 

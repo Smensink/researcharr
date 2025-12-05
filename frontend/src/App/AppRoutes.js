@@ -39,6 +39,7 @@ import getPathWithUrlBase from 'Utilities/getPathWithUrlBase';
 import CutoffUnmetConnector from 'Wanted/CutoffUnmet/CutoffUnmetConnector';
 import MissingConnector from 'Wanted/Missing/MissingConnector';
 import ImportSearches from 'ImportSearches/ImportSearches';
+import AdvancedSearch from 'AdvancedSearch/AdvancedSearch';
 
 function AppRoutes(props) {
   const {
@@ -110,6 +111,11 @@ function AppRoutes(props) {
       <Route
         path="/search-imports"
         component={ImportSearches}
+      />
+
+      <Route
+        path="/advanced-search"
+        component={AdvancedSearch}
       />
 
       <Route

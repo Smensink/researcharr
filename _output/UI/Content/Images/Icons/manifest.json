@@ -2,7 +2,7 @@
     "name": "Researcharr",
     "icons": [
         {
-            "src": "/researcharr.png",
+            "src": "/Content/Images/researcharr.png",
             "sizes": "1024x1024",
             "type": "image/png"
         }

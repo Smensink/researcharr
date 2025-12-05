@@ -118,6 +118,22 @@ namespace NzbDrone.Core.Books
             if (string.IsNullOrWhiteSpace(path))
             {
                 var folderName = _fileNameBuilder.GetAuthorFolder(newAuthor);
+                if (string.IsNullOrWhiteSpace(folderName))
+                {
+                    throw new ValidationException(new List<ValidationFailure>
+                    {
+                        new("FolderName", "Could not generate a folder name for this author.", newAuthor.Metadata?.Value?.ForeignAuthorId)
+                    });
+                }
+
+                if (string.IsNullOrWhiteSpace(newAuthor.RootFolderPath))
+                {
+                    throw new ValidationException(new List<ValidationFailure>
+                    {
+                        new("RootFolder", "No root folder is configured for this author.", newAuthor.Metadata?.Value?.ForeignAuthorId)
+                    });
+                }
+
                 path = Path.Combine(newAuthor.RootFolderPath, folderName);
             }
 

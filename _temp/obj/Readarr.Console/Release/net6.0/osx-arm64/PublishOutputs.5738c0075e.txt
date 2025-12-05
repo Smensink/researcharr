@@ -388,6 +388,13 @@
 /Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/NLog.Targets.Syslog.dll
 /Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/NodaTime.dll
 /Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/Npgsql.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/UglyToad.PdfPig.Core.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/UglyToad.PdfPig.DocumentLayoutAnalysis.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/UglyToad.PdfPig.Fonts.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/UglyToad.PdfPig.Package.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/UglyToad.PdfPig.Tokenization.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/UglyToad.PdfPig.Tokens.dll
+/Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/UglyToad.PdfPig.dll
 /Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/PdfSharpCore.dll
 /Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/Polly.dll
 /Users/sebastianmensink/Documents/Researcharr-develop/_output/net6.0/osx-arm64/publish/Polly.Contrib.WaitAndRetry.dll

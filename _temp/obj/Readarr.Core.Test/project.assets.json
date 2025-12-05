@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net7.0": {
+    "net6.0": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -116,12 +116,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -183,12 +183,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -1563,15 +1563,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -1664,13 +1665,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -2547,12 +2548,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -3079,12 +3080,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -3092,7 +3093,7 @@
           "buildTransitive/net6.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "runtimes/win/lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -3528,7 +3529,7 @@
         }
       }
     },
-    "net7.0/linux-arm": {
+    "net6.0/linux-arm": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -3643,12 +3644,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -3710,12 +3711,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -5050,15 +5051,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -5151,13 +5153,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -6197,12 +6199,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -6719,12 +6721,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -7125,7 +7127,7 @@
         }
       }
     },
-    "net7.0/linux-arm64": {
+    "net6.0/linux-arm64": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -7240,12 +7242,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -7307,12 +7309,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -8647,15 +8649,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -8748,13 +8751,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -9794,12 +9797,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -10316,12 +10319,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -10722,7 +10725,7 @@
         }
       }
     },
-    "net7.0/linux-musl-arm": {
+    "net6.0/linux-musl-arm": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -10837,12 +10840,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -10904,12 +10907,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -12244,15 +12247,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -12345,13 +12349,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -13391,12 +13395,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -13913,12 +13917,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -14319,7 +14323,7 @@
         }
       }
     },
-    "net7.0/linux-musl-arm64": {
+    "net6.0/linux-musl-arm64": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -14434,12 +14438,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -14501,12 +14505,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -15841,15 +15845,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -15942,13 +15947,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -16988,12 +16993,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -17510,12 +17515,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -17916,7 +17921,7 @@
         }
       }
     },
-    "net7.0/linux-musl-x64": {
+    "net6.0/linux-musl-x64": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -18031,12 +18036,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -18098,12 +18103,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -19438,15 +19443,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -19539,13 +19545,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -20585,12 +20591,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -21107,12 +21113,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -21513,7 +21519,7 @@
         }
       }
     },
-    "net7.0/linux-x64": {
+    "net6.0/linux-x64": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -21628,12 +21634,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -21695,12 +21701,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -23035,15 +23041,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -23136,13 +23143,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -24182,12 +24189,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -24704,12 +24711,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -25110,7 +25117,7 @@
         }
       }
     },
-    "net7.0/osx-arm64": {
+    "net6.0/osx-arm64": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -25225,12 +25232,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -25292,12 +25299,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -26632,15 +26639,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -26733,13 +26741,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -27785,12 +27793,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -28307,12 +28315,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -28713,7 +28721,7 @@
         }
       }
     },
-    "net7.0/osx-x64": {
+    "net6.0/osx-x64": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -28828,12 +28836,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -28895,12 +28903,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -30235,15 +30243,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -30336,13 +30345,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -31388,12 +31397,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -31910,12 +31919,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -32316,7 +32325,7 @@
         }
       }
     },
-    "net7.0/win-x64": {
+    "net6.0/win-x64": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -32431,12 +32440,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -32498,12 +32507,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -33841,15 +33850,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -33942,13 +33952,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -34925,12 +34935,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -35446,12 +35456,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "runtimes/win/lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "runtimes/win/lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -35869,7 +35879,7 @@
         }
       }
     },
-    "net7.0/win-x86": {
+    "net6.0/win-x86": {
       "AutoFixture/4.17.0": {
         "type": "package",
         "dependencies": {
@@ -35984,12 +35994,12 @@
       "DryIoc.dll/5.4.3": {
         "type": "package",
         "compile": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/DryIoc.dll": {
+          "lib/net6.0/DryIoc.dll": {
             "related": ".xml"
           }
         }
@@ -36051,12 +36061,12 @@
       "IPAddressRange/6.1.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/IPAddressRange.dll": {
+          "lib/net6.0/IPAddressRange.dll": {
             "related": ".xml"
           }
         }
@@ -37394,15 +37404,16 @@
       "Npgsql/7.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Npgsql.dll": {
+          "lib/net6.0/Npgsql.dll": {
             "related": ".xml"
           }
         }
@@ -37495,13 +37506,13 @@
           "SixLabors.ImageSharp": "1.0.4"
         },
         "compile": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "runtime": {
-          "lib/net7.0/PdfSharpCore.dll": {}
+          "lib/net6.0/PdfSharpCore.dll": {}
         },
         "resource": {
-          "lib/net7.0/de/PdfSharpCore.resources.dll": {
+          "lib/net6.0/de/PdfSharpCore.resources.dll": {
             "locale": "de"
           }
         }
@@ -38478,12 +38489,12 @@
       "System.Formats.Asn1/8.0.1": {
         "type": "package",
         "compile": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Formats.Asn1.dll": {
+          "lib/net6.0/System.Formats.Asn1.dll": {
             "related": ".xml"
           }
         },
@@ -38999,12 +39010,12 @@
           "System.Formats.Asn1": "8.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "runtimes/win/lib/net7.0/System.Security.Cryptography.Pkcs.dll": {
+          "runtimes/win/lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "related": ".xml"
           }
         },
@@ -46333,7 +46344,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net7.0": [
+    "net6.0": [
       "AutoFixture >= 4.17.0",
       "Microsoft.NET.Test.Sdk >= 17.10.0",
       "NBuilder >= 6.1.0",
@@ -46367,7 +46378,7 @@
         "/root/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "net7.0"
+        "net6.0"
       ],
       "sources": {
         "https://api.nuget.org/v3/index.json": {},
@@ -46378,8 +46389,8 @@
         "https://pkgs.dev.azure.com/Servarr/coverlet/_packaging/coverlet-nightly/nuget/v3/index.json": {}
       },
       "frameworks": {
-        "net7.0": {
-          "targetAlias": "net7.0",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "projectReferences": {
             "/workspace/src/NzbDrone.Core/Readarr.Core.csproj": {
               "projectPath": "/workspace/src/NzbDrone.Core/Readarr.Core.csproj"
@@ -46398,8 +46409,8 @@
       }
     },
     "frameworks": {
-      "net7.0": {
-        "targetAlias": "net7.0",
+      "net6.0": {
+        "targetAlias": "net6.0",
         "dependencies": {
           "AutoFixture": {
             "target": "Package",
@@ -46538,119 +46549,119 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.AspNetCore.App.Runtime.linux-arm",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.linux-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.linux-musl-arm",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.linux-musl-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.linux-musl-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.osx-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.osx-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.win-x86",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.linux-arm",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.linux-musl-arm",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.linux-musl-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.linux-musl-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.linux-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.osx-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.osx-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Host.win-x86",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.linux-arm",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.linux-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.linux-musl-arm",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.linux-musl-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.linux-musl-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.linux-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.osx-arm64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.osx-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.win-x64",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.win-x86",
-            "version": "[7.0.20, 7.0.20]"
+            "version": "[6.0.36, 6.0.36]"
           }
         ],
         "frameworkReferences": {
@@ -46658,7 +46669,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.410/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.428/RuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {

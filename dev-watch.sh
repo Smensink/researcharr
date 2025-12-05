@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 echo "======================================"
 echo "Researcharr Dev Watch Setup"
@@ -8,6 +8,9 @@ echo "======================================"
 # Install system dependencies
 echo "Installing system dependencies..."
 apt-get update -qq && apt-get install -y -qq sqlite3 libsqlite3-dev curl inotify-tools > /dev/null 2>&1
+
+# SDK image already includes the 6.0 runtime
+dotnet --list-runtimes
 
 # Install Node.js 20.x
 if ! command -v node >/dev/null 2>&1; then
@@ -37,7 +40,10 @@ fi
 echo "Restoring .NET packages..."
 dotnet restore src/Readarr.sln > /dev/null 2>&1
 
-# Copy existing UI files if available
+# Clear stale build artifacts to avoid locked files, then copy UI assets for faster startup
+if [ -d "_output/net6.0" ]; then
+  rm -rf _output/net6.0/*
+fi
 if [ -d "_output/UI" ]; then
   echo "Copying existing UI files..."
   cp -r _output/UI _output/net6.0/ 2>/dev/null || true
@@ -71,4 +77,5 @@ trap "echo 'Stopping...'; kill $YARN_PID 2>/dev/null || true; exit" INT TERM EXI
 # Start backend watch in foreground
 echo "Starting backend watch (dotnet)..."
 echo ""
-dotnet watch --project src/NzbDrone.Console/Readarr.Console.csproj -- run --framework net6.0 --nobrowser --data=/data --Urls=http://0.0.0.0:7337
+export DOTNET_ROOT=/usr/share/dotnet
+dotnet run --project src/NzbDrone.Console/Readarr.Console.csproj --framework net6.0 --nobrowser --data=/data --Urls=http://0.0.0.0:7337

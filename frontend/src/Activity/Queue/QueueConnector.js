@@ -12,12 +12,15 @@ import Queue from './Queue';
 
 function createMapStateToProps() {
   return createSelector(
-    (state) => state.authors,
-    (state) => state.books,
-    (state) => state.queue.options,
-    (state) => state.queue.paged,
+    (state) => state.authors || {},
+    (state) => state.books || {},
+    (state) => state.queue && state.queue.options,
+    (state) => state.queue && state.queue.paged,
     createCommandExecutingSelector(commandNames.REFRESH_MONITORED_DOWNLOADS),
     (authors, books, options, queue, isRefreshMonitoredDownloadsExecuting) => {
+      const safeOptions = options || { includeUnknownAuthorItems: false };
+      const safeQueue = queue || { items: [], pageSize: 20, sortKey: 'timeleft', sortDirection: 'asc' };
+
       return {
         isAuthorFetching: authors.isFetching,
         isAuthorPopulated: authors.isPopulated,
@@ -25,8 +28,8 @@ function createMapStateToProps() {
         isBooksPopulated: books.isPopulated,
         booksError: books.error,
         isRefreshMonitoredDownloadsExecuting,
-        ...options,
-        ...queue
+        ...safeOptions,
+        ...safeQueue
       };
     }
   );

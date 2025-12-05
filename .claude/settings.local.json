@@ -15,7 +15,10 @@
       "Bash(./dev.sh:*)",
       "Bash(docker exec:*)",
       "Bash(find:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(cat:*)",
+      "Bash(sqlite3:*)"
     ],
     "deny": [],
     "ask": []

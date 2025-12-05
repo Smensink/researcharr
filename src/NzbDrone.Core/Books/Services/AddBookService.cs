@@ -4,9 +4,11 @@ using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
 using NLog;
+using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.ImportLists.Exclusions;
 using NzbDrone.Core.MetadataSource;
+using NzbDrone.Core.RootFolders;
 
 namespace NzbDrone.Core.Books
 {
@@ -23,6 +25,7 @@ namespace NzbDrone.Core.Books
         private readonly IBookService _bookService;
         private readonly IProvideBookInfo _bookInfo;
         private readonly IImportListExclusionService _importListExclusionService;
+        private readonly IRootFolderService _rootFolderService;
         private readonly Logger _logger;
 
         public AddBookService(IAuthorService authorService,
@@ -30,6 +33,7 @@ namespace NzbDrone.Core.Books
                                IBookService bookService,
                                IProvideBookInfo bookInfo,
                                IImportListExclusionService importListExclusionService,
+                               IRootFolderService rootFolderService,
                                Logger logger)
         {
             _authorService = authorService;
@@ -37,6 +41,7 @@ namespace NzbDrone.Core.Books
             _bookService = bookService;
             _bookInfo = bookInfo;
             _importListExclusionService = importListExclusionService;
+            _rootFolderService = rootFolderService;
             _logger = logger;
         }
 
@@ -71,9 +76,26 @@ namespace NzbDrone.Core.Books
             var dbAuthor = _authorService.FindById(book.AuthorMetadata.Value.ForeignAuthorId);
             if (dbAuthor == null)
             {
-                var author = book.Author.Value;
+                var author = book.Author?.Value ?? new Author
+                {
+                    Metadata = new LazyLoaded<AuthorMetadata>(book.AuthorMetadata.Value),
+                    AddOptions = new AddAuthorOptions()
+                };
 
                 author.Metadata.Value.ForeignAuthorId = book.AuthorMetadata.Value.ForeignAuthorId;
+
+                if (string.IsNullOrWhiteSpace(author.RootFolderPath))
+                {
+                    var root = _rootFolderService.All().FirstOrDefault(r => !string.IsNullOrWhiteSpace(r.Path));
+                    if (root == null || string.IsNullOrWhiteSpace(root.Path))
+                    {
+                        throw new ValidationException(new List<ValidationFailure>
+                                                      {
+                                                          new ValidationFailure("RootFolder", "No root folders are configured; cannot add author.", author.Metadata.Value.ForeignAuthorId)
+                                                      });
+                    }
+                    author.RootFolderPath = root.Path;
+                }
 
                 // Ensure we don't auto-monitor other books (like the newest one) when adding a specific book
                 if (author.AddOptions == null)
@@ -116,7 +138,7 @@ namespace NzbDrone.Core.Books
 
         private Book AddSkyhookData(Book newBook)
         {
-            var editionId = newBook.Editions.Value.FirstOrDefault(x => x.Monitored)?.ForeignEditionId;
+            var editionId = newBook.Editions?.Value?.FirstOrDefault(x => x.Monitored)?.ForeignEditionId;
 
             Tuple<string, Book, List<AuthorMetadata>> tuple = null;
             try
@@ -133,10 +155,27 @@ namespace NzbDrone.Core.Books
                                               });
             }
 
+            if (tuple == null || tuple.Item2 == null || tuple.Item3 == null || !tuple.Item3.Any())
+            {
+                throw new ValidationException(new List<ValidationFailure>
+                                              {
+                                                  new ValidationFailure("Metadata", "Unable to fetch metadata for this book from the provider.", newBook.ForeignBookId)
+                                              });
+            }
+
             newBook.UseMetadataFrom(tuple.Item2);
             newBook.Added = DateTime.UtcNow;
 
-            newBook.Editions = tuple.Item2.Editions.Value;
+            var editions = tuple.Item2.Editions?.Value;
+            if (editions == null || !editions.Any())
+            {
+                throw new ValidationException(new List<ValidationFailure>
+                                              {
+                                                  new ValidationFailure("Editions", "No editions were returned for this book.", newBook.ForeignBookId)
+                                              });
+            }
+
+            newBook.Editions = new LazyLoaded<List<Edition>>(editions);
             newBook.Editions.Value.ForEach(x => x.Monitored = false);
 
             // Try to re-apply the originally selected edition; otherwise fall back to first
@@ -147,6 +186,28 @@ namespace NzbDrone.Core.Books
             {
                 selected.Monitored = true;
             }
+            else
+            {
+                throw new ValidationException(new List<ValidationFailure>
+                                              {
+                                                  new ValidationFailure("EditionSelection", "No suitable edition was found for this book.", newBook.ForeignBookId)
+                                              });
+            }
+
+            if (newBook.AuthorMetadata == null || newBook.AuthorMetadata.Value == null)
+            {
+                newBook.AuthorMetadata = new LazyLoaded<AuthorMetadata>(tuple.Item3.FirstOrDefault());
+            }
+
+            if (newBook.AuthorMetadata?.Value == null)
+            {
+                throw new ValidationException(new List<ValidationFailure>
+                                              {
+                                                  new ValidationFailure("Author", "No author metadata was returned for this book.", newBook.ForeignBookId)
+                                              });
+            }
+
+            newBook.AuthorMetadataId = newBook.AuthorMetadata.Value.Id;
 
             var authorId = newBook.AuthorMetadata.Value.ForeignAuthorId;
             var metadata = tuple.Item3.FirstOrDefault(x => x.ForeignAuthorId == authorId);
@@ -157,7 +218,15 @@ namespace NzbDrone.Core.Books
                 metadata = tuple.Item3.FirstOrDefault();
             }
 
-            newBook.AuthorMetadata = metadata;
+            if (metadata == null)
+            {
+                throw new ValidationException(new List<ValidationFailure>
+                                              {
+                                                  new ValidationFailure("Author", "No matching author metadata was found for this book.", newBook.ForeignBookId)
+                                              });
+            }
+
+            newBook.AuthorMetadata = new LazyLoaded<AuthorMetadata>(metadata);
 
             return newBook;
         }

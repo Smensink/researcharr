@@ -131,6 +131,12 @@ module.exports = (env) => {
                 destination: path.join(distFolder, 'Content/Images')
               },
 
+              // Root favicon (researcharr.png)
+              {
+                source: 'frontend/src/Content/Images/researcharr.png',
+                destination: path.join(distFolder, 'researcharr.png')
+              },
+
               // Robots
               {
                 source: 'frontend/src/Content/robots.txt',

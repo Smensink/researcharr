@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Threading.Tasks;
 using NLog;
 using NzbDrone.Common.Http;
 
@@ -9,6 +10,9 @@ namespace NzbDrone.Core.Http
     {
         HttpResponse Get(HttpRequest request, bool useCache, TimeSpan ttl);
         HttpResponse<T> Get<T>(HttpRequest request, bool useCache, TimeSpan ttl)
+            where T : new();
+        Task<HttpResponse> GetAsync(HttpRequest request, bool useCache, TimeSpan ttl);
+        Task<HttpResponse<T>> GetAsync<T>(HttpRequest request, bool useCache, TimeSpan ttl)
             where T : new();
     }
 
@@ -66,6 +70,48 @@ namespace NzbDrone.Core.Http
             where T : new()
         {
             var response = Get(request, useCache, ttl);
+            return new HttpResponse<T>(response);
+        }
+
+        public async Task<HttpResponse> GetAsync(HttpRequest request, bool useCache, TimeSpan ttl)
+        {
+            var cached = _repo.FindByUrl(request.Url.ToString());
+
+            if (useCache && cached != null && cached.Expiry > DateTime.UtcNow)
+            {
+                _logger.Trace($"Returning cached response for [GET] {request.Url}");
+                return new HttpResponse(request, new HttpHeader(), cached.Value, (HttpStatusCode)cached.StatusCode);
+            }
+
+            var result = await _httpClient.GetAsync(request);
+
+            if (!result.HasHttpError)
+            {
+                if (cached == null)
+                {
+                    cached = new CachedHttpResponse
+                    {
+                        Url = request.Url.ToString(),
+                    };
+                }
+
+                var now = DateTime.UtcNow;
+
+                cached.LastRefresh = now;
+                cached.Expiry = now.Add(ttl);
+                cached.Value = result.Content;
+                cached.StatusCode = (int)result.StatusCode;
+
+                _repo.Upsert(cached);
+            }
+
+            return result;
+        }
+
+        public async Task<HttpResponse<T>> GetAsync<T>(HttpRequest request, bool useCache, TimeSpan ttl)
+            where T : new()
+        {
+            var response = await GetAsync(request, useCache, ttl);
             return new HttpResponse<T>(response);
         }
     }

@@ -24,6 +24,7 @@ using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Instrumentation;
 using NzbDrone.Core.Jobs;
 using NzbDrone.Core.MediaFiles;
+using NzbDrone.Core.Mesh;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Notifications;
 using NzbDrone.Core.Organizer;
@@ -216,6 +217,17 @@ namespace NzbDrone.Core.Datastore
             Mapper.Entity<Download.Clients.HttpDownload.HttpDownloadItem>("HttpDownloadItems").RegisterModel();
 
             Mapper.Entity<UpdateHistory>("UpdateHistory").RegisterModel();
+
+            // MeSH descriptor storage
+            Mapper.Entity<MeshDescriptor>("MeshDescriptors").RegisterModel();
+            Mapper.Entity<MeshTerm>("MeshTerms").RegisterModel();
+            Mapper.Entity<MeshMetadata>("MeshMetadata").RegisterModel();
+
+            // OpenAlex concepts storage
+            Mapper.Entity<Concepts.OpenAlexConcept>("OpenAlexConcepts").RegisterModel();
+
+            // Advanced Search saved searches
+            Mapper.Entity<AdvancedSearch.SavedSearch>("SavedSearches").RegisterModel();
         }
 
         private static void RegisterMappers()

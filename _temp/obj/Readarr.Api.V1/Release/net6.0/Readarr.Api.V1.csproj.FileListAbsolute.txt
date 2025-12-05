@@ -60,10 +60,6 @@
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.xml
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.pdb
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Api.V1/Release/net6.0/ref/Readarr.Api.V1.dll
-/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.dll
-/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/refint/Readarr.Api.V1.dll
-/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.xml
-/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.pdb
 /workspace/_output/net6.0/Localization/Core/ar.json
 /workspace/_output/net6.0/Localization/Core/bg.json
 /workspace/_output/net6.0/Localization/Core/bn.json
@@ -121,4 +117,8 @@
 /workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.csproj.CoreCompileInputs.cache
 /workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.sourcelink.json
 /workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.csproj.CopyComplete
+/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.dll
+/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/refint/Readarr.Api.V1.dll
+/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.xml
+/workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/Readarr.Api.V1.pdb
 /workspace/_temp/obj/Readarr.Api.V1/Release/net6.0/ref/Readarr.Api.V1.dll
