@@ -11,7 +11,7 @@ services:
     volumes:
       - researcharr_config:/data
       - ./books:/books
-      - researcharr_downloads:/downloads
+      - ./downloads:/downloads
     depends_on:
       - flaresolverr
 
@@ -27,4 +27,3 @@ services:
 volumes:
   researcharr_config:
   researcharr_root:
-  researcharr_downloads:

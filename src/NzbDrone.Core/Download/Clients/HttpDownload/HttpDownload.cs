@@ -129,7 +129,7 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
             {
                 try
                 {
-                    _httpClient.DownloadFile(release.DownloadUrl, path, Settings.UserAgent);
+                    _httpClient.DownloadFile(release.DownloadUrl, path, Settings.UserAgent, Settings.CustomHeaders);
 
                     _logger.Info("Successfully downloaded {0}", title);
 

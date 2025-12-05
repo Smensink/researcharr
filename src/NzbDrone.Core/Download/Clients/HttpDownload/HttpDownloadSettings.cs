@@ -16,6 +16,9 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
         [FieldDefinition(1, Label = "User Agent", HelpText = "User Agent string to use for downloads", Type = FieldType.Textbox)]
         public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
 
+        [FieldDefinition(2, Label = "Custom Headers", HelpText = "Additional HTTP headers in format: Header1:Value1,Header2:Value2 (e.g., Referer:https://example.com,Accept-Language:en-US,en)", Type = FieldType.Textbox, Advanced = true)]
+        public string CustomHeaders { get; set; }
+
         public NzbDroneValidationResult Validate()
         {
             return new NzbDroneValidationResult(Validator.Validate(this));

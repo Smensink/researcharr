@@ -15,7 +15,7 @@ services:
       - nuget-cache:/root/.nuget/packages
       - node-modules:/workspace/node_modules
       - researcharr_config:/data
-      - researcharr_downloads:/downloads
+      - ./downloads:/downloads
       - ./books:/books
     depends_on:
       - flaresolverr
@@ -32,4 +32,3 @@ volumes:
   nuget-cache:
   node-modules:
   researcharr_config:
-  researcharr_downloads:

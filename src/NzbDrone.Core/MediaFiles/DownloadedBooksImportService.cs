@@ -296,9 +296,23 @@ namespace NzbDrone.Core.MediaFiles
             {
                 Author = author
             };
+
+            // Try to extract ParsedBookInfo from downloadClientItem title to help with book matching
+            ParsedBookInfo parsedBookInfo = null;
+            if (downloadClientItem != null && !string.IsNullOrWhiteSpace(downloadClientItem.Title))
+            {
+                parsedBookInfo = Parser.Parser.ParseBookTitle(downloadClientItem.Title);
+                if (parsedBookInfo != null && author != null && parsedBookInfo.AuthorName.IsNullOrWhiteSpace())
+                {
+                    // Fill in author name if not parsed from title
+                    parsedBookInfo.AuthorName = author.Name;
+                }
+            }
+
             var idInfo = new ImportDecisionMakerInfo
             {
-                DownloadClientItem = downloadClientItem
+                DownloadClientItem = downloadClientItem,
+                ParsedBookInfo = parsedBookInfo
             };
             var idConfig = new ImportDecisionMakerConfig
             {

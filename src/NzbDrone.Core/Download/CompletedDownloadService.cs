@@ -88,34 +88,44 @@ namespace NzbDrone.Core.Download
 
             trackedDownload.State = TrackedDownloadState.Importing;
 
-            var outputPath = trackedDownload.ImportItem.OutputPath.FullPath;
-            var importResults = _downloadedTracksImportService.ProcessPath(outputPath, ImportMode.Auto, trackedDownload.RemoteBook?.Author, trackedDownload.DownloadItem);
-
-            if (importResults.Empty())
+            try
             {
-                trackedDownload.Warn("No files found are eligible for import in {0}", outputPath);
+                var outputPath = trackedDownload.ImportItem.OutputPath.FullPath;
+                var importResults = _downloadedTracksImportService.ProcessPath(outputPath, ImportMode.Auto, trackedDownload.RemoteBook?.Author, trackedDownload.DownloadItem);
+
+                if (importResults.Empty())
+                {
+                    trackedDownload.Warn("No files found are eligible for import in {0}", outputPath);
+                    trackedDownload.State = TrackedDownloadState.ImportPending;
+                    return;
+                }
+
+                if (VerifyImport(trackedDownload, importResults))
+                {
+                    return;
+                }
+
                 trackedDownload.State = TrackedDownloadState.ImportPending;
-                return;
+
+                if (importResults.Any(c => c.Result != ImportResultType.Imported))
+                {
+                    trackedDownload.State = TrackedDownloadState.ImportFailed;
+                    var statusMessages = importResults
+                        .Where(v => v.Result != ImportResultType.Imported && v.ImportDecision.Item != null)
+                        .Select(v => new TrackedDownloadStatusMessage(Path.GetFileName(v.ImportDecision.Item.Path), v.Errors))
+                        .ToArray();
+
+                    trackedDownload.Warn(statusMessages);
+                    _eventAggregator.PublishEvent(new BookImportIncompleteEvent(trackedDownload));
+                    return;
+                }
             }
-
-            if (VerifyImport(trackedDownload, importResults))
+            catch (Exception ex)
             {
-                return;
-            }
-
-            trackedDownload.State = TrackedDownloadState.ImportPending;
-
-            if (importResults.Any(c => c.Result != ImportResultType.Imported))
-            {
-                trackedDownload.State = TrackedDownloadState.ImportFailed;
-                var statusMessages = importResults
-                    .Where(v => v.Result != ImportResultType.Imported && v.ImportDecision.Item != null)
-                    .Select(v => new TrackedDownloadStatusMessage(Path.GetFileName(v.ImportDecision.Item.Path), v.Errors))
-                    .ToArray();
-
-                trackedDownload.Warn(statusMessages);
-                _eventAggregator.PublishEvent(new BookImportIncompleteEvent(trackedDownload));
-                return;
+                _logger.Error(ex, "Failed to import download: {0}", trackedDownload.DownloadItem.Title);
+                trackedDownload.State = TrackedDownloadState.ImportPending;
+                trackedDownload.Warn("Import failed: {0}", ex.Message);
+                throw;
             }
         }
 
@@ -206,6 +216,23 @@ namespace NzbDrone.Core.Download
                 (OsInfo.IsNotWindows && !downloadItemOutputPath.IsUnixPath))
             {
                 trackedDownload.Warn("[{0}] is not a valid local path. You may need a Remote Path Mapping.", downloadItemOutputPath);
+                return false;
+            }
+
+            // For file-based downloads (like HttpDownload), verify the file exists
+            var fullPath = downloadItemOutputPath.FullPath;
+            if (File.Exists(fullPath))
+            {
+                _logger.Debug("Import file exists: {0}", fullPath);
+            }
+            else if (Directory.Exists(fullPath))
+            {
+                _logger.Debug("Import path is a directory: {0}", fullPath);
+            }
+            else
+            {
+                _logger.Warn("Import path does not exist: {0}", fullPath);
+                trackedDownload.Warn("Download file or folder does not exist at {0}. The download may have failed or been moved.", fullPath);
                 return false;
             }
 

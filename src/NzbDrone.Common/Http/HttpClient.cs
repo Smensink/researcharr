@@ -18,7 +18,7 @@ namespace NzbDrone.Common.Http
     public interface IHttpClient
     {
         HttpResponse Execute(HttpRequest request);
-        void DownloadFile(string url, string fileName, string userAgent = null);
+        void DownloadFile(string url, string fileName, string userAgent = null, string customHeaders = null);
         HttpResponse Get(HttpRequest request);
         HttpResponse<T> Get<T>(HttpRequest request)
             where T : new();
@@ -28,7 +28,7 @@ namespace NzbDrone.Common.Http
             where T : new();
 
         Task<HttpResponse> ExecuteAsync(HttpRequest request);
-        Task DownloadFileAsync(string url, string fileName, string userAgent = null);
+        Task DownloadFileAsync(string url, string fileName, string userAgent = null, string customHeaders = null);
         Task<HttpResponse> GetAsync(HttpRequest request);
         Task<HttpResponse<T>> GetAsync<T>(HttpRequest request)
             where T : new();
@@ -47,17 +47,20 @@ namespace NzbDrone.Common.Http
         private readonly ICached<CookieContainer> _cookieContainerCache;
         private readonly List<IHttpRequestInterceptor> _requestInterceptors;
         private readonly IHttpDispatcher _httpDispatcher;
+        private readonly IFlareSolverrService _flareSolverrService;
 
         public HttpClient(IEnumerable<IHttpRequestInterceptor> requestInterceptors,
             ICacheManager cacheManager,
             IRateLimitService rateLimitService,
             IHttpDispatcher httpDispatcher,
-            Logger logger)
+            Logger logger,
+            IFlareSolverrService flareSolverrService = null)
         {
             _requestInterceptors = requestInterceptors.ToList();
             _rateLimitService = rateLimitService;
             _httpDispatcher = httpDispatcher;
             _logger = logger;
+            _flareSolverrService = flareSolverrService;
 
             ServicePointManager.DefaultConnectionLimit = 12;
             _cookieContainerCache = cacheManager.GetCache<CookieContainer>(typeof(HttpClient));
@@ -72,13 +75,29 @@ namespace NzbDrone.Common.Http
             if (request.AllowAutoRedirect && response.HasHttpRedirect)
             {
                 var autoRedirectChain = new List<string> { request.Url.ToString() };
+                var visitedUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { request.Url.ToString() };
 
                 do
                 {
-                    request.Url += new HttpUri(response.Headers.GetSingleValue("Location"));
-                    autoRedirectChain.Add(request.Url.ToString());
+                    var location = response.Headers.GetSingleValue("Location");
+                    if (location == null)
+                    {
+                        break;
+                    }
+
+                    request.Url += new HttpUri(location);
+                    var currentUrl = request.Url.ToString();
+                    autoRedirectChain.Add(currentUrl);
 
                     _logger.Trace("Redirected to {0}", request.Url);
+
+                    // Detect redirect loops by checking if we've visited this URL before
+                    if (visitedUrls.Contains(currentUrl))
+                    {
+                        throw new WebException($"Redirect loop detected. Visited URL twice: {currentUrl}. Redirect chain: {autoRedirectChain.Join(" -> ")}", WebExceptionStatus.ProtocolError);
+                    }
+
+                    visitedUrls.Add(currentUrl);
 
                     if (autoRedirectChain.Count > MaxRedirects)
                     {
@@ -262,7 +281,7 @@ namespace NzbDrone.Common.Http
             }
         }
 
-        public async Task DownloadFileAsync(string url, string fileName, string userAgent = null)
+        public async Task DownloadFileAsync(string url, string fileName, string userAgent = null, string customHeaders = null)
         {
             var fileNamePart = fileName + ".part";
 
@@ -283,16 +302,168 @@ namespace NzbDrone.Common.Http
                     request.AllowAutoRedirect = true;
                     request.ResponseStream = fileStream;
                     request.RequestTimeout = TimeSpan.FromSeconds(300);
+
+                    // Set User-Agent
                     if (userAgent.IsNotNullOrWhiteSpace())
                     {
                         request.Headers.Set("User-Agent", userAgent);
                     }
 
-                    var response = await GetAsync(request);
+                    // Add browser-like default headers to avoid bot detection
+                    AddBrowserLikeHeaders(request, url);
 
+                    // Parse and add custom headers
+                    if (customHeaders.IsNotNullOrWhiteSpace())
+                    {
+                        ParseAndAddCustomHeaders(request, customHeaders);
+                    }
+
+                    var response = await GetAsync(request);
+                    var cloudflareSolved = false;
+
+                    // Check for Cloudflare JavaScript challenge page or other HTML responses
                     if (response.Headers.ContentType != null && response.Headers.ContentType.Contains("text/html"))
                     {
-                        throw new HttpException(request, response, "Site responded with html content.");
+                        // Read a portion of the response from the file stream to check for Cloudflare challenge
+                        var currentPosition = fileStream.Position;
+                        fileStream.Position = 0;
+                        var fileLength = fileStream.Length;
+                        var buffer = new byte[Math.Min(4096, (int)fileLength)];
+                        var bytesRead = 0;
+
+                        if (fileLength > 0)
+                        {
+                            bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length);
+                        }
+
+                        fileStream.Position = currentPosition;
+
+                        if (bytesRead > 0)
+                        {
+                            var contentPreview = System.Text.Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                            // Check for Cloudflare challenge indicators
+                            if (contentPreview.Contains("Just a moment") ||
+                                contentPreview.Contains("challenge-platform") ||
+                                contentPreview.Contains("cf-challenge") ||
+                                contentPreview.Contains("__cf_chl_opt") ||
+                                contentPreview.Contains("Enable JavaScript and cookies to continue"))
+                            {
+                                // Try FlareSolverr if available
+                                if (_flareSolverrService != null && _flareSolverrService.IsAvailable())
+                                {
+                                    _logger.Info("Cloudflare challenge detected, attempting to solve with FlareSolverr: {0}", url);
+                                    try
+                                    {
+                                        // Use FlareSolverr to solve the challenge and get the file
+                                        var flareResponse = await _flareSolverrService.SolveAsync(url, 90000);
+
+                                        // FlareSolverr solved the challenge - now download the file using cookies/headers from FlareSolverr
+                                        // Use the final URL from FlareSolverr (after redirects) or the original URL
+                                        var downloadUrl = !string.IsNullOrWhiteSpace(flareResponse.Url) ? flareResponse.Url : url;
+                                        _logger.Debug("Downloading file from FlareSolverr-solved URL: {0}", downloadUrl);
+
+                                        // Retry download from the solved URL with cookies
+                                        fileStream.SetLength(0);
+                                        fileStream.Position = 0;
+
+                                        var retryRequest = new HttpRequest(downloadUrl);
+                                        retryRequest.AllowAutoRedirect = true;
+                                        retryRequest.ResponseStream = fileStream;
+                                        retryRequest.RequestTimeout = TimeSpan.FromSeconds(300);
+
+                                        // Use the User-Agent from FlareSolverr if available
+                                        if (!string.IsNullOrWhiteSpace(flareResponse.UserAgent))
+                                        {
+                                            retryRequest.Headers.Set("User-Agent", flareResponse.UserAgent);
+                                        }
+                                        else if (userAgent.IsNotNullOrWhiteSpace())
+                                        {
+                                            retryRequest.Headers.Set("User-Agent", userAgent);
+                                        }
+
+                                        // Add cookies from FlareSolverr
+                                        if (flareResponse.Cookies != null)
+                                        {
+                                            try
+                                            {
+                                                var downloadUri = new Uri(downloadUrl);
+                                                var cookieHeader = flareResponse.Cookies.GetCookieHeader(downloadUri);
+                                                if (!string.IsNullOrWhiteSpace(cookieHeader))
+                                                {
+                                                    retryRequest.Headers.Set("Cookie", cookieHeader);
+                                                    _logger.Debug("Added {0} cookies from FlareSolverr", flareResponse.Cookies.Count);
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                _logger.Debug(ex, "Failed to add cookies from FlareSolverr");
+                                            }
+                                        }
+
+                                        AddBrowserLikeHeaders(retryRequest, downloadUrl);
+
+                                        if (customHeaders.IsNotNullOrWhiteSpace())
+                                        {
+                                            ParseAndAddCustomHeaders(retryRequest, customHeaders);
+                                        }
+
+                                        var retryResponse = await GetAsync(retryRequest);
+
+                                        // Check if we still got HTML (might be another challenge or redirect to HTML page)
+                                        if (retryResponse.Headers.ContentType != null && retryResponse.Headers.ContentType.Contains("text/html"))
+                                        {
+                                            fileStream.Position = 0;
+                                            var retryFileLength = fileStream.Length;
+                                            var retryBuffer = new byte[Math.Min(4096, (int)retryFileLength)];
+                                            var retryBytesRead = 0;
+
+                                            if (retryFileLength > 0)
+                                            {
+                                                retryBytesRead = await fileStream.ReadAsync(retryBuffer, 0, retryBuffer.Length);
+                                            }
+
+                                            if (retryBytesRead > 0)
+                                            {
+                                                var retryContentPreview = System.Text.Encoding.UTF8.GetString(retryBuffer, 0, retryBytesRead);
+                                                if (retryContentPreview.Contains("Just a moment") ||
+                                                    retryContentPreview.Contains("challenge-platform"))
+                                                {
+                                                    throw new HttpException(retryRequest, retryResponse, "Cloudflare challenge persists even after FlareSolverr attempt. The site may require additional authentication or manual intervention.");
+                                                }
+                                            }
+                                        }
+
+                                        // Success - file should be written to stream
+                                        _logger.Info("Successfully downloaded file using FlareSolverr: {0}", downloadUrl);
+                                        cloudflareSolved = true;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.Warn(ex, "FlareSolverr failed to solve Cloudflare challenge for: {0}", url);
+                                        throw new HttpException(request, response, $"Cloudflare JavaScript challenge detected and FlareSolverr failed to solve it: {ex.Message}");
+                                    }
+                                }
+                                else
+                                {
+                                    throw new HttpException(request, response, "Cloudflare JavaScript challenge detected. FlareSolverr is not available or not configured. Set FLARESOLVERR_URL environment variable to enable automatic challenge solving.");
+                                }
+                            }
+                        }
+
+                        if (!cloudflareSolved)
+                        {
+                            var errorMsg = "Site responded with html content instead of expected file.";
+                            if (_flareSolverrService == null || !_flareSolverrService.IsAvailable())
+                            {
+                                errorMsg += " FlareSolverr is not available. Set FLARESOLVERR_URL environment variable to enable automatic Cloudflare challenge solving.";
+                            }
+                            else
+                            {
+                                errorMsg += " This may be a Cloudflare challenge that FlareSolverr could not solve, or the server is returning an error page.";
+                            }
+                            throw new HttpException(request, response, errorMsg);
+                        }
                     }
                 }
 
@@ -315,10 +486,121 @@ namespace NzbDrone.Common.Http
             }
         }
 
-        public void DownloadFile(string url, string fileName, string userAgent = null)
+        public void DownloadFile(string url, string fileName, string userAgent = null, string customHeaders = null)
         {
             // https://docs.microsoft.com/en-us/archive/msdn-magazine/2015/july/async-programming-brownfield-async-development#the-thread-pool-hack
-            Task.Run(() => DownloadFileAsync(url, fileName, userAgent)).GetAwaiter().GetResult();
+            Task.Run(() => DownloadFileAsync(url, fileName, userAgent, customHeaders)).GetAwaiter().GetResult();
+        }
+
+        private void AddBrowserLikeHeaders(HttpRequest request, string url)
+        {
+            try
+            {
+                var uri = new Uri(url);
+
+                // Set Accept header for PDF downloads
+                if (!request.Headers.ContainsKey("Accept"))
+                {
+                    request.Headers.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,application/pdf,*/*;q=0.8";
+                }
+
+                // Set Accept-Language
+                if (!request.Headers.ContainsKey("Accept-Language"))
+                {
+                    request.Headers.Set("Accept-Language", "en-US,en;q=0.9");
+                }
+
+                // Set Accept-Encoding
+                if (!request.Headers.ContainsKey("Accept-Encoding"))
+                {
+                    request.Headers.Set("Accept-Encoding", "gzip, deflate, br");
+                }
+
+                // Set Referer to the same domain to appear as if navigating from the site
+                if (!request.Headers.ContainsKey("Referer"))
+                {
+                    var referer = $"{uri.Scheme}://{uri.Host}/";
+                    request.Headers.Set("Referer", referer);
+                }
+
+                // Set DNT (Do Not Track) header
+                if (!request.Headers.ContainsKey("DNT"))
+                {
+                    request.Headers.Set("DNT", "1");
+                }
+
+                // Set Sec-Fetch headers for modern browsers
+                if (!request.Headers.ContainsKey("Sec-Fetch-Dest"))
+                {
+                    request.Headers.Set("Sec-Fetch-Dest", "document");
+                }
+
+                if (!request.Headers.ContainsKey("Sec-Fetch-Mode"))
+                {
+                    request.Headers.Set("Sec-Fetch-Mode", "navigate");
+                }
+
+                if (!request.Headers.ContainsKey("Sec-Fetch-Site"))
+                {
+                    request.Headers.Set("Sec-Fetch-Site", "none");
+                }
+
+                if (!request.Headers.ContainsKey("Sec-Fetch-User"))
+                {
+                    request.Headers.Set("Sec-Fetch-User", "?1");
+                }
+
+                // Set Upgrade-Insecure-Requests
+                if (!request.Headers.ContainsKey("Upgrade-Insecure-Requests"))
+                {
+                    request.Headers.Set("Upgrade-Insecure-Requests", "1");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Failed to add browser-like headers for URL: {0}", url);
+            }
+        }
+
+        private void ParseAndAddCustomHeaders(HttpRequest request, string customHeaders)
+        {
+            try
+            {
+                if (customHeaders.IsNullOrWhiteSpace())
+                {
+                    return;
+                }
+
+                // Parse format: Header1:Value1,Header2:Value2
+                var headerPairs = customHeaders.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var pair in headerPairs)
+                {
+                    var parts = pair.Split(new[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
+                    {
+                        var headerName = parts[0].Trim();
+                        var headerValue = parts[1].Trim();
+
+                        if (headerName.Equals("User-Agent", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // User-Agent is handled separately, skip it here
+                            continue;
+                        }
+
+                        request.Headers.Set(headerName, headerValue);
+                        _logger.Debug("Added custom header: {0} = {1}", headerName, headerValue);
+                    }
+                    else
+                    {
+                        _logger.Warn("Invalid custom header format (expected 'Header:Value'): {0}", pair);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Failed to parse custom headers: {0}", customHeaders);
+            }
         }
 
         public Task<HttpResponse> GetAsync(HttpRequest request)
