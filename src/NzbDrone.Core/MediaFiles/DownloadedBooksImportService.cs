@@ -302,7 +302,7 @@ namespace NzbDrone.Core.MediaFiles
             if (downloadClientItem != null && !string.IsNullOrWhiteSpace(downloadClientItem.Title))
             {
                 parsedBookInfo = Parser.Parser.ParseBookTitle(downloadClientItem.Title);
-                if (parsedBookInfo != null && author != null && parsedBookInfo.AuthorName.IsNullOrWhiteSpace())
+                if (parsedBookInfo != null && author != null && string.IsNullOrWhiteSpace(parsedBookInfo.AuthorName))
                 {
                     // Fill in author name if not parsed from title
                     parsedBookInfo.AuthorName = author.Name;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NLog;
+using NzbDrone.Common.Http;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download.Clients;
 using NzbDrone.Core.Download.Pending;
@@ -90,11 +91,24 @@ namespace NzbDrone.Core.Download
                     case ProcessedDecisionResult.Rejected:
                         {
                             rejected.Add(report);
+                            // For HTTP downloads, continue trying other releases even if one is rejected
+                            if (downloadProtocol == DownloadProtocol.Http)
+                            {
+                                continue;
+                            }
                             break;
                         }
 
                     case ProcessedDecisionResult.Failed:
                         {
+                            // For HTTP downloads, continue trying other releases instead of marking protocol as failed
+                            if (downloadProtocol == DownloadProtocol.Http)
+                            {
+                                _logger.Debug("HTTP download failed for {0}, will try next release", report.RemoteBook.Release.Title);
+                                PreparePending(pendingAddQueue, grabbed, pending, report, PendingReleaseReason.Fallback);
+                                continue;
+                            }
+
                             PreparePending(pendingAddQueue, grabbed, pending, report, PendingReleaseReason.DownloadClientUnavailable);
 
                             if (downloadProtocol == DownloadProtocol.Usenet)
@@ -111,6 +125,11 @@ namespace NzbDrone.Core.Download
 
                     case ProcessedDecisionResult.Skipped:
                         {
+                            // For HTTP downloads, continue trying other releases
+                            if (downloadProtocol == DownloadProtocol.Http)
+                            {
+                                continue;
+                            }
                             break;
                         }
                 }
@@ -207,6 +226,18 @@ namespace NzbDrone.Core.Download
             {
                 _logger.Warn("Failed to download release from indexer, no longer available. " + remoteBook);
                 return ProcessedDecisionResult.Rejected;
+            }
+            catch (HttpException httpEx)
+            {
+                // For HTTP downloads, treat certain errors as rejection to allow trying next release
+                if (remoteBook.Release.DownloadProtocol == DownloadProtocol.Http)
+                {
+                    _logger.Warn(httpEx, "HTTP download failed for {0}, will try next release: {1}", remoteBook.Release.Title, httpEx.Message);
+                    return ProcessedDecisionResult.Rejected;
+                }
+
+                _logger.Warn(httpEx, "HTTP request failed: " + remoteBook);
+                return ProcessedDecisionResult.Skipped;
             }
             catch (Exception ex)
             {

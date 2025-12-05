@@ -410,33 +410,55 @@ namespace NzbDrone.Common.Http
 
                                         var retryResponse = await GetAsync(retryRequest);
 
-                                        // Check if we still got HTML (might be another challenge or redirect to HTML page)
-                                        if (retryResponse.Headers.ContentType != null && retryResponse.Headers.ContentType.Contains("text/html"))
+                                        // Verify the downloaded content is actually a file (not HTML)
+                                        fileStream.Position = 0;
+                                        var retryFileLength = fileStream.Length;
+                                        var retryBuffer = new byte[Math.Min(4096, (int)retryFileLength)];
+                                        var retryBytesRead = 0;
+
+                                        if (retryFileLength > 0)
                                         {
-                                            fileStream.Position = 0;
-                                            var retryFileLength = fileStream.Length;
-                                            var retryBuffer = new byte[Math.Min(4096, (int)retryFileLength)];
-                                            var retryBytesRead = 0;
+                                            retryBytesRead = await fileStream.ReadAsync(retryBuffer, 0, retryBuffer.Length);
+                                        }
 
-                                            if (retryFileLength > 0)
+                                        if (retryBytesRead > 0)
+                                        {
+                                            // Check if it's a PDF file (starts with %PDF)
+                                            var isPdf = retryBytesRead >= 4 && 
+                                                       retryBuffer[0] == 0x25 && // %
+                                                       retryBuffer[1] == 0x50 && // P
+                                                       retryBuffer[2] == 0x44 && // D
+                                                       retryBuffer[3] == 0x46;   // F
+
+                                            if (isPdf)
                                             {
-                                                retryBytesRead = await fileStream.ReadAsync(retryBuffer, 0, retryBuffer.Length);
+                                                // Success - it's a PDF file
+                                                _logger.Info("Successfully downloaded PDF file using FlareSolverr: {0}", downloadUrl);
+                                                cloudflareSolved = true;
                                             }
-
-                                            if (retryBytesRead > 0)
+                                            else
                                             {
+                                                // Check if it's still HTML
                                                 var retryContentPreview = System.Text.Encoding.UTF8.GetString(retryBuffer, 0, retryBytesRead);
                                                 if (retryContentPreview.Contains("Just a moment") ||
-                                                    retryContentPreview.Contains("challenge-platform"))
+                                                    retryContentPreview.Contains("challenge-platform") ||
+                                                    retryContentPreview.Contains("<!DOCTYPE html") ||
+                                                    retryContentPreview.Contains("<html"))
                                                 {
                                                     throw new HttpException(retryRequest, retryResponse, "Cloudflare challenge persists even after FlareSolverr attempt. The site may require additional authentication or manual intervention.");
                                                 }
+                                                else
+                                                {
+                                                    // Might be a different file type or valid content
+                                                    _logger.Info("Downloaded file using FlareSolverr (content type may differ): {0}", downloadUrl);
+                                                    cloudflareSolved = true;
+                                                }
                                             }
                                         }
-
-                                        // Success - file should be written to stream
-                                        _logger.Info("Successfully downloaded file using FlareSolverr: {0}", downloadUrl);
-                                        cloudflareSolved = true;
+                                        else
+                                        {
+                                            throw new HttpException(retryRequest, retryResponse, "FlareSolverr solved challenge but no content was downloaded.");
+                                        }
                                     }
                                     catch (Exception ex)
                                     {

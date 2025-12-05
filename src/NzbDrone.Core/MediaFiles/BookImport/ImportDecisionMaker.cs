@@ -185,8 +185,13 @@ namespace NzbDrone.Core.MediaFiles.BookImport
         {
             if (edition.Edition != null && edition.Edition.Book.Value.Author.Value.QualityProfileId == 0)
             {
+                if (edition.LocalBooks == null || !edition.LocalBooks.Any())
+                {
+                    return;
+                }
+
                 var rootFolder = _rootFolderService.GetBestRootFolder(edition.LocalBooks.First().Path);
-                if (rootFolder.DefaultQualityProfileId > 0)
+                if (rootFolder != null && rootFolder.DefaultQualityProfileId > 0)
                 {
                     var qualityProfile = _qualityProfileService.Get(rootFolder.DefaultQualityProfileId);
 

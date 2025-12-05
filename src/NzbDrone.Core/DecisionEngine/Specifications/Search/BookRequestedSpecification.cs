@@ -24,6 +24,24 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.Search
                 return Decision.Accept();
             }
 
+            // If no books in search criteria, accept (e.g., author search)
+            if (searchCriteria.Books == null || !searchCriteria.Books.Any())
+            {
+                return Decision.Accept();
+            }
+
+            // If remote book has no books parsed, reject for interactive search
+            if (remoteBook.Books == null || !remoteBook.Books.Any())
+            {
+                if (searchCriteria.InteractiveSearch)
+                {
+                    _logger.Debug("Release rejected since no books could be parsed: {0}", remoteBook.ParsedBookInfo);
+                    return Decision.Reject("Unable to parse books from release name");
+                }
+
+                return Decision.Accept();
+            }
+
             var criteriaBook = searchCriteria.Books.Select(v => v.Id).ToList();
             var remoteBooks = remoteBook.Books.Select(v => v.Id).ToList();
 
