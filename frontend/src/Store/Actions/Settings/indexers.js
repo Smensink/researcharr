@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions';
 import { sortDirections } from 'Helpers/Props';
+import translate from 'Utilities/String/translate';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import createBulkEditItemHandler from 'Store/Actions/Creators/createBulkEditItemHandler';
 import createBulkRemoveItemHandler from 'Store/Actions/Creators/createBulkRemoveItemHandler';
@@ -42,6 +43,7 @@ export const BULK_EDIT_INDEXERS = 'settings/indexers/bulkEditIndexers';
 export const BULK_DELETE_INDEXERS = 'settings/indexers/bulkDeleteIndexers';
 export const SET_MANAGE_INDEXERS_SORT = 'settings/indexers/setManageIndexersSort';
 export const FETCH_INDEXER_STATISTICS = 'settings/indexers/fetchIndexerStatistics';
+export const FETCH_INDEXER_FAILURES = 'settings/indexers/fetchIndexerFailures';
 
 //
 // Action Creators
@@ -61,6 +63,7 @@ export const bulkEditIndexers = createThunk(BULK_EDIT_INDEXERS);
 export const bulkDeleteIndexers = createThunk(BULK_DELETE_INDEXERS);
 export const setManageIndexersSort = createAction(SET_MANAGE_INDEXERS_SORT);
 export const fetchIndexerStatistics = createThunk(FETCH_INDEXER_STATISTICS);
+export const fetchIndexerFailures = createThunk(FETCH_INDEXER_FAILURES);
 
 export const setIndexerValue = createAction(SET_INDEXER_VALUE, (payload) => {
   return {
@@ -103,6 +106,9 @@ export default {
     pendingChanges: {},
     statistics: {},
     isStatisticsFetching: false,
+    failures: {},
+    isFailuresFetching: false,
+    failuresError: null,
     sortKey: 'name',
     sortDirection: sortDirections.ASCENDING,
     sortPredicates: {
@@ -156,6 +162,67 @@ export default {
           section,
           isStatisticsFetching: false,
           statistics: {}
+        }));
+      });
+
+      return abortRequest;
+    },
+
+    [FETCH_INDEXER_FAILURES]: function(getState, payload, dispatch) {
+      const { indexerId, since, operationType, errorType, page, pageSize } = payload || {};
+      
+      dispatch(set({ 
+        section, 
+        isFailuresFetching: true,
+        failuresError: null
+      }));
+
+      let url = `/indexer/${indexerId}/failures?`;
+      const params = [];
+      
+      if (since) {
+        params.push(`since=${encodeURIComponent(since.toISOString())}`);
+      }
+      if (operationType !== undefined && operationType !== null) {
+        params.push(`operationType=${operationType}`);
+      }
+      if (errorType !== undefined && errorType !== null) {
+        params.push(`errorType=${errorType}`);
+      }
+      if (page) {
+        params.push(`page=${page}`);
+      }
+      if (pageSize) {
+        params.push(`pageSize=${pageSize}`);
+      }
+      
+      url += params.join('&');
+
+      const { request, abortRequest } = createAjaxRequest({
+        url: url,
+        traditional: true
+      });
+
+      request.done((data) => {
+        dispatch(set({
+          section,
+          failures: {
+            ...getState().settings.indexers.failures,
+            [indexerId]: data || []
+          },
+          isFailuresFetching: false,
+          failuresError: null
+        }));
+      });
+
+      request.fail((xhr) => {
+        dispatch(set({
+          section,
+          isFailuresFetching: false,
+          failuresError: {
+            indexerId,
+            message: xhr.responseJSON?.message || translate('UnableToLoadIndexerFailures')
+          }
         }));
       });
 

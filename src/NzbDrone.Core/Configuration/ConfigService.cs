@@ -123,6 +123,12 @@ namespace NzbDrone.Core.Configuration
             set { SetValue("MinimumAge", value); }
         }
 
+        public bool AutoAdjustIndexerPriority
+        {
+            get { return GetValueBoolean("AutoAdjustIndexerPriority", false); }
+            set { SetValue("AutoAdjustIndexerPriority", value); }
+        }
+
         public ProperDownloadTypes DownloadPropersAndRepacks
         {
             get { return GetValueEnum("DownloadPropersAndRepacks", ProperDownloadTypes.PreferAndUpgrade); }

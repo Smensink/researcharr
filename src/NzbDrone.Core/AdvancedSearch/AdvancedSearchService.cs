@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NLog;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Core.Books;
 using NzbDrone.Core.IndexerSearch;
+using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.MetadataSource.OpenAlex;
 using Newtonsoft.Json;
@@ -33,16 +35,22 @@ namespace NzbDrone.Core.AdvancedSearch
         private readonly ISavedSearchRepository _savedSearchRepository;
         private readonly IAddBookService _addBookService;
         private readonly IManageCommandQueue _commandQueueManager;
+        private readonly IMediaFileService _mediaFileService;
+        private readonly Logger _logger;
 
         public AdvancedSearchService(IOpenAlexProxy openAlexProxy,
                                      ISavedSearchRepository savedSearchRepository,
                                      IAddBookService addBookService,
-                                     IManageCommandQueue commandQueueManager)
+                                     IManageCommandQueue commandQueueManager,
+                                     IMediaFileService mediaFileService,
+                                     Logger logger)
         {
             _openAlexProxy = openAlexProxy;
             _savedSearchRepository = savedSearchRepository;
             _addBookService = addBookService;
             _commandQueueManager = commandQueueManager;
+            _mediaFileService = mediaFileService;
+            _logger = logger;
         }
 
         public OpenAlexListResponse<OpenAlexWork> Search(string search, string filter, string sort, int perPage, string cursor)
@@ -69,7 +77,17 @@ namespace NzbDrone.Core.AdvancedSearch
 
             if (addedBook != null && addedBook.Id > 0)
             {
-                _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                // Check if book already has files - only search if not already imported
+                var existingFiles = _mediaFileService.GetFilesByBook(addedBook.Id);
+                if (existingFiles == null || !existingFiles.Any())
+                {
+                    _logger.Debug("Book {0} ({1}) has no files, triggering search", addedBook.Title, addedBook.Id);
+                    _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                }
+                else
+                {
+                    _logger.Debug("Book {0} ({1}) already has {2} file(s), skipping search", addedBook.Title, addedBook.Id, existingFiles.Count);
+                }
             }
 
             return addedBook;
@@ -88,7 +106,17 @@ namespace NzbDrone.Core.AdvancedSearch
 
             if (addedBook != null && addedBook.Id > 0)
             {
-                _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                // Check if book already has files - only search if not already imported
+                var existingFiles = _mediaFileService.GetFilesByBook(addedBook.Id);
+                if (existingFiles == null || !existingFiles.Any())
+                {
+                    _logger.Debug("Book {0} ({1}) has no files, triggering search", addedBook.Title, addedBook.Id);
+                    _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                }
+                else
+                {
+                    _logger.Debug("Book {0} ({1}) already has {2} file(s), skipping search", addedBook.Title, addedBook.Id, existingFiles.Count);
+                }
             }
 
             return addedBook;
@@ -180,7 +208,17 @@ namespace NzbDrone.Core.AdvancedSearch
 
             if (addedBook != null && addedBook.Id > 0)
             {
-                _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                // Check if book already has files - only search if not already imported
+                var existingFiles = _mediaFileService.GetFilesByBook(addedBook.Id);
+                if (existingFiles == null || !existingFiles.Any())
+                {
+                    _logger.Debug("Book {0} ({1}) has no files, triggering search", addedBook.Title, addedBook.Id);
+                    _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                }
+                else
+                {
+                    _logger.Debug("Book {0} ({1}) already has {2} file(s), skipping search", addedBook.Title, addedBook.Id, existingFiles.Count);
+                }
             }
 
             return addedBook;
@@ -199,7 +237,17 @@ namespace NzbDrone.Core.AdvancedSearch
 
             if (addedBook != null && addedBook.Id > 0)
             {
-                _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                // Check if book already has files - only search if not already imported
+                var existingFiles = _mediaFileService.GetFilesByBook(addedBook.Id);
+                if (existingFiles == null || !existingFiles.Any())
+                {
+                    _logger.Debug("Book {0} ({1}) has no files, triggering search", addedBook.Title, addedBook.Id);
+                    _commandQueueManager.Push(new BookSearchCommand(new List<int> { addedBook.Id }));
+                }
+                else
+                {
+                    _logger.Debug("Book {0} ({1}) already has {2} file(s), skipping search", addedBook.Title, addedBook.Id, existingFiles.Count);
+                }
             }
 
             return addedBook;

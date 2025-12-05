@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Link from 'Components/Link/Link';
 import Card from 'Components/Card';
 import Label from 'Components/Label';
 import IconButton from 'Components/Link/IconButton';
@@ -141,21 +142,31 @@ class Indexer extends Component {
               <>
                 {
                   statistics.recentFailures > 0 &&
-                    <Label
-                      kind={kinds.WARNING}
-                      title={translate('RecentFailures', { count: statistics.recentFailures })}
+                    <Link
+                      to={`/settings/indexers/${id}/errors`}
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {statistics.recentFailures} {translate('Failures')}
-                    </Label>
+                      <Label
+                        kind={kinds.WARNING}
+                        title={translate('RecentFailures', { count: statistics.recentFailures })}
+                      >
+                        {statistics.recentFailures} {translate('Failures')}
+                      </Label>
+                    </Link>
                 }
                 {
                   statistics.isHealthy === false &&
-                    <Label
-                      kind={kinds.DANGER}
-                      title={translate('IndexerUnhealthy')}
+                    <Link
+                      to={`/settings/indexers/${id}/errors`}
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {translate('Unhealthy')}
-                    </Label>
+                      <Label
+                        kind={kinds.DANGER}
+                        title={translate('IndexerUnhealthy')}
+                      >
+                        {translate('Unhealthy')}
+                      </Label>
+                    </Link>
                 }
                 {
                   statistics.isHealthy === true && statistics.recentFailures === 0 &&
@@ -165,6 +176,19 @@ class Indexer extends Component {
                     >
                       {translate('Healthy')}
                     </Label>
+                }
+                {
+                  (statistics.totalFailures > 0 || statistics.recentFailures > 0) &&
+                    <Link
+                      to={`/settings/indexers/${id}/errors`}
+                      onClick={(e) => e.stopPropagation()}
+                      className={styles.errorsLink}
+                    >
+                      <IconButton
+                        name={icons.WARNING}
+                        title={translate('ViewErrors')}
+                      />
+                    </Link>
                 }
               </>
             )

@@ -40,6 +40,17 @@ namespace NzbDrone.Core.Parser
 
         private static readonly Regex[] ReportBookTitleRegex = new[]
         {
+            //Sci-Hub format: Title (may contain dashes) + Journal Name, Year
+            //e.g., "Salivary gland-type tumors of the breast - a spectrum + Seminars in Diagnostic Pathology, 2010"
+            //Note: Sci-Hub prefix is already stripped by SciHubPrefixRegex
+            new Regex(@"^(?<book>.+?)\s*\+\s*(?<journal>[^,]+?),\s*(?<releaseyear>\d{4})$",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled),
+
+            //Author - Title + Journal Name, Year
+            //e.g., "Smith - Paper title + Nature, 2020"
+            new Regex(@"^(?<author>.+?)\s*-\s*(?<book>.+?)\s*\+\s*(?<journal>[^,]+?),\s*(?<releaseyear>\d{4})$",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled),
+
             //ruTracker - (Genre) [Source]? Author - Discography
             new Regex(@"^(?:\(.+?\))(?:\W*(?:\[(?<source>.+?)\]))?\W*(?<author>.+?)(?: - )(?<discography>Discography|Discografia).+?(?<startyear>\d{4}).+?(?<endyear>\d{4})",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled),
@@ -181,6 +192,11 @@ namespace NzbDrone.Core.Parser
                                                                 string.Empty,
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        // Strip Sci-Hub prefixes (e.g., "Sci-Hub. " or "Sci-Hub | ")
+        private static readonly RegexReplace SciHubPrefixRegex = new RegexReplace(@"^Sci-Hub\s*[\.\|]\s*",
+                                                                string.Empty,
+                                                                RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         private static readonly RegexReplace WebsitePostfixRegex = new RegexReplace(@"(?:\[\s*)?(?:www\.)?[-a-z0-9-]{1,256}\.(?:xn--[a-z0-9-]{4,}|[a-z]{2,6})\b(?:\s*\])$",
                                                                 string.Empty,
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -271,6 +287,7 @@ namespace NzbDrone.Core.Parser
 
                 // TODO: Quick fix stripping [url] - prefixes.
                 simpleTitle = WebsitePrefixRegex.Replace(simpleTitle);
+                simpleTitle = SciHubPrefixRegex.Replace(simpleTitle);
                 simpleTitle = WebsitePostfixRegex.Replace(simpleTitle);
 
                 simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle);
@@ -361,11 +378,32 @@ namespace NzbDrone.Core.Parser
 
                 simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle);
 
-                var bestBook = books
-                    .OrderByDescending(x => simpleTitle.FuzzyMatch(x.Editions.Value.Single(x => x.Monitored).Title, wordDelimiters: WordDelimiters))
-                    .First()
-                    .Editions.Value
-                    .Single(x => x.Monitored);
+                // Find the best matching book with a minimum score threshold to prevent wrong matches
+                const double minFuzzyScore = 0.7; // Require at least 70% match confidence
+                var bookMatches = books
+                    .Select(book =>
+                    {
+                        var edition = book.Editions.Value.Single(x => x.Monitored);
+                        var match = simpleTitle.FuzzyMatch(edition.Title, 0.5, WordDelimiters);
+                        return new
+                        {
+                            Book = book,
+                            Edition = edition,
+                            Score = match.Item3
+                        };
+                    })
+                    .Where(x => x.Score >= minFuzzyScore)
+                    .OrderByDescending(x => x.Score)
+                    .ToList();
+
+                if (!bookMatches.Any())
+                {
+                    Logger.Debug("No books match with sufficient confidence (min score: {0})", minFuzzyScore);
+                    return null;
+                }
+
+                var bestBookMatch = bookMatches.First();
+                var bestBook = bestBookMatch.Edition;
 
                 var foundAuthor = GetTitleFuzzy(simpleTitle, authorName, out var remainder);
 
@@ -465,6 +503,7 @@ namespace NzbDrone.Core.Parser
 
                 // TODO: Quick fix stripping [url] - prefixes.
                 simpleTitle = WebsitePrefixRegex.Replace(simpleTitle);
+                simpleTitle = SciHubPrefixRegex.Replace(simpleTitle);
                 simpleTitle = WebsitePostfixRegex.Replace(simpleTitle);
 
                 simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle);
@@ -639,6 +678,7 @@ namespace NzbDrone.Core.Parser
             title = title.Trim();
             title = RemoveFileExtension(title);
             title = WebsitePrefixRegex.Replace(title);
+            title = SciHubPrefixRegex.Replace(title);
 
             var animeMatch = AnimeReleaseGroupRegex.Match(title);
 
@@ -791,9 +831,16 @@ namespace NzbDrone.Core.Parser
 
         private static ParsedBookInfo ParseBookMatchCollection(MatchCollection matchCollection, string releaseTitle)
         {
-            var authorName = matchCollection[0].Groups["author"].Value.Replace('.', ' ').Replace('_', ' ');
+            // Author is optional (some formats like Sci-Hub don't have author)
+            var authorName = matchCollection[0].Groups["author"].Success 
+                ? matchCollection[0].Groups["author"].Value.Replace('.', ' ').Replace('_', ' ')
+                : string.Empty;
+            
             var bookTitle = matchCollection[0].Groups["book"].Value.Replace('.', ' ').Replace('_', ' ');
-            var releaseVersion = matchCollection[0].Groups["version"].Value.Replace('.', ' ').Replace('_', ' ');
+            var releaseVersion = matchCollection[0].Groups["version"].Success
+                ? matchCollection[0].Groups["version"].Value.Replace('.', ' ').Replace('_', ' ')
+                : string.Empty;
+            
             authorName = RequestInfoRegex.Replace(authorName, "").Trim(' ');
             bookTitle = RequestInfoRegex.Replace(bookTitle, "").Trim(' ');
             releaseVersion = RequestInfoRegex.Replace(releaseVersion, "").Trim(' ');

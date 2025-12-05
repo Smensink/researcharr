@@ -105,6 +105,23 @@ function IndexerOptions(props) {
                 {...settings.rssSyncInterval}
               />
             </FormGroup>
+
+            <FormGroup
+              advancedSettings={advancedSettings}
+              isAdvanced={true}
+            >
+              <FormLabel>
+                {translate('AutoAdjustIndexerPriority')}
+              </FormLabel>
+
+              <FormInputGroup
+                type={inputTypes.CHECK}
+                name="autoAdjustIndexerPriority"
+                helpText={translate('AutoAdjustIndexerPriorityHelpText')}
+                onChange={onInputChange}
+                {...settings.autoAdjustIndexerPriority}
+              />
+            </FormGroup>
           </Form>
       }
     </FieldSet>

@@ -10,3 +10,9 @@
 
   word-break: break-all;
 }
+
+.errorsLink {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 5px;
+}

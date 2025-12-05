@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
@@ -14,13 +15,15 @@ namespace Readarr.Api.V1.Indexers
         public static readonly IndexerResourceMapper ResourceMapper = new ();
         public static readonly IndexerBulkResourceMapper BulkResourceMapper = new ();
         private readonly IIndexerStatisticsService _statisticsService;
+        private readonly IIndexerFailureRepository _failureRepository;
 
-        public IndexerController(IndexerFactory indexerFactory, DownloadClientExistsValidator downloadClientExistsValidator, IIndexerStatisticsService statisticsService)
+        public IndexerController(IndexerFactory indexerFactory, DownloadClientExistsValidator downloadClientExistsValidator, IIndexerStatisticsService statisticsService, IIndexerFailureRepository failureRepository)
             : base(indexerFactory, "indexer", ResourceMapper, BulkResourceMapper)
         {
             SharedValidator.RuleFor(c => c.Priority).InclusiveBetween(1, 50);
             SharedValidator.RuleFor(c => c.DownloadClientId).SetValidator(downloadClientExistsValidator);
             _statisticsService = statisticsService;
+            _failureRepository = failureRepository;
         }
 
         [HttpGet("statistics")]
@@ -66,6 +69,55 @@ namespace Readarr.Api.V1.Indexers
                 FailureRate = statistics.FailureRate,
                 IsHealthy = statistics.IsHealthy
             };
+        }
+
+        [HttpGet("{id}/failures")]
+        [Produces("application/json")]
+        public ActionResult<List<IndexerFailureResource>> GetFailures(
+            int id,
+            [FromQuery] DateTime? since = null,
+            [FromQuery] IndexerOperationType? operationType = null,
+            [FromQuery] IndexerErrorType? errorType = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 50)
+        {
+            List<IndexerFailure> failures;
+
+            if (since.HasValue)
+            {
+                failures = _failureRepository.GetByIndexerIdAndDateRange(id, since.Value, DateTime.UtcNow);
+            }
+            else
+            {
+                failures = _failureRepository.GetByIndexerId(id);
+            }
+
+            // Apply filters
+            if (operationType.HasValue)
+            {
+                failures = failures.Where(f => f.OperationType == operationType.Value).ToList();
+            }
+
+            if (errorType.HasValue)
+            {
+                failures = failures.Where(f => f.ErrorType == errorType.Value).ToList();
+            }
+
+            // Apply pagination
+            var totalCount = failures.Count;
+            var pagedFailures = failures
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var resources = pagedFailures.Select(f => new IndexerFailureResource(f)).ToList();
+
+            // Add pagination headers if needed (could be enhanced with proper pagination response model)
+            Response.Headers.Add("X-Total-Count", totalCount.ToString());
+            Response.Headers.Add("X-Page", page.ToString());
+            Response.Headers.Add("X-Page-Size", pageSize.ToString());
+
+            return Ok(resources);
         }
     }
 }
