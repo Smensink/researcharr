@@ -5,6 +5,7 @@ using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Delay;
+using NzbDrone.Core.Profiles.Qualities;
 using NzbDrone.Core.Qualities;
 
 namespace NzbDrone.Core.DecisionEngine
@@ -199,13 +200,13 @@ namespace NzbDrone.Core.DecisionEngine
             return CompareBy(x.RemoteBook, y.RemoteBook, remoteBook => (remoteBook?.Release?.Size ?? 0L).Round(200.Megabytes()));
         }
 
-        private int GetQualityIndex(RemoteBook remoteBook)
+        private QualityIndex GetQualityIndex(RemoteBook remoteBook)
         {
             var parsedQuality = remoteBook?.ParsedBookInfo?.Quality;
 
             if (remoteBook?.Author?.QualityProfile?.Value == null || parsedQuality?.Quality == null)
             {
-                return int.MinValue;
+                return new QualityIndex(int.MinValue);
             }
 
             return remoteBook.Author.QualityProfile.Value.GetIndex(parsedQuality.Quality);
