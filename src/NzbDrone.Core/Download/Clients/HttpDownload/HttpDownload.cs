@@ -19,6 +19,7 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
     {
         private readonly IHttpClient _httpClient;
         private readonly IHttpDownloadItemRepository _repository;
+        private readonly IIndexerStatusService _indexerStatusService;
 
         public HttpDownload(IHttpClient httpClient,
                             IHttpDownloadItemRepository repository,
@@ -26,11 +27,13 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
                             IConfigService configService,
                             IDownloadClientStatusService downloadClientStatusService,
                             IRemotePathMappingService remotePathMappingService,
+                            IIndexerStatusService indexerStatusService,
                             Logger logger)
             : base(configService, diskProvider, remotePathMappingService, logger)
         {
             _httpClient = httpClient;
             _repository = repository;
+            _indexerStatusService = indexerStatusService;
         }
 
         public override DownloadProtocol Protocol => DownloadProtocol.Http;
@@ -124,6 +127,9 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
 
             _logger.Info("Downloading {0} to {1}", release.DownloadUrl, path);
 
+            // Capture indexer ID for error attribution
+            var indexerId = remoteBook?.Release?.IndexerId ?? 0;
+
             // Fire and forget the download task so we return the ID immediately
             Task.Run(() =>
             {
@@ -140,6 +146,12 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
                         item.Status = DownloadItemStatus.Completed;
                         _repository.Update(item);
                     }
+
+                    // Record success for the indexer
+                    if (indexerId > 0)
+                    {
+                        _indexerStatusService.RecordSuccess(indexerId);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -152,6 +164,22 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
                         item.Status = DownloadItemStatus.Failed;
                         item.Message = ex.Message;
                         _repository.Update(item);
+                    }
+
+                    // Record failure for the indexer with detailed information
+                    if (indexerId > 0)
+                    {
+                        try
+                        {
+                            _indexerStatusService.RecordFailure(indexerId);
+                            var errorType = DetermineErrorType(ex);
+                            var httpStatusCode = GetHttpStatusCode(ex);
+                            _indexerStatusService.RecordFailure(indexerId, IndexerOperationType.Search, errorType, ex.Message ?? "HTTP download failed", httpStatusCode);
+                        }
+                        catch (Exception recordEx)
+                        {
+                            _logger.Debug(recordEx, "Failed to record indexer failure for indexer {0}", indexerId);
+                        }
                     }
                 }
             });
@@ -166,6 +194,32 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
             {
                 failures.Add(failure);
             }
+        }
+
+        private static IndexerErrorType DetermineErrorType(Exception ex)
+        {
+            return ex switch
+            {
+                System.Net.Http.HttpRequestException => IndexerErrorType.ConnectionFailure,
+                System.Net.WebException webEx when webEx.Status == System.Net.WebExceptionStatus.Timeout => IndexerErrorType.Timeout,
+                System.Net.WebException => IndexerErrorType.ConnectionFailure,
+                System.Threading.Tasks.TaskCanceledException => IndexerErrorType.Timeout,
+                NzbDrone.Common.Http.HttpException httpEx when httpEx.Response?.StatusCode == System.Net.HttpStatusCode.Unauthorized || httpEx.Response?.StatusCode == System.Net.HttpStatusCode.Forbidden => IndexerErrorType.AuthError,
+                NzbDrone.Common.Http.HttpException => IndexerErrorType.HttpError,
+                NzbDrone.Core.Indexers.Exceptions.RequestLimitReachedException => IndexerErrorType.RateLimit,
+                NzbDrone.Core.Http.CloudFlare.CloudFlareCaptchaException => IndexerErrorType.CloudflareCaptcha,
+                _ => IndexerErrorType.Unknown
+            };
+        }
+
+        private static int? GetHttpStatusCode(Exception ex)
+        {
+            if (ex is NzbDrone.Common.Http.HttpException httpEx)
+            {
+                return (int?)httpEx.Response?.StatusCode;
+            }
+
+            return null;
         }
     }
 }

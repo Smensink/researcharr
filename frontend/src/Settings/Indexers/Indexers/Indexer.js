@@ -74,7 +74,8 @@ class Indexer extends Component {
       supportsRss,
       supportsSearch,
       priority,
-      showPriority
+      showPriority,
+      statistics
     } = this.props;
 
     return (
@@ -134,6 +135,40 @@ class Indexer extends Component {
                 Disabled
               </Label>
           }
+
+          {
+            statistics && (
+              <>
+                {
+                  statistics.recentFailures > 0 &&
+                    <Label
+                      kind={kinds.WARNING}
+                      title={translate('RecentFailures', { count: statistics.recentFailures })}
+                    >
+                      {statistics.recentFailures} {translate('Failures')}
+                    </Label>
+                }
+                {
+                  statistics.isHealthy === false &&
+                    <Label
+                      kind={kinds.DANGER}
+                      title={translate('IndexerUnhealthy')}
+                    >
+                      {translate('Unhealthy')}
+                    </Label>
+                }
+                {
+                  statistics.isHealthy === true && statistics.recentFailures === 0 &&
+                    <Label
+                      kind={kinds.SUCCESS}
+                      title={translate('IndexerHealthy')}
+                    >
+                      {translate('Healthy')}
+                    </Label>
+                }
+              </>
+            )
+          }
         </div>
 
         <TagList
@@ -174,6 +209,7 @@ Indexer.propTypes = {
   supportsRss: PropTypes.bool.isRequired,
   supportsSearch: PropTypes.bool.isRequired,
   showPriority: PropTypes.bool.isRequired,
+  statistics: PropTypes.object,
   onCloneIndexerPress: PropTypes.func.isRequired,
   onConfirmDeleteIndexer: PropTypes.func.isRequired
 };

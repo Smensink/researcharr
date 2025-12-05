@@ -33,8 +33,16 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Specifications
                 return Decision.Accept();
             }
 
+            // Check for null quality profile - guard against authors without quality profiles
+            var qualityProfile = item.Author?.QualityProfile?.Value;
+            if (qualityProfile == null || qualityProfile.Items == null || !qualityProfile.Items.Any())
+            {
+                _logger.Debug("Author quality profile is missing or invalid, accepting import: {0}", item.Path);
+                return Decision.Accept();
+            }
+
             var downloadPropersAndRepacks = _configService.DownloadPropersAndRepacks;
-            var qualityComparer = new QualityModelComparer(item.Author.QualityProfile);
+            var qualityComparer = new QualityModelComparer(qualityProfile);
 
             foreach (var bookFile in files)
             {

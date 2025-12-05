@@ -152,9 +152,28 @@ namespace NzbDrone.Core.MediaFiles.BookImport
             }
 
             var qualifiedImports = decisions.Where(c => c.Approved)
-                .GroupBy(c => c.Item.Author.Id, (i, s) => s
-                         .OrderByDescending(c => c.Item.Quality, new QualityModelComparer(s.First().Item.Author.QualityProfile))
-                         .ThenByDescending(c => c.Item.Size))
+                .GroupBy(c => c.Item.Author?.Id ?? 0, (i, s) =>
+                {
+                    var firstItem = s.First();
+                    var author = firstItem.Item.Author;
+                    
+                    // If author is null, just sort by size
+                    if (author == null)
+                    {
+                        return s.OrderByDescending(c => c.Item.Size);
+                    }
+                    
+                    // Get quality profile and check if it's null or invalid
+                    var qualityProfile = author.QualityProfile?.Value;
+                    if (qualityProfile == null || qualityProfile.Items == null || !qualityProfile.Items.Any())
+                    {
+                        return s.OrderByDescending(c => c.Item.Size);
+                    }
+                    
+                    // Only create QualityModelComparer if we have a valid profile with items
+                    return s.OrderByDescending(c => c.Item.Quality, new QualityModelComparer(qualityProfile))
+                             .ThenByDescending(c => c.Item.Size);
+                })
                 .SelectMany(c => c)
                 .ToList();
 

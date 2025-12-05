@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { cloneIndexer, deleteIndexer, fetchIndexers } from 'Store/Actions/settingsActions';
+import { cloneIndexer, deleteIndexer, fetchIndexers, fetchIndexerStatistics } from 'Store/Actions/settingsActions';
 import createSortedSectionSelector from 'Store/Selectors/createSortedSectionSelector';
 import createTagsSelector from 'Store/Selectors/createTagsSelector';
 import sortByName from 'Utilities/Array/sortByName';
@@ -12,10 +12,12 @@ function createMapStateToProps() {
   return createSelector(
     createSortedSectionSelector('settings.indexers', sortByName),
     createTagsSelector(),
-    (indexers, tagList) => {
+    (state) => state.settings.indexers.statistics || {},
+    (indexers, tagList, statistics) => {
       return {
         ...indexers,
-        tagList
+        tagList,
+        statistics
       };
     }
   );
@@ -24,7 +26,8 @@ function createMapStateToProps() {
 const mapDispatchToProps = {
   dispatchFetchIndexers: fetchIndexers,
   dispatchDeleteIndexer: deleteIndexer,
-  dispatchCloneIndexer: cloneIndexer
+  dispatchCloneIndexer: cloneIndexer,
+  dispatchFetchIndexerStatistics: fetchIndexerStatistics
 };
 
 class IndexersConnector extends Component {
@@ -34,6 +37,7 @@ class IndexersConnector extends Component {
 
   componentDidMount() {
     this.props.dispatchFetchIndexers();
+    this.props.dispatchFetchIndexerStatistics();
   }
 
   //
@@ -58,6 +62,7 @@ class IndexersConnector extends Component {
 
 IndexersConnector.propTypes = {
   dispatchFetchIndexers: PropTypes.func.isRequired,
+  dispatchFetchIndexerStatistics: PropTypes.func.isRequired,
   dispatchDeleteIndexer: PropTypes.func.isRequired,
   dispatchCloneIndexer: PropTypes.func.isRequired
 };

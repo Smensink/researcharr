@@ -4,7 +4,8 @@
 .enableAutomaticSearch,
 .enableInteractiveSearch,
 .priority,
-.implementation {
+.implementation,
+.statistics {
   composes: cell from '~Components/Table/Cells/TableRowCell.css';
 
   word-break: break-all;

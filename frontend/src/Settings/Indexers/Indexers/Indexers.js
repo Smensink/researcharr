@@ -55,6 +55,7 @@ class Indexers extends Component {
     const {
       items,
       tagList,
+      statistics,
       dispatchCloneIndexer,
       onConfirmDeleteIndexer,
       ...otherProps
@@ -76,12 +77,14 @@ class Indexers extends Component {
           <div className={styles.indexers}>
             {
               items.map((item) => {
+                const itemStatistics = statistics && statistics[item.id] ? statistics[item.id] : null;
                 return (
                   <Indexer
                     key={item.id}
                     {...item}
                     tagList={tagList}
                     showPriority={showPriority}
+                    statistics={itemStatistics}
                     onCloneIndexerPress={this.onCloneIndexerPress}
                     onConfirmDeleteIndexer={onConfirmDeleteIndexer}
                   />
@@ -122,6 +125,7 @@ Indexers.propTypes = {
   error: PropTypes.object,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   tagList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  statistics: PropTypes.object,
   dispatchCloneIndexer: PropTypes.func.isRequired,
   onConfirmDeleteIndexer: PropTypes.func.isRequired
 };

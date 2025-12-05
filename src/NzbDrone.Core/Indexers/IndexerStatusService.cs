@@ -1,3 +1,4 @@
+using System;
 using NLog;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Core.Messaging.Events;
@@ -11,13 +12,20 @@ namespace NzbDrone.Core.Indexers
         ReleaseInfo GetLastRssSyncReleaseInfo(int indexerId);
 
         void UpdateRssSyncStatus(int indexerId, ReleaseInfo releaseInfo);
+
+        void RecordFailure(int indexerId, IndexerOperationType operation, IndexerErrorType errorType, string errorMessage, int? httpStatusCode = null);
+
+        IndexerStatus GetStatus(int indexerId);
     }
 
     public class IndexerStatusService : ProviderStatusServiceBase<IIndexer, IndexerStatus>, IIndexerStatusService
     {
-        public IndexerStatusService(IIndexerStatusRepository providerStatusRepository, IEventAggregator eventAggregator, IRuntimeInfo runtimeInfo, Logger logger)
+        private readonly IIndexerFailureRepository _failureRepository;
+
+        public IndexerStatusService(IIndexerStatusRepository providerStatusRepository, IIndexerFailureRepository failureRepository, IEventAggregator eventAggregator, IRuntimeInfo runtimeInfo, Logger logger)
             : base(providerStatusRepository, eventAggregator, runtimeInfo, logger)
         {
+            _failureRepository = failureRepository;
         }
 
         public ReleaseInfo GetLastRssSyncReleaseInfo(int indexerId)
@@ -35,6 +43,33 @@ namespace NzbDrone.Core.Indexers
 
                 _providerStatusRepository.Upsert(status);
             }
+        }
+
+        public void RecordFailure(int indexerId, IndexerOperationType operation, IndexerErrorType errorType, string errorMessage, int? httpStatusCode = null)
+        {
+            try
+            {
+                var failure = new IndexerFailure
+                {
+                    IndexerId = indexerId,
+                    OperationType = operation,
+                    ErrorType = errorType,
+                    ErrorMessage = errorMessage?.Substring(0, Math.Min(errorMessage?.Length ?? 0, 1000)), // Limit message length
+                    HttpStatusCode = httpStatusCode,
+                    Timestamp = DateTime.UtcNow
+                };
+
+                _failureRepository.Insert(failure);
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug(ex, "Failed to record indexer failure for indexer {0}", indexerId);
+            }
+        }
+
+        public IndexerStatus GetStatus(int indexerId)
+        {
+            return GetProviderStatus(indexerId);
         }
     }
 }

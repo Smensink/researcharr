@@ -163,7 +163,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                 EnsureData(release);
                 release.NewDownload = config.NewDownload;
 
-                var releaseDecision = GetDecision(release, itemInfo.DownloadClientItem);
+                var releaseDecision = GetDecision(release, itemInfo.DownloadClientItem, config);
 
                 foreach (var localTrack in release.LocalBooks)
                 {
@@ -202,13 +202,23 @@ namespace NzbDrone.Core.MediaFiles.BookImport
             }
         }
 
-        private ImportDecision<LocalEdition> GetDecision(LocalEdition localEdition, DownloadClientItem downloadClientItem)
+        private ImportDecision<LocalEdition> GetDecision(LocalEdition localEdition, DownloadClientItem downloadClientItem, ImportDecisionMakerConfig config = null)
         {
             ImportDecision<LocalEdition> decision = null;
 
             if (localEdition.Edition == null)
             {
-                decision = new ImportDecision<LocalEdition>(localEdition, new Rejection($"Couldn't find similar book for {localEdition}"));
+                // For manual imports (indicated by KeepAllEditions=true and AddNewAuthors=false),
+                // don't reject unmatched files - allow user to manually assign them
+                if (config != null && config.KeepAllEditions && !config.AddNewAuthors)
+                {
+                    // Return an approved decision so the file can be manually assigned
+                    decision = new ImportDecision<LocalEdition>(localEdition);
+                }
+                else
+                {
+                    decision = new ImportDecision<LocalEdition>(localEdition, new Rejection($"Couldn't find similar book for {localEdition}"));
+                }
             }
             else
             {

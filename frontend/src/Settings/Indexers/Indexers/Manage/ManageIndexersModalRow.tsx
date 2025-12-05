@@ -19,6 +19,7 @@ interface ManageIndexersModalRowProps {
   priority: number;
   implementation: string;
   tags: number[];
+  statistics?: any;
   columns: Column[];
   isSelected?: boolean;
   onSelectedChange(result: SelectStateInputProps): void;
@@ -35,6 +36,7 @@ function ManageIndexersModalRow(props: ManageIndexersModalRowProps) {
     priority,
     implementation,
     tags,
+    statistics,
     onSelectedChange,
   } = props;
 
@@ -89,6 +91,50 @@ function ManageIndexersModalRow(props: ManageIndexersModalRowProps) {
       </TableRowCell>
 
       <TableRowCell className={styles.priority}>{priority}</TableRowCell>
+
+      <TableRowCell className={styles.statistics}>
+        {statistics ? (
+          <div>
+            {statistics.recentFailures > 0 && (
+              <Label
+                kind={kinds.WARNING}
+                title={translate('RecentFailures', { count: statistics.recentFailures })}
+              >
+                {statistics.recentFailures} {translate('Failures')}
+              </Label>
+            )}
+            {statistics.totalFailures > 0 && statistics.recentFailures === 0 && (
+              <Label
+                kind={kinds.INFO}
+                title={translate('TotalFailures', { count: statistics.totalFailures })}
+              >
+                {statistics.totalFailures} {translate('Total')}
+              </Label>
+            )}
+            {statistics.isHealthy === false && (
+              <Label
+                kind={kinds.DANGER}
+                title={translate('IndexerUnhealthy')}
+              >
+                {translate('Unhealthy')}
+              </Label>
+            )}
+            {statistics.isHealthy === true && statistics.recentFailures === 0 && statistics.totalFailures === 0 && (
+              <Label
+                kind={kinds.SUCCESS}
+                title={translate('IndexerHealthy')}
+              >
+                {translate('Healthy')}
+              </Label>
+            )}
+            {!statistics.recentFailures && !statistics.totalFailures && statistics.isHealthy !== false && (
+              <span>-</span>
+            )}
+          </div>
+        ) : (
+          <span>-</span>
+        )}
+      </TableRowCell>
 
       <TableRowCell className={styles.tags}>
         <TagListConnector tags={tags} />

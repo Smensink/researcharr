@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IndexerAppState } from 'App/State/SettingsAppState';
 import Alert from 'Components/Alert';
@@ -18,6 +18,7 @@ import { kinds } from 'Helpers/Props';
 import {
   bulkDeleteIndexers,
   bulkEditIndexers,
+  fetchIndexerStatistics,
   setManageIndexersSort,
 } from 'Store/Actions/settingsActions';
 import createClientSideCollectionSelector from 'Store/Selectors/createClientSideCollectionSelector';
@@ -73,6 +74,12 @@ const COLUMNS: Column[] = [
     isVisible: true,
   },
   {
+    name: 'statistics',
+    label: () => translate('Statistics'),
+    isSortable: false,
+    isVisible: true,
+  },
+  {
     name: 'tags',
     label: () => translate('Tags'),
     isSortable: true,
@@ -99,6 +106,10 @@ function ManageIndexersModalContent(props: ManageIndexersModalContentProps) {
   }: IndexerAppState = useSelector(
     createClientSideCollectionSelector('settings.indexers')
   );
+
+  const statistics = useSelector(
+    (state: any) => state.settings.indexers.statistics || {}
+  );
   const dispatch = useDispatch();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -107,6 +118,10 @@ function ManageIndexersModalContent(props: ManageIndexersModalContentProps) {
   const [isSavingTags, setIsSavingTags] = useState(false);
 
   const [selectState, setSelectState] = useSelectState();
+
+  useEffect(() => {
+    dispatch(fetchIndexerStatistics());
+  }, [dispatch]);
 
   const { allSelected, allUnselected, selectedState } = selectState;
 
@@ -231,11 +246,13 @@ function ManageIndexersModalContent(props: ManageIndexersModalContentProps) {
           >
             <TableBody>
               {items.map((item) => {
+                const itemStatistics = statistics[item.id] || null;
                 return (
                   <ManageIndexersModalRow
                     key={item.id}
                     isSelected={selectedState[item.id]}
                     {...item}
+                    statistics={itemStatistics}
                     columns={COLUMNS}
                     onSelectedChange={onSelectedChange}
                   />

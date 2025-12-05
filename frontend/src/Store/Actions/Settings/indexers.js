@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions';
 import { sortDirections } from 'Helpers/Props';
+import createAjaxRequest from 'Utilities/createAjaxRequest';
 import createBulkEditItemHandler from 'Store/Actions/Creators/createBulkEditItemHandler';
 import createBulkRemoveItemHandler from 'Store/Actions/Creators/createBulkRemoveItemHandler';
 import createFetchHandler from 'Store/Actions/Creators/createFetchHandler';
@@ -12,6 +13,7 @@ import createSetClientSideCollectionSortReducer from 'Store/Actions/Creators/Red
 import createSetProviderFieldValueReducer from 'Store/Actions/Creators/Reducers/createSetProviderFieldValueReducer';
 import createSetSettingValueReducer from 'Store/Actions/Creators/Reducers/createSetSettingValueReducer';
 import { createThunk } from 'Store/thunks';
+import { set } from '../baseActions';
 import getSectionState from 'Utilities/State/getSectionState';
 import selectProviderSchema from 'Utilities/State/selectProviderSchema';
 import updateSectionState from 'Utilities/State/updateSectionState';
@@ -39,6 +41,7 @@ export const TEST_ALL_INDEXERS = 'settings/indexers/testAllIndexers';
 export const BULK_EDIT_INDEXERS = 'settings/indexers/bulkEditIndexers';
 export const BULK_DELETE_INDEXERS = 'settings/indexers/bulkDeleteIndexers';
 export const SET_MANAGE_INDEXERS_SORT = 'settings/indexers/setManageIndexersSort';
+export const FETCH_INDEXER_STATISTICS = 'settings/indexers/fetchIndexerStatistics';
 
 //
 // Action Creators
@@ -57,6 +60,7 @@ export const testAllIndexers = createThunk(TEST_ALL_INDEXERS);
 export const bulkEditIndexers = createThunk(BULK_EDIT_INDEXERS);
 export const bulkDeleteIndexers = createThunk(BULK_DELETE_INDEXERS);
 export const setManageIndexersSort = createAction(SET_MANAGE_INDEXERS_SORT);
+export const fetchIndexerStatistics = createThunk(FETCH_INDEXER_STATISTICS);
 
 export const setIndexerValue = createAction(SET_INDEXER_VALUE, (payload) => {
   return {
@@ -97,6 +101,8 @@ export default {
     isTestingAll: false,
     items: [],
     pendingChanges: {},
+    statistics: {},
+    isStatisticsFetching: false,
     sortKey: 'name',
     sortDirection: sortDirections.ASCENDING,
     sortPredicates: {
@@ -120,7 +126,41 @@ export default {
     [CANCEL_TEST_INDEXER]: createCancelTestProviderHandler(section),
     [TEST_ALL_INDEXERS]: createTestAllProvidersHandler(section, '/indexer'),
     [BULK_EDIT_INDEXERS]: createBulkEditItemHandler(section, '/indexer/bulk'),
-    [BULK_DELETE_INDEXERS]: createBulkRemoveItemHandler(section, '/indexer/bulk')
+    [BULK_DELETE_INDEXERS]: createBulkRemoveItemHandler(section, '/indexer/bulk'),
+
+    [FETCH_INDEXER_STATISTICS]: function(getState, payload, dispatch) {
+      dispatch(set({ section, isStatisticsFetching: true }));
+
+      const { request, abortRequest } = createAjaxRequest({
+        url: '/indexer/statistics',
+        traditional: true
+      });
+
+      request.done((data) => {
+        const statisticsMap = {};
+        if (Array.isArray(data)) {
+          data.forEach((stat) => {
+            statisticsMap[stat.indexerId] = stat;
+          });
+        }
+
+        dispatch(set({
+          section,
+          statistics: statisticsMap,
+          isStatisticsFetching: false
+        }));
+      });
+
+      request.fail((xhr) => {
+        dispatch(set({
+          section,
+          isStatisticsFetching: false,
+          statistics: {}
+        }));
+      });
+
+      return abortRequest;
+    }
   },
 
   //

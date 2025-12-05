@@ -203,6 +203,7 @@ namespace NzbDrone.Core.Datastore
                   .Ignore(c => c.Message);
 
             Mapper.Entity<IndexerStatus>("IndexerStatus").RegisterModel();
+            Mapper.Entity<IndexerFailure>("IndexerFailure").RegisterModel();
             Mapper.Entity<DownloadClientStatus>("DownloadClientStatus").RegisterModel();
             Mapper.Entity<ImportListStatus>("ImportListStatus").RegisterModel();
             Mapper.Entity<NotificationStatus>("NotificationStatus").RegisterModel();

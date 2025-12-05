@@ -10,6 +10,7 @@ using NzbDrone.Core.Download.Clients;
 using NzbDrone.Core.Download.Pending;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Indexers;
+using NzbDrone.Core.Indexers.Exceptions;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Parser.Model;
 
@@ -116,13 +117,17 @@ namespace NzbDrone.Core.Download
             }
             catch (ReleaseDownloadException ex)
             {
-                if (ex.InnerException is TooManyRequestsException http429)
+                if (ex.InnerException is RequestLimitReachedException http429)
                 {
                     _indexerStatusService.RecordFailure(remoteBook.Release.IndexerId, http429.RetryAfter);
+                    _indexerStatusService.RecordFailure(remoteBook.Release.IndexerId, IndexerOperationType.Search, IndexerErrorType.RateLimit, ex.Message ?? http429.Message);
                 }
                 else
                 {
                     _indexerStatusService.RecordFailure(remoteBook.Release.IndexerId);
+                    var errorType = DetermineErrorType(ex);
+                    var httpStatusCode = GetHttpStatusCode(ex);
+                    _indexerStatusService.RecordFailure(remoteBook.Release.IndexerId, IndexerOperationType.Search, errorType, ex.Message ?? ex.InnerException?.Message ?? "Download failed", httpStatusCode);
                 }
 
                 throw;
@@ -140,6 +145,34 @@ namespace NzbDrone.Core.Download
 
             _logger.ProgressInfo("Report sent to {0} from indexer {1}. {2}", downloadClient.Definition.Name, remoteBook.Release.Indexer, downloadTitle);
             _eventAggregator.PublishEvent(bookGrabbedEvent);
+        }
+
+        private static IndexerErrorType DetermineErrorType(Exception ex)
+        {
+            var innerEx = ex.InnerException ?? ex;
+            return innerEx switch
+            {
+                System.Net.Http.HttpRequestException => IndexerErrorType.ConnectionFailure,
+                System.Net.WebException webEx when webEx.Status == System.Net.WebExceptionStatus.Timeout => IndexerErrorType.Timeout,
+                System.Net.WebException => IndexerErrorType.ConnectionFailure,
+                System.Threading.Tasks.TaskCanceledException => IndexerErrorType.Timeout,
+                NzbDrone.Common.Http.HttpException httpEx when httpEx.Response?.StatusCode == System.Net.HttpStatusCode.Unauthorized || httpEx.Response?.StatusCode == System.Net.HttpStatusCode.Forbidden => IndexerErrorType.AuthError,
+                NzbDrone.Common.Http.HttpException => IndexerErrorType.HttpError,
+                NzbDrone.Core.Indexers.Exceptions.RequestLimitReachedException => IndexerErrorType.RateLimit,
+                NzbDrone.Core.Http.CloudFlare.CloudFlareCaptchaException => IndexerErrorType.CloudflareCaptcha,
+                _ => IndexerErrorType.Unknown
+            };
+        }
+
+        private static int? GetHttpStatusCode(Exception ex)
+        {
+            var innerEx = ex.InnerException ?? ex;
+            if (innerEx is NzbDrone.Common.Http.HttpException httpEx)
+            {
+                return (int?)httpEx.Response?.StatusCode;
+            }
+
+            return null;
         }
     }
 }

@@ -112,5 +112,13 @@ namespace NzbDrone.Core.Test.ParserTests
         {
             DoiUtility.Normalize(input).Should().Be(expected);
         }
+
+        [TestCase("10.3390/cancers13225694https://www.mdpi.com/journal/cancers?mailto=researcharr%40example.com", "10.3390/cancers13225694")]
+        [TestCase("10.1063/1.1316015https://aip.scitation.org/doi/pdf/10.1063/1.1316015", "10.1063/1.1316015")]
+        [TestCase("10.1038/nature12373http://example.com", "10.1038/nature12373")]
+        public void should_extract_doi_when_concatenated_with_url(string input, string expected)
+        {
+            DoiUtility.Normalize(input).Should().Be(expected);
+        }
     }
 }

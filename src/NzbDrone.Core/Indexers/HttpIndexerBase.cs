@@ -175,10 +175,13 @@ namespace NzbDrone.Core.Indexers
                 if (webException.Status is WebExceptionStatus.NameResolutionFailure or WebExceptionStatus.ConnectFailure)
                 {
                     _indexerStatusService.RecordConnectionFailure(Definition.Id);
+                    _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.ConnectionFailure, webException.Message);
                 }
                 else
                 {
                     _indexerStatusService.RecordFailure(Definition.Id);
+                    var errorType = webException.Message.Contains("timed out") ? IndexerErrorType.Timeout : IndexerErrorType.HttpError;
+                    _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, errorType, webException.Message);
                 }
 
                 if (webException.Message.Contains("502") || webException.Message.Contains("503") ||
@@ -195,12 +198,15 @@ namespace NzbDrone.Core.Indexers
             {
                 var retryTime = ex.RetryAfter != TimeSpan.Zero ? ex.RetryAfter : minimumBackoff;
                 _indexerStatusService.RecordFailure(Definition.Id, retryTime);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.RateLimit, ex.Message);
 
                 _logger.Warn("API Request Limit reached for {0}. Disabled for {1}", this, retryTime);
             }
             catch (HttpException ex)
             {
                 _indexerStatusService.RecordFailure(Definition.Id);
+                var httpStatusCode = (int?)ex.Response?.StatusCode;
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.HttpError, ex.Message, httpStatusCode);
                 if (ex.Response.HasHttpServerError)
                 {
                     _logger.Warn("Unable to connect to {0} at [{1}]. Indexer's server is unavailable. Try again later. {2}", this, url, ex.Message);
@@ -214,17 +220,20 @@ namespace NzbDrone.Core.Indexers
             {
                 var retryTime = ex.RetryAfter != TimeSpan.Zero ? ex.RetryAfter : minimumBackoff;
                 _indexerStatusService.RecordFailure(Definition.Id, retryTime);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.RateLimit, ex.Message);
 
                 _logger.Warn("API Request Limit reached for {0}. Disabled for {1}", this, retryTime);
             }
-            catch (ApiKeyException)
+            catch (ApiKeyException ex)
             {
                 _indexerStatusService.RecordFailure(Definition.Id);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.AuthError, ex.Message ?? "Invalid API Key");
                 _logger.Warn("Invalid API Key for {0} {1}", this, url);
             }
             catch (CloudFlareCaptchaException ex)
             {
                 _indexerStatusService.RecordFailure(Definition.Id);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.CloudflareCaptcha, ex.Message ?? "CloudFlare CAPTCHA required");
                 ex.WithData("FeedUrl", url);
                 if (ex.IsExpired)
                 {
@@ -238,16 +247,19 @@ namespace NzbDrone.Core.Indexers
             catch (TaskCanceledException ex)
             {
                 _indexerStatusService.RecordFailure(Definition.Id);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.Timeout, ex.Message ?? "Request timeout");
                 _logger.Warn(ex, "Unable to connect to indexer, possibly due to a timeout. {0}", url);
             }
             catch (IndexerException ex)
             {
                 _indexerStatusService.RecordFailure(Definition.Id);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.Unknown, ex.Message ?? "Indexer exception");
                 _logger.Warn(ex, "{0}", url);
             }
             catch (Exception ex)
             {
                 _indexerStatusService.RecordFailure(Definition.Id);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.RssSync, IndexerErrorType.Unknown, ex.Message ?? "Unknown error");
                 ex.WithData("FeedUrl", url);
                 _logger.Error(ex, "An error occurred while processing feed. {0}", url);
             }
@@ -367,17 +379,20 @@ namespace NzbDrone.Core.Indexers
             catch (ApiKeyException ex)
             {
                 _logger.Warn("Indexer returned result for RSS URL, API Key appears to be invalid: " + ex.Message);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.AuthError, ex.Message ?? "Invalid API Key");
 
                 return new ValidationFailure("ApiKey", "Invalid API Key");
             }
             catch (RequestLimitReachedException ex)
             {
                 _logger.Warn("Request limit reached: " + ex.Message);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.RateLimit, ex.Message);
 
                 return new ValidationFailure(string.Empty, "Request limit reached: " + ex.Message);
             }
             catch (CloudFlareCaptchaException ex)
             {
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.CloudflareCaptcha, ex.Message ?? "CloudFlare CAPTCHA required");
                 if (ex.IsExpired)
                 {
                     return new ValidationFailure("CaptchaToken", "CloudFlare CAPTCHA token expired, please Refresh.");
@@ -390,17 +405,21 @@ namespace NzbDrone.Core.Indexers
             catch (UnsupportedFeedException ex)
             {
                 _logger.Warn(ex, "Indexer feed is not supported");
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.ParseError, ex.Message ?? "Unsupported feed");
 
                 return new ValidationFailure(string.Empty, "Indexer feed is not supported: " + ex.Message);
             }
             catch (IndexerException ex)
             {
                 _logger.Warn(ex, "Unable to connect to indexer");
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.Unknown, ex.Message ?? "Indexer exception");
 
                 return new ValidationFailure(string.Empty, "Unable to connect to indexer. " + ex.Message);
             }
             catch (HttpException ex)
             {
+                var httpStatusCode = (int?)ex.Response?.StatusCode;
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.HttpError, ex.Message, httpStatusCode);
                 if (ex.Response.StatusCode == HttpStatusCode.BadRequest &&
                     ex.Response.Content.Contains("not support the requested query"))
                 {
@@ -424,18 +443,24 @@ namespace NzbDrone.Core.Indexers
             catch (HttpRequestException ex)
             {
                 _logger.Warn(ex, "Unable to connect to indexer");
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.ConnectionFailure, ex.Message ?? "Connection failure");
 
                 return new ValidationFailure(string.Empty, "Unable to connect to indexer, please check your DNS settings and ensure IPv6 is working or disabled. " + ex.Message);
             }
             catch (TaskCanceledException ex)
             {
                 _logger.Warn(ex, "Unable to connect to indexer");
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.Timeout, ex.Message ?? "Request timeout");
 
                 return new ValidationFailure(string.Empty, "Unable to connect to indexer, possibly due to a timeout. Try again or check your network settings. " + ex.Message);
             }
             catch (WebException webException)
             {
                 _logger.Warn("Unable to connect to indexer.");
+                var errorType = webException.Status is WebExceptionStatus.NameResolutionFailure or WebExceptionStatus.ConnectFailure
+                    ? IndexerErrorType.ConnectionFailure
+                    : (webException.Message.Contains("timed out") ? IndexerErrorType.Timeout : IndexerErrorType.HttpError);
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, errorType, webException.Message);
 
                 if (webException.Status is WebExceptionStatus.NameResolutionFailure or WebExceptionStatus.ConnectFailure)
                 {
@@ -451,6 +476,7 @@ namespace NzbDrone.Core.Indexers
             catch (Exception ex)
             {
                 _logger.Warn(ex, "Unable to connect to indexer");
+                _indexerStatusService.RecordFailure(Definition.Id, IndexerOperationType.Test, IndexerErrorType.Unknown, ex.Message ?? "Unknown error");
 
                 return new ValidationFailure(string.Empty, "Unable to connect to indexer, check the log for more details");
             }

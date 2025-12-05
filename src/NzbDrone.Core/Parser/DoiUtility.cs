@@ -30,6 +30,35 @@ namespace NzbDrone.Core.Parser
                 return null;
             }
 
+            // First, try to extract DOI using regex (handles cases where DOI is concatenated with URLs)
+            var match = DoiRegex.Match(doi);
+            if (match.Success)
+            {
+                var extractedDoi = match.Groups["doi"].Value;
+                extractedDoi = extractedDoi.TrimEnd('.', ',', ';', ':', ')', ']');
+                
+                // Stop at URL indicators if they appear after the DOI
+                var httpIndex = extractedDoi.IndexOf("http", StringComparison.OrdinalIgnoreCase);
+                if (httpIndex > 0)
+                {
+                    extractedDoi = extractedDoi.Substring(0, httpIndex);
+                }
+                
+                var httpsIndex = extractedDoi.IndexOf("https", StringComparison.OrdinalIgnoreCase);
+                if (httpsIndex > 0)
+                {
+                    extractedDoi = extractedDoi.Substring(0, httpsIndex);
+                }
+                
+                extractedDoi = extractedDoi.Trim().ToLowerInvariant();
+                
+                if (extractedDoi.StartsWith("10.", StringComparison.OrdinalIgnoreCase) && extractedDoi.Contains("/"))
+                {
+                    return extractedDoi;
+                }
+            }
+
+            // Fallback to original logic for backward compatibility
             var trimmed = doi.Trim();
             var doiIndex = trimmed.IndexOf("doi.org/", StringComparison.OrdinalIgnoreCase);
 
@@ -44,6 +73,21 @@ namespace NzbDrone.Core.Parser
             }
 
             trimmed = trimmed.Trim().ToLowerInvariant();
+            
+            // Stop at URL indicators if they appear after the DOI
+            var httpIdx = trimmed.IndexOf("http", StringComparison.OrdinalIgnoreCase);
+            if (httpIdx > 0)
+            {
+                trimmed = trimmed.Substring(0, httpIdx);
+            }
+            
+            var httpsIdx = trimmed.IndexOf("https", StringComparison.OrdinalIgnoreCase);
+            if (httpsIdx > 0)
+            {
+                trimmed = trimmed.Substring(0, httpsIdx);
+            }
+            
+            trimmed = trimmed.Trim();
 
             if (!trimmed.StartsWith("10.", StringComparison.OrdinalIgnoreCase) || !trimmed.Contains("/"))
             {

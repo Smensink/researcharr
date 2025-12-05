@@ -125,7 +125,7 @@ namespace NzbDrone.Core.Download
                 _logger.Error(ex, "Failed to import download: {0}", trackedDownload.DownloadItem.Title);
                 trackedDownload.State = TrackedDownloadState.ImportPending;
                 trackedDownload.Warn("Import failed: {0}", ex.Message);
-                throw;
+                // Don't rethrow - state is set and warning is logged, let the caller handle the error state
             }
         }
 

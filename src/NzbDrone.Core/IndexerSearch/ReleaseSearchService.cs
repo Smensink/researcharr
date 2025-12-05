@@ -22,18 +22,21 @@ namespace NzbDrone.Core.IndexerSearch
     public class ReleaseSearchService : ISearchForReleases
     {
         private readonly IIndexerFactory _indexerFactory;
+        private readonly IIndexerStatusService _indexerStatusService;
         private readonly IBookService _bookService;
         private readonly IAuthorService _authorService;
         private readonly IMakeDownloadDecision _makeDownloadDecision;
         private readonly Logger _logger;
 
         public ReleaseSearchService(IIndexerFactory indexerFactory,
+                                    IIndexerStatusService indexerStatusService,
                                 IBookService bookService,
                                 IAuthorService authorService,
                                 IMakeDownloadDecision makeDownloadDecision,
                                 Logger logger)
         {
             _indexerFactory = indexerFactory;
+            _indexerStatusService = indexerStatusService;
             _bookService = bookService;
             _authorService = authorService;
             _makeDownloadDecision = makeDownloadDecision;
@@ -184,9 +187,47 @@ namespace NzbDrone.Core.IndexerSearch
             catch (Exception ex)
             {
                 _logger.Error(ex, "Error while searching for {0}", criteriaBase);
+                
+                // Record detailed failure information
+                try
+                {
+                    var errorType = DetermineErrorType(ex);
+                    var httpStatusCode = GetHttpStatusCode(ex);
+                    _indexerStatusService.RecordFailure(indexer.Definition.Id, IndexerOperationType.Search, errorType, ex.Message, httpStatusCode);
+                }
+                catch
+                {
+                    // Ignore errors in failure recording
+                }
             }
 
             return Array.Empty<ReleaseInfo>();
+        }
+
+        private static IndexerErrorType DetermineErrorType(Exception ex)
+        {
+            return ex switch
+            {
+                System.Net.Http.HttpRequestException => IndexerErrorType.ConnectionFailure,
+                System.Net.WebException webEx when webEx.Status == System.Net.WebExceptionStatus.Timeout => IndexerErrorType.Timeout,
+                System.Net.WebException => IndexerErrorType.ConnectionFailure,
+                System.Threading.Tasks.TaskCanceledException => IndexerErrorType.Timeout,
+                NzbDrone.Common.Http.HttpException httpEx when httpEx.Response?.StatusCode == System.Net.HttpStatusCode.Unauthorized || httpEx.Response?.StatusCode == System.Net.HttpStatusCode.Forbidden => IndexerErrorType.AuthError,
+                NzbDrone.Common.Http.HttpException => IndexerErrorType.HttpError,
+                NzbDrone.Core.Indexers.Exceptions.RequestLimitReachedException => IndexerErrorType.RateLimit,
+                NzbDrone.Core.Http.CloudFlare.CloudFlareCaptchaException => IndexerErrorType.CloudflareCaptcha,
+                _ => IndexerErrorType.Unknown
+            };
+        }
+
+        private static int? GetHttpStatusCode(Exception ex)
+        {
+            if (ex is NzbDrone.Common.Http.HttpException httpEx)
+            {
+                return (int?)httpEx.Response?.StatusCode;
+            }
+
+            return null;
         }
 
         private List<DownloadDecision> DeDupeDecisions(List<DownloadDecision> decisions)
