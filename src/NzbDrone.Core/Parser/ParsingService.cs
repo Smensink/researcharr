@@ -8,6 +8,7 @@ using NzbDrone.Core.Books;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Qualities;
 
 namespace NzbDrone.Core.Parser
 {
@@ -67,11 +68,26 @@ namespace NzbDrone.Core.Parser
 
         public RemoteBook Map(ParsedBookInfo parsedBookInfo, SearchCriteriaBase searchCriteria = null)
         {
+            // Ensure ParsedBookInfo is never null - create a minimal one if needed
+            if (parsedBookInfo == null)
+            {
+                parsedBookInfo = new ParsedBookInfo
+                {
+                    Quality = new QualityModel(Quality.PDF) // Default quality for academic papers
+                };
+            }
+            // Ensure Quality is always set
+            else if (parsedBookInfo.Quality == null)
+            {
+                parsedBookInfo.Quality = new QualityModel(Quality.PDF);
+            }
+
             var remoteBook = new RemoteBook
             {
                 ParsedBookInfo = parsedBookInfo,
             };
 
+            // GetAuthor can handle null parsedBookInfo (it will check searchCriteria)
             var author = GetAuthor(parsedBookInfo, searchCriteria);
 
             if (author == null)
@@ -101,13 +117,19 @@ namespace NzbDrone.Core.Parser
 
         public List<Book> GetBooks(ParsedBookInfo parsedBookInfo, Author author, SearchCriteriaBase searchCriteria = null)
         {
-            var bookTitle = parsedBookInfo.BookTitle;
-            var result = new List<Book>();
+            // If we have search criteria with books, use them (especially for book searches)
+            if (searchCriteria != null && searchCriteria.Books != null && searchCriteria.Books.Any())
+            {
+                return searchCriteria.Books;
+            }
 
-            if (parsedBookInfo.BookTitle == null)
+            if (parsedBookInfo == null || parsedBookInfo.BookTitle == null)
             {
                 return new List<Book>();
             }
+
+            var bookTitle = parsedBookInfo.BookTitle;
+            var result = new List<Book>();
 
             Book bookInfo = null;
 
@@ -187,9 +209,17 @@ namespace NzbDrone.Core.Parser
 
         private Author GetAuthor(ParsedBookInfo parsedBookInfo, SearchCriteriaBase searchCriteria)
         {
-            Author author = null;
+            // If we have search criteria with author and books, use it (especially for book searches)
+            if (searchCriteria != null && searchCriteria.Author != null && 
+                searchCriteria.Books != null && searchCriteria.Books.Any())
+            {
+                // For book searches, trust the search criteria author
+                return searchCriteria.Author;
+            }
 
-            if (searchCriteria != null)
+            // Try to match parsed author name with search criteria author
+            if (searchCriteria != null && searchCriteria.Author != null && 
+                parsedBookInfo != null && parsedBookInfo.AuthorName.IsNotNullOrWhiteSpace())
             {
                 if (searchCriteria.Author.CleanName == parsedBookInfo.AuthorName.CleanAuthorName())
                 {
@@ -197,7 +227,13 @@ namespace NzbDrone.Core.Parser
                 }
             }
 
-            author = _authorService.FindByName(parsedBookInfo.AuthorName);
+            // If no parsed author name, can't find author
+            if (parsedBookInfo == null || parsedBookInfo.AuthorName.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            var author = _authorService.FindByName(parsedBookInfo.AuthorName);
 
             if (author == null)
             {

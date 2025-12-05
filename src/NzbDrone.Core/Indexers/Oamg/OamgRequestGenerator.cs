@@ -22,6 +22,17 @@ namespace NzbDrone.Core.Indexers.Oamg
         {
             var chain = new IndexerPageableRequestChain();
 
+            // Prioritize DOI search if available (most reliable identifier)
+            if (searchCriteria.BookDoi.IsNotNullOrWhiteSpace())
+            {
+                var normalizedDoi = Parser.DoiUtility.Normalize(searchCriteria.BookDoi);
+                if (normalizedDoi.IsNotNullOrWhiteSpace())
+                {
+                    // OAMG (OpenAlex Mirror) supports DOI search
+                    chain.Add(BuildRequests(normalizedDoi));
+                }
+            }
+
             if (searchCriteria.AuthorQuery.IsNotNullOrWhiteSpace())
             {
                 chain.Add(BuildRequests(searchCriteria.AuthorQuery));

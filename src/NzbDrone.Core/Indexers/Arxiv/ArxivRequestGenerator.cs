@@ -22,6 +22,17 @@ namespace NzbDrone.Core.Indexers.Arxiv
         {
             var chain = new IndexerPageableRequestChain();
 
+            // Arxiv uses arXiv IDs, not DOIs, but we can still search by DOI if available
+            // (some papers may have both arXiv ID and DOI)
+            if (!string.IsNullOrWhiteSpace(searchCriteria.BookDoi))
+            {
+                var normalizedDoi = Parser.DoiUtility.Normalize(searchCriteria.BookDoi);
+                if (!string.IsNullOrWhiteSpace(normalizedDoi))
+                {
+                    chain.Add(BuildRequests(normalizedDoi, 0, 100));
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(searchCriteria.AuthorQuery))
             {
                 chain.Add(BuildRequests(searchCriteria.AuthorQuery, 0, 100));

@@ -48,6 +48,18 @@ namespace NzbDrone.Core.Indexers.SciHub
 
         private IEnumerable<string> BuildQueries(BookSearchCriteria searchCriteria)
         {
+            // Prioritize BookDoi field (most reliable)
+            if (searchCriteria.BookDoi.IsNotNullOrWhiteSpace())
+            {
+                var normalized = Parser.DoiUtility.Normalize(searchCriteria.BookDoi);
+                if (normalized.IsNotNullOrWhiteSpace())
+                {
+                    yield return normalized;
+                    yield break; // If we have explicit DOI, don't try other fields
+                }
+            }
+
+            // Fallback: try to extract DOI from other fields
             if (searchCriteria.BookIsbn.IsNotNullOrWhiteSpace())
             {
                 var normalized = NormalizeQuery(searchCriteria.BookIsbn);

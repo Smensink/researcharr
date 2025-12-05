@@ -44,6 +44,18 @@ namespace NzbDrone.Core.Indexers.LibGen
         {
             var chain = new IndexerPageableRequestChain();
 
+            // Prioritize DOI search if available (most reliable identifier)
+            if (searchCriteria.BookDoi.IsNotNullOrWhiteSpace())
+            {
+                var normalizedDoi = Parser.DoiUtility.Normalize(searchCriteria.BookDoi);
+                if (normalizedDoi.IsNotNullOrWhiteSpace())
+                {
+                    // LibGen may not support direct DOI search, but try it anyway
+                    chain.Add(BuildRequests(normalizedDoi, "title"));
+                }
+            }
+
+            // Fallback to title/author search
             BuildTitleAndAuthorRequests(chain, searchCriteria.BookQuery, searchCriteria.AuthorQuery);
 
             return chain;

@@ -41,8 +41,29 @@ function createFetchServerSideCollectionHandler(section, url, fetchDataAugmenter
     }).request;
 
     promise.done((response) => {
+      if (!response || !Array.isArray(response.records)) {
+        dispatch(set({
+          section,
+          isFetching: false,
+          isPopulated: false,
+          error: { message: 'Invalid response from server' }
+        }));
+        return;
+      }
+
+      // Ensure required properties exist with defaults
+      const safeResponse = {
+        records: response.records || [],
+        totalRecords: response.totalRecords || 0,
+        pageSize: response.pageSize || sectionState.pageSize || 25,
+        page: response.page || page,
+        sortKey: response.sortKey || sectionState.sortKey,
+        sortDirection: response.sortDirection || sectionState.sortDirection,
+        ..._.omit(response, ['records', 'totalRecords', 'pageSize', 'page', 'sortKey', 'sortDirection'])
+      };
+
       dispatch(batchActions([
-        updateServerSideCollection({ section, data: response }),
+        updateServerSideCollection({ section, data: safeResponse }),
 
         set({
           section,

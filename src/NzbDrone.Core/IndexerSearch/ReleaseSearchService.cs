@@ -82,9 +82,35 @@ namespace NzbDrone.Core.IndexerSearch
 
             var searchSpec = Get<BookSearchCriteria>(author, new List<Book> { book }, userInvokedSearch, interactiveSearch);
 
-            searchSpec.BookTitle = book.Editions.Value.SingleOrDefault(x => x.Monitored).Title;
+            var monitoredEdition = book.Editions.Value.SingleOrDefault(x => x.Monitored);
+            searchSpec.BookTitle = monitoredEdition?.Title ?? book.Title;
 
-            // searchSpec.BookIsbn = book.Isbn13;
+            // Extract DOI from book - most important identifier for academic papers
+            // Check Links first (where DOI is stored as Name="DOI")
+            var doiLink = book.Links?.FirstOrDefault(l => l.Name?.Equals("DOI", StringComparison.OrdinalIgnoreCase) == true);
+            if (doiLink != null && !string.IsNullOrWhiteSpace(doiLink.Url))
+            {
+                searchSpec.BookDoi = Parser.DoiUtility.Normalize(doiLink.Url);
+            }
+            else if (monitoredEdition != null && !string.IsNullOrWhiteSpace(monitoredEdition.Isbn13))
+            {
+                // Fallback to Edition.Isbn13 (which may contain DOI for academic papers)
+                var normalizedDoi = Parser.DoiUtility.Normalize(monitoredEdition.Isbn13);
+                if (normalizedDoi != null)
+                {
+                    searchSpec.BookDoi = normalizedDoi;
+                }
+                else
+                {
+                    searchSpec.BookIsbn = monitoredEdition.Isbn13;
+                }
+            }
+
+            if (monitoredEdition != null)
+            {
+                searchSpec.Disambiguation = monitoredEdition.Disambiguation;
+            }
+
             if (book.ReleaseDate.HasValue)
             {
                 searchSpec.BookYear = book.ReleaseDate.Value.Year;

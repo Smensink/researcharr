@@ -66,6 +66,18 @@ namespace NzbDrone.Core.Parser
 
         public static IEnumerable<string> GetDois(SearchCriteriaBase searchCriteria)
         {
+            // Check BookSearchCriteria.BookDoi first (most reliable, explicitly set)
+            if (searchCriteria is IndexerSearch.Definitions.BookSearchCriteria bookCriteria && 
+                bookCriteria.BookDoi.IsNotNullOrWhiteSpace())
+            {
+                var normalized = Normalize(bookCriteria.BookDoi);
+                if (normalized.IsNotNullOrWhiteSpace())
+                {
+                    yield return normalized;
+                }
+            }
+
+            // Fallback: extract DOIs from Books' Links
             if (searchCriteria?.Books == null)
             {
                 yield break;

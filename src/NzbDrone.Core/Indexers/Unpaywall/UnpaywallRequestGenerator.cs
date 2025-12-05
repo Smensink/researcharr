@@ -45,6 +45,14 @@ namespace NzbDrone.Core.Indexers.Unpaywall
 
         private IEnumerable<string> GetDoiQueries(BookSearchCriteria searchCriteria)
         {
+            // Prioritize BookDoi field (most reliable)
+            if (searchCriteria.BookDoi.IsNotNullOrWhiteSpace())
+            {
+                yield return searchCriteria.BookDoi;
+                yield break; // If we have explicit DOI, don't try to extract from other fields
+            }
+
+            // Fallback: try to extract DOI from other fields
             var candidates = new List<string>();
 
             if (searchCriteria.BookQuery.IsNotNullOrWhiteSpace())

@@ -153,74 +153,107 @@ namespace NzbDrone.Core.DecisionEngine
                     if (parsedBookInfo != null && !parsedBookInfo.AuthorName.IsNullOrWhiteSpace())
                     {
                         remoteBook = _parsingService.Map(parsedBookInfo, searchCriteria);
-                        remoteBook.Release = report;
-
-                        _aggregationService.Augment(remoteBook);
-
-                        // try parsing again using the search criteria, in case it parsed but parsed incorrectly
-                        if ((remoteBook.Author == null || remoteBook.Books.Empty()) && searchCriteria != null)
+                        if (remoteBook != null)
                         {
-                            _logger.Debug("Author/Book null for {0}, reparsing with search criteria", report.Title);
-                            var parsedBookInfoWithCriteria = Parser.Parser.ParseBookTitleWithSearchCriteria(report.Title,
-                                                                                                                searchCriteria.Author,
-                                                                                                                searchCriteria.Books);
+                            remoteBook.Release = report;
 
-                            if (parsedBookInfoWithCriteria != null && parsedBookInfoWithCriteria.AuthorName.IsNotNullOrWhiteSpace())
-                            {
-                                remoteBook = _parsingService.Map(parsedBookInfoWithCriteria, searchCriteria);
-                            }
-                        }
-
-                        remoteBook.Release = report;
-
-                        // parse quality again with title and category if unknown
-                        if (remoteBook.ParsedBookInfo.Quality.Quality == Quality.Unknown)
-                        {
-                            remoteBook.ParsedBookInfo.Quality = QualityParser.ParseQuality(report.Title, null, report.Categories);
-                        }
-
-                        if (remoteBook.Author == null)
-                        {
-                            // If author is unknown but DOI matches, we can trust the release and use the search criteria author
-                            if (DoiUtility.IsDoiMatch(report, searchCriteria) && searchCriteria?.Author != null)
-                            {
-                                _logger.Debug("Author unknown but DOI matches, using search criteria author");
-                                remoteBook.Author = searchCriteria.Author;
-
-                                if (remoteBook.Books.Empty() && searchCriteria.Books != null)
-                                {
-                                    remoteBook.Books = searchCriteria.Books;
-                                }
-                            }
-                            else
-                            {
-                                decision = new DownloadDecision(remoteBook, new Rejection("Unknown Author"));
-                            }
-                        }
-                        else if (remoteBook.Books.Empty())
-                        {
-                            // If Books is empty but DOI matches, populate from search criteria
-                            if (DoiUtility.IsDoiMatch(report, searchCriteria) && searchCriteria?.Books != null)
-                            {
-                                _logger.Debug("Books empty but DOI matches, using search criteria books");
-                                remoteBook.Books = searchCriteria.Books;
-                            }
-
-                            // Only reject if Books is still empty after trying to populate
-                            if (remoteBook.Books.Empty())
-                            {
-                                decision = new DownloadDecision(remoteBook, new Rejection("Unable to parse books from release name"));
-                            }
-                        }
-                        else
-                        {
                             _aggregationService.Augment(remoteBook);
 
-                            remoteBook.CustomFormats = _formatCalculator.ParseCustomFormat(remoteBook, remoteBook.Release.Size);
-                            remoteBook.CustomFormatScore = remoteBook?.Author?.QualityProfile?.Value.CalculateCustomFormatScore(remoteBook.CustomFormats) ?? 0;
+                            // try parsing again using the search criteria, in case it parsed but parsed incorrectly
+                            if ((remoteBook.Author == null || remoteBook.Books.Empty()) && searchCriteria != null)
+                            {
+                                _logger.Debug("Author/Book null for {0}, reparsing with search criteria", report.Title);
+                                var parsedBookInfoWithCriteria = Parser.Parser.ParseBookTitleWithSearchCriteria(report.Title,
+                                                                                                                    searchCriteria.Author,
+                                                                                                                    searchCriteria.Books);
 
-                            remoteBook.DownloadAllowed = remoteBook.Books.Any();
-                            decision = GetDecisionForReport(remoteBook, searchCriteria);
+                                if (parsedBookInfoWithCriteria != null && parsedBookInfoWithCriteria.AuthorName.IsNotNullOrWhiteSpace())
+                                {
+                                    var newRemoteBook = _parsingService.Map(parsedBookInfoWithCriteria, searchCriteria);
+                                    if (newRemoteBook != null)
+                                    {
+                                        remoteBook = newRemoteBook;
+                                        remoteBook.Release = report;
+                                        // Ensure ParsedBookInfo is set
+                                        if (remoteBook.ParsedBookInfo == null)
+                                        {
+                                            remoteBook.ParsedBookInfo = parsedBookInfoWithCriteria;
+                                        }
+                                        // Augment the new remoteBook to populate critical fields before validation
+                                        _aggregationService.Augment(remoteBook);
+                                    }
+                                }
+                            }
+
+                            if (remoteBook != null)
+                            {
+                                remoteBook.Release = report;
+
+                                // Ensure ParsedBookInfo and Quality are always set
+                                if (remoteBook.ParsedBookInfo == null)
+                                {
+                                    remoteBook.ParsedBookInfo = new ParsedBookInfo
+                                    {
+                                        Quality = QualityParser.ParseQuality(report.Title, null, report.Categories)
+                                    };
+                                }
+                                else if (remoteBook.ParsedBookInfo.Quality == null || remoteBook.ParsedBookInfo.Quality.Quality == Quality.Unknown)
+                                {
+                                    remoteBook.ParsedBookInfo.Quality = QualityParser.ParseQuality(report.Title, null, report.Categories);
+                                }
+
+                                if (remoteBook.Author == null)
+                                {
+                                    // If author is unknown but DOI matches, we can trust the release and use the search criteria author
+                                    if (DoiUtility.IsDoiMatch(report, searchCriteria) && searchCriteria?.Author != null)
+                                    {
+                                        _logger.Debug("Author unknown but DOI matches, using search criteria author");
+                                        remoteBook.Author = searchCriteria.Author;
+
+                                        if (remoteBook.Books.Empty() && searchCriteria.Books != null)
+                                        {
+                                            remoteBook.Books = searchCriteria.Books;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        decision = new DownloadDecision(remoteBook, new Rejection("Unknown Author"));
+                                    }
+                                }
+                                else if (remoteBook.Books.Empty())
+                                {
+                                    // If Books is empty but DOI matches, populate from search criteria
+                                    if (DoiUtility.IsDoiMatch(report, searchCriteria) && searchCriteria?.Books != null)
+                                    {
+                                        _logger.Debug("Books empty but DOI matches, using search criteria books");
+                                        remoteBook.Books = searchCriteria.Books;
+                                    }
+
+                                    // Only reject if Books is still empty after trying to populate
+                                    if (remoteBook.Books.Empty())
+                                    {
+                                        decision = new DownloadDecision(remoteBook, new Rejection("Unable to parse books from release name"));
+                                    }
+                                }
+                                else
+                                {
+                                    _aggregationService.Augment(remoteBook);
+
+                                    if (remoteBook.Release != null)
+                                    {
+                                        remoteBook.CustomFormats = _formatCalculator.ParseCustomFormat(remoteBook, remoteBook.Release.Size);
+                                        remoteBook.CustomFormatScore = remoteBook?.Author?.QualityProfile?.Value?.CalculateCustomFormatScore(remoteBook.CustomFormats) ?? 0;
+                                    }
+                                    else
+                                    {
+                                        remoteBook.CustomFormats = new List<CustomFormat>();
+                                        remoteBook.CustomFormatScore = 0;
+                                    }
+
+                                    remoteBook.DownloadAllowed = remoteBook.Books != null && remoteBook.Books.Any();
+                                    decision = GetDecisionForReport(remoteBook, searchCriteria);
+                                }
+                            }
                         }
                     }
 
@@ -274,7 +307,15 @@ namespace NzbDrone.Core.DecisionEngine
                     if (decision == null && remoteBook == null && parsedBookInfo != null)
                     {
                         remoteBook = _parsingService.Map(parsedBookInfo, searchCriteria);
-                        remoteBook.Release = report;
+                        if (remoteBook != null)
+                        {
+                            remoteBook.Release = report;
+                            // Ensure ParsedBookInfo is set (Map should set it, but be defensive)
+                            if (remoteBook.ParsedBookInfo == null)
+                            {
+                                remoteBook.ParsedBookInfo = parsedBookInfo;
+                            }
+                        }
                     }
 
                     // If we have a remoteBook and still no decision, run the standard evaluation pipeline.
@@ -312,17 +353,25 @@ namespace NzbDrone.Core.DecisionEngine
                         {
                             _aggregationService.Augment(remoteBook);
 
-                            remoteBook.CustomFormats = _formatCalculator.ParseCustomFormat(remoteBook, remoteBook.Release.Size);
-                            remoteBook.CustomFormatScore = remoteBook?.Author?.QualityProfile?.Value.CalculateCustomFormatScore(remoteBook.CustomFormats) ?? 0;
+                            if (remoteBook.Release != null)
+                            {
+                                remoteBook.CustomFormats = _formatCalculator.ParseCustomFormat(remoteBook, remoteBook.Release.Size);
+                                remoteBook.CustomFormatScore = remoteBook?.Author?.QualityProfile?.Value?.CalculateCustomFormatScore(remoteBook.CustomFormats) ?? 0;
+                            }
+                            else
+                            {
+                                remoteBook.CustomFormats = new List<CustomFormat>();
+                                remoteBook.CustomFormatScore = 0;
+                            }
 
-                            remoteBook.DownloadAllowed = remoteBook.Books.Any();
+                            remoteBook.DownloadAllowed = remoteBook.Books != null && remoteBook.Books.Any();
                             decision = GetDecisionForReport(remoteBook, searchCriteria);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e, "Couldn't process release.");
+                    _logger.Error(e, "Couldn't process release. Title: {0}, Indexer: {1}", report?.Title ?? "Unknown", report?.Indexer ?? "Unknown");
 
                     var errorRemote = new RemoteBook { Release = report };
                     decision = new DownloadDecision(errorRemote, new Rejection("Unexpected error processing release"));

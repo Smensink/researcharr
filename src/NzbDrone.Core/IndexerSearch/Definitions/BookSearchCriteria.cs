@@ -8,6 +8,7 @@ namespace NzbDrone.Core.IndexerSearch.Definitions
         public int BookYear { get; set; }
         public string BookIsbn { get; set; }
         public string Disambiguation { get; set; }
+        public string BookDoi { get; set; }
 
         public string BookQuery => GetQueryTitle(BookTitle.SplitBookTitle(Author.Name).Item1);
 

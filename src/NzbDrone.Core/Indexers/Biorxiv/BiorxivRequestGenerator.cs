@@ -89,6 +89,14 @@ namespace NzbDrone.Core.Indexers.Biorxiv
 
         private IEnumerable<string> GetDoiQueries(BookSearchCriteria searchCriteria)
         {
+            // Prioritize BookDoi field (most reliable)
+            if (!string.IsNullOrWhiteSpace(searchCriteria.BookDoi))
+            {
+                yield return searchCriteria.BookDoi;
+                yield break; // If we have explicit DOI, don't try to extract from other fields
+            }
+
+            // Fallback: try to extract DOI from other fields
             var candidates = new List<string>();
 
             if (!string.IsNullOrWhiteSpace(searchCriteria.BookTitle))

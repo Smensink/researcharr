@@ -3,9 +3,12 @@ import createAuthorSelector from './createAuthorSelector';
 
 function createAuthorQualityProfileSelector() {
   return createSelector(
-    (state) => state.settings.qualityProfiles.items,
+    (state) => state.settings?.qualityProfiles?.items || [],
     createAuthorSelector(),
-    (qualityProfiles, author = {}) => {
+    (qualityProfiles, author) => {
+      if (!author || !author.qualityProfileId) {
+        return undefined;
+      }
       return qualityProfiles.find((profile) => {
         return profile.id === author.qualityProfileId;
       });

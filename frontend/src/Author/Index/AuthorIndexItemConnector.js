@@ -55,6 +55,10 @@ function createMapStateToProps() {
         return {};
       }
 
+      // Ensure profiles are defined (provide empty objects as fallback)
+      const safeQualityProfile = qualityProfile || {};
+      const safeMetadataProfile = metadataProfile || {};
+
       const isRefreshingAuthor = executingCommands.some((command) => {
         return (
           command.name === commandNames.REFRESH_AUTHOR &&
@@ -73,8 +77,8 @@ function createMapStateToProps() {
 
       return {
         ...author,
-        qualityProfile,
-        metadataProfile,
+        qualityProfile: safeQualityProfile,
+        metadataProfile: safeMetadataProfile,
         latestBook,
         showSearchAction,
         isRefreshingAuthor,
