@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "Hash": "LWhMQMiObAofwLsZKd1IdjVMCocfEXAWg26HJm6aF/g=",
+  "Hash": "UopRINS0QGL/+gQTIJIBYhShNETKeuaCMMyEQ9/S/kc=",
   "Source": "Readarr.Host",
   "BasePath": "_content/Readarr.Host",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [
     {
-      "Identity": "/Users/sebastianmensink/Documents/Researcharr-develop/src/NzbDrone.SignalR/Readarr.SignalR.csproj",
+      "Identity": "/workspace/src/NzbDrone.SignalR/Readarr.SignalR.csproj",
       "Version": 2,
       "Source": "Readarr.SignalR",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",

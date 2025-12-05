@@ -1,0 +1,12 @@
+.timestamp,
+.operationType,
+.errorType,
+.errorMessage,
+.httpStatusCode {
+  composes: cell from '~Components/Table/Cells/TableRowCell.css';
+}
+
+.errorMessage {
+  word-break: break-word;
+}
+

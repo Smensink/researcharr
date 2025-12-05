@@ -3,6 +3,7 @@
 interface CssExports {
   'cloneButton': string;
   'enabled': string;
+  'errorsLink': string;
   'indexer': string;
   'name': string;
   'nameContainer': string;

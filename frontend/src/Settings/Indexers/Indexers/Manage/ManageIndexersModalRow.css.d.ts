@@ -4,9 +4,11 @@ interface CssExports {
   'enableAutomaticSearch': string;
   'enableInteractiveSearch': string;
   'enableRss': string;
+  'errorsLink': string;
   'implementation': string;
   'name': string;
   'priority': string;
+  'statistics': string;
   'tags': string;
 }
 export const cssExports: CssExports;

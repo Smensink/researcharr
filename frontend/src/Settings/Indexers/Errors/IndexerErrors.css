@@ -1,0 +1,93 @@
+.header {
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  margin-bottom: 10px;
+}
+
+.statistics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.statItem {
+  display: flex;
+  gap: 5px;
+}
+
+.statLabel {
+  font-weight: bold;
+}
+
+.statValue {
+  color: var(--textColor);
+}
+
+.breakdown {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: var(--cardBackgroundColor);
+  border-radius: 4px;
+}
+
+.breakdown h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdownItem {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borderColor);
+}
+
+.breakdownItem:last-child {
+  border-bottom: none;
+}
+
+.operationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.operationName {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.operationRate {
+  font-size: 13px;
+  color: var(--textColor);
+}
+
+.operationDetails {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: var(--dimTextColor);
+}
+
+.successCount {
+  color: var(--successColor);
+}
+
+.failureCount {
+  color: var(--dangerColor);
+}
+
+.totalCount {
+  color: var(--textColor);
+}
+

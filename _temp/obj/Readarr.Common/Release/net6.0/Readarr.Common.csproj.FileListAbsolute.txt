@@ -16,6 +16,10 @@
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Common/Release/net6.0/Readarr.Common.xml
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Common/Release/net6.0/Readarr.Common.pdb
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Common/Release/net6.0/ref/Readarr.Common.dll
+/workspace/_output/net6.0/Readarr.Common.deps.json
+/workspace/_output/net6.0/Readarr.Common.dll
+/workspace/_output/net6.0/Readarr.Common.pdb
+/workspace/_output/net6.0/Readarr.Common.xml
 /workspace/_temp/obj/Readarr.Common/Release/net6.0/Readarr.Common.csproj.AssemblyReference.cache
 /workspace/_temp/obj/Readarr.Common/Release/net6.0/NzbDrone.Common.EnsureThat.Resources.ExceptionMessages.resources
 /workspace/_temp/obj/Readarr.Common/Release/net6.0/Readarr.Common.csproj.GenerateResource.cache
@@ -29,8 +33,4 @@
 /workspace/_temp/obj/Readarr.Common/Release/net6.0/refint/Readarr.Common.dll
 /workspace/_temp/obj/Readarr.Common/Release/net6.0/Readarr.Common.xml
 /workspace/_temp/obj/Readarr.Common/Release/net6.0/Readarr.Common.pdb
-/workspace/_output/net6.0/Readarr.Common.deps.json
-/workspace/_output/net6.0/Readarr.Common.dll
-/workspace/_output/net6.0/Readarr.Common.pdb
-/workspace/_output/net6.0/Readarr.Common.xml
 /workspace/_temp/obj/Readarr.Common/Release/net6.0/ref/Readarr.Common.dll

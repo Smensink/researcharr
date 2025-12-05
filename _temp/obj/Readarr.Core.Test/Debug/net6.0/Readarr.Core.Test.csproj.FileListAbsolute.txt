@@ -147,3 +147,17 @@
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.genruntimeconfig.cache
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Core.Test/Debug/net6.0/ref/Readarr.Core.Test.dll
 /Users/sebastianmensink/Documents/Researcharr-develop/_tests/net6.0/Files/Indexers/LibGen/LibGenSearch.html
+/workspace/_tests/net6.0/.msCoverageSourceRootsMapping_Readarr.Core.Test
+/workspace/_tests/net6.0/CoverletSourceRootsMapping
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.csproj.AssemblyReference.cache
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.csproj.SuggestedBindingRedirects.cache
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.dll.config
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.GeneratedMSBuildEditorConfig.editorconfig
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Sentry.Attributes.cs
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.AssemblyInfoInputs.cache
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.AssemblyInfo.cs
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.csproj.CoreCompileInputs.cache
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.dll
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/refint/Readarr.Core.Test.dll
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.xml
+/workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.pdb

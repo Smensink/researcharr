@@ -60,10 +60,6 @@
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.xml
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.pdb
 /Users/sebastianmensink/Documents/Researcharr-develop/_temp/obj/Readarr.Core/Release/net6.0/ref/Readarr.Core.dll
-/workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.dll
-/workspace/_temp/obj/Readarr.Core/Release/net6.0/refint/Readarr.Core.dll
-/workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.xml
-/workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.pdb
 /workspace/_output/net6.0/Localization/Core/ar.json
 /workspace/_output/net6.0/Localization/Core/bg.json
 /workspace/_output/net6.0/Localization/Core/bn.json
@@ -121,4 +117,8 @@
 /workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.csproj.CoreCompileInputs.cache
 /workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.sourcelink.json
 /workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.csproj.CopyComplete
+/workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.dll
+/workspace/_temp/obj/Readarr.Core/Release/net6.0/refint/Readarr.Core.dll
+/workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.xml
+/workspace/_temp/obj/Readarr.Core/Release/net6.0/Readarr.Core.pdb
 /workspace/_temp/obj/Readarr.Core/Release/net6.0/ref/Readarr.Core.dll

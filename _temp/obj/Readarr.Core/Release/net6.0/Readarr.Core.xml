@@ -93,6 +93,13 @@
             On some properties sab serializes array of single item as plain string.
             </summary>
         </member>
+        <member name="M:NzbDrone.Core.Indexers.Commands.AdjustIndexerPriorityCommandService.CalculateBayesianReliabilityScore(NzbDrone.Core.Indexers.IndexerStatistics)">
+            <summary>
+            Calculates a Bayesian reliability score for an indexer.
+            Uses a prior belief (95% success rate with weight of 100 operations) combined with observed data.
+            Higher score = more reliable indexer.
+            </summary>
+        </member>
         <member name="M:NzbDrone.Core.Indexers.TorrentRss.TorrentRssSettingsDetector.Detect(NzbDrone.Core.Indexers.TorrentRss.TorrentRssIndexerSettings)">
             <summary>
             Detect settings for Parser, based on URL
