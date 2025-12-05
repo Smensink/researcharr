@@ -95,9 +95,15 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
                 }
             }
 
-            var fileTitles = new[] { title, CleanTitleCruft.Replace(title) }.Distinct().ToList();
+            // Normalize titles to handle dash vs colon differences (e.g., "Title - Subtitle" vs "Title: Subtitle")
+            var normalizedTitle = Parser.Parser.NormalizeTitleSeparators(title);
+            var fileTitles = new[] { title, normalizedTitle, CleanTitleCruft.Replace(title), CleanTitleCruft.Replace(normalizedTitle) }.Distinct().Where(t => !t.IsNullOrWhiteSpace()).ToList();
 
-            dist.AddString("book", fileTitles, titleOptions);
+            // Normalize book titles as well
+            var normalizedTitleOptions = titleOptions.Select(t => Parser.Parser.NormalizeTitleSeparators(t)).ToList();
+            var allTitleOptions = titleOptions.Concat(normalizedTitleOptions).Distinct().Where(t => !t.IsNullOrWhiteSpace()).ToList();
+
+            dist.AddString("book", fileTitles, allTitleOptions);
             Logger.Trace("book: '{0}' vs '{1}'; {2}", fileTitles.ConcatToString("' or '"), titleOptions.ConcatToString("' or '"), dist.NormalizedDistance());
 
             var isbn = localTracks.MostCommon(x => x.FileTrackInfo.Isbn);

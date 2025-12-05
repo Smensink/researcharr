@@ -15,17 +15,21 @@ namespace NzbDrone.Core.Indexers
 
         void RecordFailure(int indexerId, IndexerOperationType operation, IndexerErrorType errorType, string errorMessage, int? httpStatusCode = null);
 
+        void RecordSuccess(int indexerId, IndexerOperationType operation);
+
         IndexerStatus GetStatus(int indexerId);
     }
 
     public class IndexerStatusService : ProviderStatusServiceBase<IIndexer, IndexerStatus>, IIndexerStatusService
     {
         private readonly IIndexerFailureRepository _failureRepository;
+        private readonly IIndexerSuccessRepository _successRepository;
 
-        public IndexerStatusService(IIndexerStatusRepository providerStatusRepository, IIndexerFailureRepository failureRepository, IEventAggregator eventAggregator, IRuntimeInfo runtimeInfo, Logger logger)
+        public IndexerStatusService(IIndexerStatusRepository providerStatusRepository, IIndexerFailureRepository failureRepository, IIndexerSuccessRepository successRepository, IEventAggregator eventAggregator, IRuntimeInfo runtimeInfo, Logger logger)
             : base(providerStatusRepository, eventAggregator, runtimeInfo, logger)
         {
             _failureRepository = failureRepository;
+            _successRepository = successRepository;
         }
 
         public ReleaseInfo GetLastRssSyncReleaseInfo(int indexerId)
@@ -64,6 +68,25 @@ namespace NzbDrone.Core.Indexers
             catch (Exception ex)
             {
                 _logger.Debug(ex, "Failed to record indexer failure for indexer {0}", indexerId);
+            }
+        }
+
+        public void RecordSuccess(int indexerId, IndexerOperationType operation)
+        {
+            try
+            {
+                var success = new IndexerSuccess
+                {
+                    IndexerId = indexerId,
+                    OperationType = operation,
+                    Timestamp = DateTime.UtcNow
+                };
+
+                _successRepository.Insert(success);
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug(ex, "Failed to record indexer success for indexer {0}", indexerId);
             }
         }
 

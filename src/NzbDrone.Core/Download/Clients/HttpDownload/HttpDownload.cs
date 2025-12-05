@@ -150,7 +150,7 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
                     // Record success for the indexer
                     if (indexerId > 0)
                     {
-                        _indexerStatusService.RecordSuccess(indexerId);
+                        _indexerStatusService.RecordSuccess(indexerId, IndexerOperationType.Download);
                     }
                 }
                 catch (Exception ex)

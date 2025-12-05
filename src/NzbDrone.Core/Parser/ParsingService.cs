@@ -117,10 +117,57 @@ namespace NzbDrone.Core.Parser
 
         public List<Book> GetBooks(ParsedBookInfo parsedBookInfo, Author author, SearchCriteriaBase searchCriteria = null)
         {
-            // If we have search criteria with books, use them (especially for book searches)
+            // If we have search criteria with books, verify the parsed title matches before returning them
+            // This prevents returning wrong books when parsing matched incorrectly
             if (searchCriteria != null && searchCriteria.Books != null && searchCriteria.Books.Any())
             {
-                return searchCriteria.Books;
+                // If we have a parsed book title, verify it matches one of the search criteria books
+                if (parsedBookInfo?.BookTitle != null)
+                {
+                    var parsedTitle = Parser.Parser.NormalizeTitleSeparators(parsedBookInfo.BookTitle);
+                    var cleanParsedTitle = Parser.CleanAuthorName(parsedTitle);
+                    
+                    // Check for exact or close match in search criteria books
+                    var matchingBook = searchCriteria.Books.FirstOrDefault(b => 
+                        b.Title.Equals(parsedTitle, StringComparison.OrdinalIgnoreCase) ||
+                        b.CleanTitle.Equals(cleanParsedTitle, StringComparison.OrdinalIgnoreCase) ||
+                        Parser.Parser.NormalizeTitleSeparators(b.Title).Equals(parsedTitle, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (matchingBook != null)
+                    {
+                        // Return only the matching book, not all books
+                        return new List<Book> { matchingBook };
+                    }
+                    
+                    // If no exact match, try fuzzy matching with a high threshold
+                    var wordDelimiters = new HashSet<char>(" .,_-=()[]|\"`''");
+                    var fuzzyMatches = searchCriteria.Books
+                        .Select(b =>
+                        {
+                            var normalizedTitle = Parser.Parser.NormalizeTitleSeparators(b.Title);
+                            var (_, _, score) = parsedTitle.ToLowerInvariant().FuzzyMatch(normalizedTitle.ToLowerInvariant(), 0.5, wordDelimiters);
+                            return new { Book = b, Score = score };
+                        })
+                        .Where(x => x.Score >= 0.7) // Require at least 70% match
+                        .OrderByDescending(x => x.Score)
+                        .ToList();
+                    
+                    if (fuzzyMatches.Any())
+                    {
+                        // Return only the best matching book
+                        return new List<Book> { fuzzyMatches.First().Book };
+                    }
+                    
+                    // If parsed title doesn't match any search criteria book, don't return them
+                    // This prevents wrong books from being assigned
+                    _logger.Debug("Parsed book title '{0}' doesn't match any search criteria books, not returning search criteria books", parsedTitle);
+                }
+                else
+                {
+                    // No parsed title, so we can't verify - return search criteria books as fallback
+                    // This is safe because BookRequestedSpecification will verify by ID
+                    return searchCriteria.Books;
+                }
             }
 
             if (parsedBookInfo == null || parsedBookInfo.BookTitle == null)

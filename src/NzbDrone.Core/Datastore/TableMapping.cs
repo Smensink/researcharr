@@ -204,6 +204,7 @@ namespace NzbDrone.Core.Datastore
 
             Mapper.Entity<IndexerStatus>("IndexerStatus").RegisterModel();
             Mapper.Entity<IndexerFailure>("IndexerFailure").RegisterModel();
+            Mapper.Entity<IndexerSuccess>("IndexerSuccess").RegisterModel();
             Mapper.Entity<DownloadClientStatus>("DownloadClientStatus").RegisterModel();
             Mapper.Entity<ImportListStatus>("ImportListStatus").RegisterModel();
             Mapper.Entity<NotificationStatus>("NotificationStatus").RegisterModel();

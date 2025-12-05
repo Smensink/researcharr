@@ -182,7 +182,19 @@ namespace NzbDrone.Core.IndexerSearch
         {
             try
             {
-                return await searchAction(indexer);
+                var results = await searchAction(indexer);
+                
+                // Record success for search operation
+                try
+                {
+                    _indexerStatusService.RecordSuccess(indexer.Definition.Id, IndexerOperationType.Search);
+                }
+                catch
+                {
+                    // Ignore errors in success recording
+                }
+                
+                return results;
             }
             catch (Exception ex)
             {

@@ -109,11 +109,11 @@ namespace NzbDrone.Core.Indexers
 
             if (result == null || result.IsValid)
             {
-                _indexerStatusService.RecordSuccess(definition.Id);
+                _indexerStatusService.RecordSuccess(definition.Id, IndexerOperationType.Test);
             }
             else
             {
-                _indexerStatusService.RecordFailure(definition.Id);
+                _indexerStatusService.RecordFailure(definition.Id, IndexerOperationType.Test, IndexerErrorType.Unknown, "Test failed");
             }
 
             return result;

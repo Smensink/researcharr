@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NLog;
 using NzbDrone.Core.IndexerSearch.Definitions;
@@ -45,7 +46,31 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.Search
                 // This prevents wrong papers from being downloaded when parsing fails
                 if (remoteBook.Release != null && DoiUtility.IsDoiMatch(remoteBook.Release, searchCriteria))
                 {
-                    _logger.Debug("Books not parsed but DOI matches, accepting release: {0}", remoteBook.ParsedBookInfo);
+                    // Even with DOI match, verify the parsed title (if available) is somewhat similar to search criteria
+                    // This adds an extra safety check to prevent completely unrelated papers
+                    if (remoteBook.ParsedBookInfo?.BookTitle != null && searchCriteria.Books.Any())
+                    {
+                        var parsedTitle = Parser.Parser.NormalizeTitleSeparators(remoteBook.ParsedBookInfo.BookTitle);
+                        var searchTitles = searchCriteria.Books.Select(b => Parser.Parser.NormalizeTitleSeparators(b.Title)).ToList();
+                        
+                        // Check if parsed title has any similarity to search criteria titles
+                        // Use same word delimiters as Parser class
+                        var wordDelimiters = new HashSet<char>(" .,_-=()[]|\"`'’");
+                        var hasSimilarity = searchTitles.Any(searchTitle =>
+                        {
+                            var (_, _, score) = parsedTitle.ToLowerInvariant().FuzzyMatch(searchTitle.ToLowerInvariant(), 0.5, wordDelimiters);
+                            return score >= 0.5; // Require at least 50% similarity even with DOI match
+                        });
+
+                        if (!hasSimilarity)
+                        {
+                            _logger.Debug("Release rejected: DOI matches but parsed title '{0}' is too different from search criteria titles: {1}", 
+                                parsedTitle, string.Join(", ", searchTitles));
+                            return Decision.Reject("Parsed title doesn't match search criteria even though DOI matches");
+                        }
+                    }
+
+                    _logger.Debug("Books not parsed but DOI matches and title similarity check passed, accepting release: {0}", remoteBook.ParsedBookInfo);
                     return Decision.Accept();
                 }
 
@@ -59,8 +84,34 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.Search
 
             if (!criteriaBook.Intersect(remoteBooks).Any())
             {
-                _logger.Debug("Release rejected since the book wasn't requested: {0}", remoteBook.ParsedBookInfo);
+                _logger.Debug("Release rejected since the book wasn't requested: {0}. Parsed books: [{1}], Search criteria books: [{2}]", 
+                    remoteBook.ParsedBookInfo,
+                    string.Join(", ", remoteBooks),
+                    string.Join(", ", criteriaBook));
                 return Decision.Reject("Book wasn't requested");
+            }
+
+            // Additional validation: if we have a parsed book title, verify it actually matches one of the search criteria books
+            // This prevents cases where parsing matched the wrong book but GetBooks returned all search criteria books
+            if (remoteBook.ParsedBookInfo?.BookTitle != null && searchCriteria.Books.Any())
+            {
+                var parsedTitle = Parser.Parser.NormalizeTitleSeparators(remoteBook.ParsedBookInfo.BookTitle);
+                var searchTitles = searchCriteria.Books.Select(b => Parser.Parser.NormalizeTitleSeparators(b.Title)).ToList();
+                
+                // Check if parsed title has sufficient similarity to any search criteria title
+                var wordDelimiters = new HashSet<char>(" .,_-=()[]|\"`''");
+                var hasSimilarity = searchTitles.Any(searchTitle =>
+                {
+                    var (_, _, score) = parsedTitle.ToLowerInvariant().FuzzyMatch(searchTitle.ToLowerInvariant(), 0.5, wordDelimiters);
+                    return score >= 0.6; // Require at least 60% similarity for automatic searches
+                });
+
+                if (!hasSimilarity)
+                {
+                    _logger.Debug("Release rejected: parsed title '{0}' doesn't match search criteria titles: {1}. Book IDs matched but titles don't.", 
+                        parsedTitle, string.Join(", ", searchTitles));
+                    return Decision.Reject("Parsed title doesn't match search criteria");
+                }
             }
 
             return Decision.Accept();

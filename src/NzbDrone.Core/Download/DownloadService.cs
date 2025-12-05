@@ -98,7 +98,7 @@ namespace NzbDrone.Core.Download
             {
                 downloadClientId = await downloadClient.Download(remoteBook, indexer);
                 _downloadClientStatusService.RecordSuccess(downloadClient.Definition.Id);
-                _indexerStatusService.RecordSuccess(remoteBook.Release.IndexerId);
+                _indexerStatusService.RecordSuccess(remoteBook.Release.IndexerId, IndexerOperationType.Download);
             }
             catch (ReleaseUnavailableException)
             {

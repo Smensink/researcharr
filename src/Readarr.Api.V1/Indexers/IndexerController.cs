@@ -42,7 +42,16 @@ namespace Readarr.Api.V1.Indexers
                 FailuresByOperation = s.FailuresByOperation,
                 FailuresByErrorType = s.FailuresByErrorType,
                 FailureRate = s.FailureRate,
-                IsHealthy = s.IsHealthy
+                IsHealthy = s.IsHealthy,
+                OperationStatistics = s.OperationStatistics?.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => new OperationStatisticsResource
+                    {
+                        Successes = kvp.Value.Successes,
+                        Failures = kvp.Value.Failures,
+                        FailureRate = kvp.Value.FailureRate,
+                        TotalOperations = kvp.Value.TotalOperations
+                    })
             }).ToList();
         }
 
@@ -67,7 +76,16 @@ namespace Readarr.Api.V1.Indexers
                 FailuresByOperation = statistics.FailuresByOperation,
                 FailuresByErrorType = statistics.FailuresByErrorType,
                 FailureRate = statistics.FailureRate,
-                IsHealthy = statistics.IsHealthy
+                IsHealthy = statistics.IsHealthy,
+                OperationStatistics = statistics.OperationStatistics?.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => new OperationStatisticsResource
+                    {
+                        Successes = kvp.Value.Successes,
+                        Failures = kvp.Value.Failures,
+                        FailureRate = kvp.Value.FailureRate,
+                        TotalOperations = kvp.Value.TotalOperations
+                    })
             };
         }
 

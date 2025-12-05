@@ -250,6 +250,31 @@ namespace NzbDrone.Core.Parser
         private static readonly Regex AfterDashRegex = new Regex(@"[-:].*", RegexOptions.Compiled);
         private static readonly Regex HtmlTagRegex = new Regex(@"<[^>]*>", RegexOptions.Compiled);
 
+        /// <summary>
+        /// Normalizes title separators by converting " - " (dash with spaces) to ": " (colon with space).
+        /// This helps match Sci-Hub formatted titles (which use dashes) with library titles (which use colons).
+        /// </summary>
+        public static string NormalizeTitleSeparators(string title)
+        {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return title;
+            }
+
+            // Replace " - " (dash with spaces on both sides) with ": " (colon with space)
+            // This handles cases like "Title - Subtitle" -> "Title: Subtitle"
+            var normalized = title.Replace(" - ", ": ");
+
+            // Handle multiple consecutive dashes (e.g., "Title -- Subtitle" -> "Title: Subtitle")
+            while (normalized.Contains(" - "))
+            {
+                normalized = normalized.Replace(" - ", ": ");
+            }
+
+            // Trim any leading/trailing whitespace
+            return normalized.Trim();
+        }
+
         public static ParsedTrackInfo ParseMusicPath(string path)
         {
             var fileInfo = new FileInfo(path);
@@ -379,7 +404,7 @@ namespace NzbDrone.Core.Parser
                 simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle);
 
                 // Find the best matching book with a minimum score threshold to prevent wrong matches
-                const double minFuzzyScore = 0.7; // Require at least 70% match confidence
+                const double minFuzzyScore = 0.75; // Require at least 75% match confidence (increased from 0.7 for stricter matching)
                 var bookMatches = books
                     .Select(book =>
                     {
@@ -844,6 +869,9 @@ namespace NzbDrone.Core.Parser
             authorName = RequestInfoRegex.Replace(authorName, "").Trim(' ');
             bookTitle = RequestInfoRegex.Replace(bookTitle, "").Trim(' ');
             releaseVersion = RequestInfoRegex.Replace(releaseVersion, "").Trim(' ');
+
+            // Normalize title separators (dash to colon) for better matching with library titles
+            bookTitle = NormalizeTitleSeparators(bookTitle);
 
             int.TryParse(matchCollection[0].Groups["releaseyear"].Value, out var releaseYear);
 

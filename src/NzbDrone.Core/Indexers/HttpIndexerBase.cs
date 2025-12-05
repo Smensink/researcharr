@@ -168,7 +168,7 @@ namespace NzbDrone.Core.Indexers
                     _indexerStatusService.UpdateRssSyncStatus(Definition.Id, lastReleaseInfo);
                 }
 
-                _indexerStatusService.RecordSuccess(Definition.Id);
+                _indexerStatusService.RecordSuccess(Definition.Id, IndexerOperationType.RssSync);
             }
             catch (WebException webException)
             {
