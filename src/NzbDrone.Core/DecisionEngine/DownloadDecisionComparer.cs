@@ -206,7 +206,8 @@ namespace NzbDrone.Core.DecisionEngine
 
             if (remoteBook?.Author?.QualityProfile?.Value == null || parsedQuality?.Quality == null)
             {
-                return new QualityIndex(int.MinValue);
+                // Return max value so missing profiles sort last (lowest priority)
+                return new QualityIndex(int.MaxValue);
             }
 
             return remoteBook.Author.QualityProfile.Value.GetIndex(parsedQuality.Quality);

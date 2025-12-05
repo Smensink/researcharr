@@ -574,6 +574,30 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         }
 
         [Test]
+        public void should_prioritize_missing_quality_profile_last()
+        {
+            var remoteBook1 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.FLAC));
+            var remoteBook2 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.MP3));
+            var remoteBook3 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.AZW3));
+
+            remoteBook2.Author.QualityProfile = null;
+
+            var decisions = new List<DownloadDecision>
+            {
+                new DownloadDecision(remoteBook1),
+                new DownloadDecision(remoteBook2),
+                new DownloadDecision(remoteBook3)
+            };
+
+            var prioritized = Subject.PrioritizeDecisions(decisions);
+
+            // Items with missing quality profile should be last (lowest priority)
+            prioritized.Last().RemoteBook.Should().Be(remoteBook2);
+            // Items with valid profiles should be prioritized first
+            prioritized.First().RemoteBook.Should().NotBe(remoteBook2);
+        }
+
+        [Test]
         public void should_handle_missing_author_without_throwing()
         {
             var remoteBook1 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.FLAC));

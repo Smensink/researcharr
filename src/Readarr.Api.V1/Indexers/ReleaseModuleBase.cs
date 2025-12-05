@@ -39,15 +39,21 @@ namespace Readarr.Api.V1.Indexers
 
             release.ReleaseWeight = initialWeight;
 
-            if (decision.RemoteBook.Author != null)
+            if (decision.RemoteBook?.Author?.QualityProfile?.Value != null && release.Quality?.Quality != null)
             {
-                release.QualityWeight = decision.RemoteBook
-                                                .Author
-                                                .QualityProfile.Value.GetIndex(release.Quality.Quality).Index * 100;
+                var qualityIndex = decision.RemoteBook.Author.QualityProfile.Value.GetIndex(release.Quality.Quality);
+                release.QualityWeight = qualityIndex.Index * 100;
+            }
+            else
+            {
+                release.QualityWeight = 0;
             }
 
-            release.QualityWeight += release.Quality.Revision.Real * 10;
-            release.QualityWeight += release.Quality.Revision.Version;
+            if (release.Quality?.Revision != null)
+            {
+                release.QualityWeight += release.Quality.Revision.Real * 10;
+                release.QualityWeight += release.Quality.Revision.Version;
+            }
 
             return release;
         }
