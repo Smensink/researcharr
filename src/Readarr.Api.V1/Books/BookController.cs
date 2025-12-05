@@ -80,7 +80,18 @@ namespace Readarr.Api.V1.Books
 
                 foreach (var book in books)
                 {
-                    book.Author = authors[book.AuthorMetadataId];
+                    // Use TryGetValue to handle cases where AuthorMetadataId doesn't exist in authors dictionary
+                    // This can happen with migrated journals or if the author was deleted
+                    if (authors.TryGetValue(book.AuthorMetadataId, out var author))
+                    {
+                        book.Author = author;
+                    }
+                    else
+                    {
+                        // Fallback: try to load author lazily if available
+                        book.Author = book.Author?.Value;
+                    }
+                    
                     if (editions.TryGetValue(book.Id, out var bookEditions))
                     {
                         book.Editions = bookEditions;

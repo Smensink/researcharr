@@ -124,14 +124,14 @@ namespace NzbDrone.Core.Parser
                 // If we have a parsed book title, verify it matches one of the search criteria books
                 if (parsedBookInfo?.BookTitle != null)
                 {
-                    var parsedTitle = Parser.Parser.NormalizeTitleSeparators(parsedBookInfo.BookTitle);
-                    var cleanParsedTitle = Parser.CleanAuthorName(parsedTitle);
+                    var parsedTitle = Parser.NormalizeTitleSeparators(parsedBookInfo.BookTitle);
+                    var cleanParsedTitle = parsedTitle.CleanAuthorName();
                     
                     // Check for exact or close match in search criteria books
                     var matchingBook = searchCriteria.Books.FirstOrDefault(b => 
                         b.Title.Equals(parsedTitle, StringComparison.OrdinalIgnoreCase) ||
                         b.CleanTitle.Equals(cleanParsedTitle, StringComparison.OrdinalIgnoreCase) ||
-                        Parser.Parser.NormalizeTitleSeparators(b.Title).Equals(parsedTitle, StringComparison.OrdinalIgnoreCase));
+                        Parser.NormalizeTitleSeparators(b.Title).Equals(parsedTitle, StringComparison.OrdinalIgnoreCase));
                     
                     if (matchingBook != null)
                     {
@@ -144,9 +144,9 @@ namespace NzbDrone.Core.Parser
                     var fuzzyMatches = searchCriteria.Books
                         .Select(b =>
                         {
-                            var normalizedTitle = Parser.Parser.NormalizeTitleSeparators(b.Title);
-                            var (_, _, score) = parsedTitle.ToLowerInvariant().FuzzyMatch(normalizedTitle.ToLowerInvariant(), 0.5, wordDelimiters);
-                            return new { Book = b, Score = score };
+                            var normalizedTitle = Parser.NormalizeTitleSeparators(b.Title);
+                            var result = parsedTitle.ToLowerInvariant().FuzzyMatch(normalizedTitle.ToLowerInvariant(), 0.5, wordDelimiters);
+                            return new { Book = b, Score = result.Item3 };
                         })
                         .Where(x => x.Score >= 0.7) // Require at least 70% match
                         .OrderByDescending(x => x.Score)
@@ -261,16 +261,61 @@ namespace NzbDrone.Core.Parser
                 searchCriteria.Books != null && searchCriteria.Books.Any())
             {
                 // For book searches, trust the search criteria author
-                return searchCriteria.Author;
+                // But prefer journal if available
+                var searchAuthor = searchCriteria.Author;
+                var isJournal = searchAuthor.Metadata?.Value?.Type == AuthorMetadataType.Journal ||
+                                string.Equals(searchAuthor.Metadata?.Value?.Disambiguation, "Journal", System.StringComparison.InvariantCultureIgnoreCase);
+                
+                if (isJournal)
+                {
+                    return searchAuthor;
+                }
+                
+                // If search criteria has a person author, try to find the journal for the book first
+                // Check if any of the books have a journal linked
+                foreach (var book in searchCriteria.Books)
+                {
+                    if (book.AuthorMetadataId > 0)
+                    {
+                        var bookAuthor = _authorService.GetAuthorByMetadataId(book.AuthorMetadataId);
+                        if (bookAuthor != null)
+                        {
+                            var bookIsJournal = bookAuthor.Metadata?.Value?.Type == AuthorMetadataType.Journal ||
+                                                string.Equals(bookAuthor.Metadata?.Value?.Disambiguation, "Journal", System.StringComparison.InvariantCultureIgnoreCase);
+                            if (bookIsJournal)
+                            {
+                                _logger.Debug("Found journal {0} for book, using it instead of person author {1}", bookAuthor, searchAuthor);
+                                return bookAuthor;
+                            }
+                        }
+                    }
+                }
+                
+                // Fall back to search criteria author (person author)
+                return searchAuthor;
             }
 
             // Try to match parsed author name with search criteria author
             if (searchCriteria != null && searchCriteria.Author != null && 
                 parsedBookInfo != null && parsedBookInfo.AuthorName.IsNotNullOrWhiteSpace())
             {
-                if (searchCriteria.Author.CleanName == parsedBookInfo.AuthorName.CleanAuthorName())
+                var searchAuthor = searchCriteria.Author;
+                var isJournal = searchAuthor.Metadata?.Value?.Type == AuthorMetadataType.Journal ||
+                                string.Equals(searchAuthor.Metadata?.Value?.Disambiguation, "Journal", System.StringComparison.InvariantCultureIgnoreCase);
+                
+                if (isJournal)
                 {
-                    return searchCriteria.Author;
+                    // Search criteria has a journal - use it
+                    return searchAuthor;
+                }
+                
+                // Search criteria has a person author - check if name matches
+                if (searchAuthor.CleanName == parsedBookInfo.AuthorName.CleanAuthorName())
+                {
+                    // Name matches, but prefer journal if book has one
+                    // For now, return the search criteria author (person author)
+                    // The matching logic will handle journal vs person author comparison
+                    return searchAuthor;
                 }
             }
 
@@ -280,6 +325,9 @@ namespace NzbDrone.Core.Parser
                 return null;
             }
 
+            // Try to find author by name - prefer journals, but also check person authors if they exist in DB
+            // Note: We don't auto-add person authors, so if not found, we return null
+            // The parsed author name will still be available in ParsedBookInfo for secondary matching
             var author = _authorService.FindByName(parsedBookInfo.AuthorName);
 
             if (author == null)
@@ -290,7 +338,9 @@ namespace NzbDrone.Core.Parser
 
             if (author == null)
             {
-                _logger.Debug("No matching author {0}", parsedBookInfo.AuthorName);
+                _logger.Debug("No matching author/journal found for '{0}'. Author name '{1}' will be used for secondary matching if available.", 
+                    parsedBookInfo.AuthorName, parsedBookInfo.AuthorName);
+                // Return null - the parsed author name in ParsedBookInfo will be used for secondary matching
                 return null;
             }
 

@@ -73,7 +73,8 @@ namespace NzbDrone.Core.Indexers.PubMedCentral
             var infoUrl = $"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC{pmcId}/";
 
             // Note: We don't have full metadata without efetch call
-            // In a more complete implementation, we'd fetch title/author from efetch
+            // In a more complete implementation, we'd fetch title/author/journal from efetch
+            // Journal would be in <MedlineCitation><Article><Journal><Title> element
             var release = new ReleaseInfo
             {
                 Guid = $"PMC-{pmcId}",
@@ -81,6 +82,7 @@ namespace NzbDrone.Core.Indexers.PubMedCentral
                 Author = "Unknown Author", // Placeholder - would need efetch for real author
                 Book = $"PMC{pmcId}", // Placeholder - would need efetch for real title
                 Doi = null, // Would need efetch to get DOI
+                Source = null, // Would need efetch to get journal from <Journal><Title> element
                 DownloadUrl = pdfUrl,
                 InfoUrl = infoUrl,
                 Size = 0,

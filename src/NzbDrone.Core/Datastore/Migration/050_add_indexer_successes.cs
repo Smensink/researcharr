@@ -15,7 +15,8 @@ namespace NzbDrone.Core.Datastore.Migration
 
             Create.Index("IX_IndexerSuccess_IndexerId").OnTable("IndexerSuccess").OnColumn("IndexerId");
             Create.Index("IX_IndexerSuccess_Timestamp").OnTable("IndexerSuccess").OnColumn("Timestamp");
-            Create.Index("IX_IndexerSuccess_IndexerId_OperationType").OnTable("IndexerSuccess").OnColumn("IndexerId").OnColumn("OperationType");
+            Create.Index("IX_IndexerSuccess_IndexerId_OperationType").OnTable("IndexerSuccess").OnColumn("IndexerId").Ascending()
+                                                                     .OnColumn("OperationType").Ascending();
         }
     }
 }

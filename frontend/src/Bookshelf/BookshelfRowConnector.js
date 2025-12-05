@@ -24,6 +24,17 @@ function createMapStateToProps() {
     createAuthorSelector(),
     getBookMap,
     (author, bookMap) => {
+      if (!author) {
+        return {
+          authorId: 0,
+          authorName: '',
+          monitored: false,
+          status: {},
+          isSaving: false,
+          books: []
+        };
+      }
+
       const booksInAuthor = bookMap.hasOwnProperty(author.id) ? bookMap[author.id] : [];
       const sortedBooks = _.orderBy(booksInAuthor, 'releaseDate', 'desc');
 
@@ -31,7 +42,7 @@ function createMapStateToProps() {
         ...author,
         authorId: author.id,
         authorName: author.authorName,
-        monitored: author.monitored,
+        monitored: author?.monitored ?? false,
         status: author.status,
         isSaving: author.isSaving,
         books: sortedBooks

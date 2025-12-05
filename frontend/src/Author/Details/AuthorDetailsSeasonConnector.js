@@ -36,7 +36,7 @@ function createMapStateToProps() {
         columns: books.columns,
         sortKey: books.sortKey,
         sortDirection: books.sortDirection,
-        authorMonitored: author.monitored,
+        authorMonitored: author?.monitored ?? false,
         isSmallScreen: dimensions.isSmallScreen,
         uiSettings
       };

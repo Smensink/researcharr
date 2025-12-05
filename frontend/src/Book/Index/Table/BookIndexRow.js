@@ -182,8 +182,8 @@ class BookIndexRow extends Component {
                   )}
                 >
                   <AuthorNameLink
-                    titleSlug={author.titleSlug}
-                    authorName={author.authorName}
+                    titleSlug={author?.titleSlug ?? 'unknown'}
+                    authorName={author?.authorName ?? 'Unknown'}
                   />
                 </VirtualTableRowCell>
               );
@@ -239,7 +239,7 @@ class BookIndexRow extends Component {
                   key={name}
                   className={styles[name]}
                 >
-                  {author.path}
+                  {author?.path ?? ''}
                 </VirtualTableRowCell>
               );
             }
@@ -370,8 +370,8 @@ BookIndexRow.propTypes = {
   monitored: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   titleSlug: PropTypes.string.isRequired,
-  author: PropTypes.object.isRequired,
-  qualityProfile: PropTypes.object.isRequired,
+  author: PropTypes.object,
+  qualityProfile: PropTypes.object,
   releaseDate: PropTypes.string,
   added: PropTypes.string,
   statistics: PropTypes.object.isRequired,
@@ -397,7 +397,10 @@ BookIndexRow.defaultProps = {
     totalBookCount: 0
   },
   genres: [],
-  tags: []
+  tags: [],
+  titleSlug: 'unknown',
+  author: null,
+  qualityProfile: null
 };
 
 export default BookIndexRow;

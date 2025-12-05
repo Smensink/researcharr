@@ -26,7 +26,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
 
         private static readonly List<string> AudiobookFormats = new List<string> { "Audiobook", "Audio CD", "Audio Cassette", "Audible Audio", "CD-ROM", "MP3 CD" };
 
-        public static Distance BookDistance(List<LocalBook> localTracks, Edition edition)
+        public static Distance BookDistance(List<LocalBook> localTracks, Edition edition, List<AuthorMetadata> allAuthorMetadata = null)
         {
             var dist = new Distance();
 
@@ -56,17 +56,123 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
                 Logger.Trace("doi: '{0}' vs '{1}' (one missing); {2}", localDoi ?? "null", editionDoi ?? "null", dist.NormalizedDistance());
             }
 
-            // the most common list of authors reported by a file
+            // Get all authors from file
             var fileAuthors = localTracks.Select(x => x.FileTrackInfo.Authors.Where(a => a.IsNotNullOrWhiteSpace()).ToList())
                 .GroupBy(x => x.ConcatToString())
                 .OrderByDescending(x => x.Count())
                 .First()
                 .First();
 
-            var authors = GetAuthorVariants(fileAuthors);
+            var fileAuthorVariants = GetAuthorVariants(fileAuthors);
+            var editionAuthorMetadata = edition.Book.Value.AuthorMetadata.Value;
+            var editionAuthorName = editionAuthorMetadata.Name;
 
-            dist.AddString("author", authors, edition.Book.Value.AuthorMetadata.Value.Name);
-            Logger.Trace("author: '{0}' vs '{1}'; {2}", authors.ConcatToString("' or '"), edition.Book.Value.AuthorMetadata.Value.Name, dist.NormalizedDistance());
+            // Check if edition is linked to a journal
+            var isJournal = editionAuthorMetadata.Type == AuthorMetadataType.Journal ||
+                            string.Equals(editionAuthorMetadata.Disambiguation, "Journal", System.StringComparison.InvariantCultureIgnoreCase);
+
+            // Match authors individually if we have the full author metadata list
+            if (allAuthorMetadata != null && allAuthorMetadata.Any())
+            {
+                // Match each file author individually against each metadata author
+                // Use the best match score (lowest distance)
+                var bestAuthorMatch = 1.0; // 1.0 = no match, 0.0 = perfect match
+                var matchedAuthorName = string.Empty;
+
+                foreach (var fileAuthor in fileAuthorVariants)
+                {
+                    foreach (var metadataAuthor in allAuthorMetadata)
+                    {
+                        // Skip journal metadata when matching individual authors
+                        var metadataIsJournal = metadataAuthor.Type == AuthorMetadataType.Journal ||
+                                               string.Equals(metadataAuthor.Disambiguation, "Journal", System.StringComparison.InvariantCultureIgnoreCase);
+                        if (metadataIsJournal)
+                        {
+                            continue; // Skip journal - we'll match it separately
+                        }
+
+                        // Calculate string similarity for this author pair
+                        var authorDistance = Distance.StringScore(fileAuthor, metadataAuthor.Name);
+                        if (authorDistance < bestAuthorMatch)
+                        {
+                            bestAuthorMatch = authorDistance;
+                            matchedAuthorName = metadataAuthor.Name;
+                        }
+
+                        // Also check aliases
+                        if (metadataAuthor.Aliases != null)
+                        {
+                            foreach (var alias in metadataAuthor.Aliases)
+                            {
+                                var aliasDistance = Distance.StringScore(fileAuthor, alias);
+                                if (aliasDistance < bestAuthorMatch)
+                                {
+                                    bestAuthorMatch = aliasDistance;
+                                    matchedAuthorName = alias;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Add the best author match to distance calculation
+                if (isJournal)
+                {
+                    // For journals, check if any file author matches the journal name
+                    // Then also check individual author matches
+                    // Use the minimum (best) of journal name match and individual author matches
+                    var journalMatchDistance = fileAuthorVariants.Any() 
+                        ? fileAuthorVariants.Min(fa => Distance.StringScore(fa, editionAuthorName))
+                        : 1.0;
+                    
+                    // Use the best match between journal name and individual authors
+                    var finalAuthorDistance = Math.Min(journalMatchDistance, bestAuthorMatch);
+                    
+                    dist.Add("author_secondary", finalAuthorDistance);
+                    
+                    if (bestAuthorMatch < 1.0 && bestAuthorMatch < journalMatchDistance)
+                    {
+                        Logger.Trace("journal: '{0}' vs file authors '{1}' (best individual author match: '{2}' with distance {3}, journal distance {4}); {5}", 
+                            editionAuthorName, fileAuthorVariants.ConcatToString("' or '"), matchedAuthorName, bestAuthorMatch, journalMatchDistance, dist.NormalizedDistance());
+                    }
+                    else if (journalMatchDistance < 1.0)
+                    {
+                        Logger.Trace("journal: '{0}' vs file authors '{1}' (journal name match distance {2}, best individual author distance {3}); {4}", 
+                            editionAuthorName, fileAuthorVariants.ConcatToString("' or '"), journalMatchDistance, bestAuthorMatch, dist.NormalizedDistance());
+                    }
+                    else
+                    {
+                        Logger.Trace("journal: '{0}' vs file authors '{1}' (no matches - journal distance {2}, individual author distance {3}); {4}", 
+                            editionAuthorName, fileAuthorVariants.ConcatToString("' or '"), journalMatchDistance, bestAuthorMatch, dist.NormalizedDistance());
+                    }
+                }
+                else
+                {
+                    // For person authors, use the best individual match
+                    dist.Add("author", bestAuthorMatch);
+                    Logger.Trace("author: file authors '{0}' vs metadata authors (best match: '{1}' with distance {2}); {3}", 
+                        fileAuthorVariants.ConcatToString("' or '"), matchedAuthorName, bestAuthorMatch, dist.NormalizedDistance());
+                }
+            }
+            else
+            {
+                // Fallback to original behavior if we don't have full author metadata list
+                if (isJournal)
+                {
+                    // For journals, author name matching is secondary (papers can have multiple authors)
+                    // Use "author_secondary" key which has lower weight (1.0 vs 3.0) to indicate secondary importance
+                    // The primary matching is done by journal name/entity, author names are just a hint
+                    dist.AddString("author_secondary", fileAuthorVariants, editionAuthorName);
+                    Logger.Trace("journal: '{0}' vs file authors '{1}'; {2}", 
+                        editionAuthorName, fileAuthorVariants.ConcatToString("' or '"), dist.NormalizedDistance());
+                }
+                else
+                {
+                    // For person authors, author name matching is primary
+                    dist.AddString("author", fileAuthorVariants, editionAuthorName);
+                    Logger.Trace("author: '{0}' vs '{1}'; {2}", fileAuthorVariants.ConcatToString("' or '"), editionAuthorName, dist.NormalizedDistance());
+                }
+            }
 
             var title = localTracks.MostCommon(x => x.FileTrackInfo.BookTitle) ?? "";
             var titleOptions = new List<string> { edition.Title };
@@ -166,6 +272,18 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
             {
                 dist.AddString("publisher", localPublisher, editionPublisher);
                 Logger.Trace($"publisher: {localPublisher} vs {editionPublisher}; {dist.NormalizedDistance()}");
+            }
+
+            // Journal/Source matching - match journal name from file metadata against edition journal name
+            // This is important for papers where the journal is the primary entity
+            var localSource = localTracks.MostCommon(x => x.FileTrackInfo.Source);
+            var editionSource = isJournal ? editionAuthorName : edition.Disambiguation;
+            
+            // Only match if both have journal/source information
+            if (localSource.IsNotNullOrWhiteSpace() && editionSource.IsNotNullOrWhiteSpace())
+            {
+                dist.AddString("source", localSource, editionSource);
+                Logger.Trace($"source/journal: '{localSource}' vs '{editionSource}'; {dist.NormalizedDistance()}");
             }
 
             // try to tilt it towards the correct "type" of release

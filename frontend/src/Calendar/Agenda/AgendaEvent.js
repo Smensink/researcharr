@@ -54,10 +54,14 @@ class AgendaEvent extends Component {
       colorImpairedMode
     } = this.props;
 
+    if (!author) {
+      return null;
+    }
+
     const startTime = moment(releaseDate);
     // const endTime = startTime.add(author.runtime, 'minutes');
     const downloading = !!(queueItem || grabbed);
-    const isMonitored = author.monitored && monitored;
+    const isMonitored = author?.monitored && monitored;
     const statusStyle = getStatusStyle(id, downloading, startTime, isMonitored, statistics.percentOfBooks);
 
     return (

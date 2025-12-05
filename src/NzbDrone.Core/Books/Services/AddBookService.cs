@@ -26,6 +26,8 @@ namespace NzbDrone.Core.Books
         private readonly IProvideBookInfo _bookInfo;
         private readonly IImportListExclusionService _importListExclusionService;
         private readonly IRootFolderService _rootFolderService;
+        private readonly IAuthorMetadataService _authorMetadataService;
+        private readonly IAuthorMetadataRepository _authorMetadataRepository;
         private readonly Logger _logger;
 
         public AddBookService(IAuthorService authorService,
@@ -34,6 +36,8 @@ namespace NzbDrone.Core.Books
                                IProvideBookInfo bookInfo,
                                IImportListExclusionService importListExclusionService,
                                IRootFolderService rootFolderService,
+                               IAuthorMetadataService authorMetadataService,
+                               IAuthorMetadataRepository authorMetadataRepository,
                                Logger logger)
         {
             _authorService = authorService;
@@ -42,6 +46,8 @@ namespace NzbDrone.Core.Books
             _bookInfo = bookInfo;
             _importListExclusionService = importListExclusionService;
             _rootFolderService = rootFolderService;
+            _authorMetadataService = authorMetadataService;
+            _authorMetadataRepository = authorMetadataRepository;
             _logger = logger;
         }
 
@@ -71,6 +77,10 @@ namespace NzbDrone.Core.Books
             // Note it's a manual addition so it's not deleted on next refresh
             book.AddOptions.AddType = BookAddType.Manual;
             book.Editions.Value.Single(x => x.Monitored).ManualAdd = true;
+            
+            // When manually adding a book (e.g., from advanced search), set it to monitored
+            // since the user explicitly chose to add it
+            book.Monitored = true;
 
             // Add the author if necessary
             var dbAuthor = _authorService.FindById(book.AuthorMetadata.Value.ForeignAuthorId);
@@ -227,6 +237,18 @@ namespace NzbDrone.Core.Books
             }
 
             newBook.AuthorMetadata = new LazyLoaded<AuthorMetadata>(metadata);
+
+            // Save all author metadata to database and store their IDs
+            if (tuple.Item3 != null && tuple.Item3.Any())
+            {
+                _authorMetadataService.UpsertMany(tuple.Item3);
+                
+                // Fetch the saved metadata to get their IDs (after upsert, new items have IDs)
+                var foreignIds = tuple.Item3.Select(m => m.ForeignAuthorId).ToList();
+                var savedMetadata = _authorMetadataRepository.FindById(foreignIds);
+                
+                newBook.AuthorMetadataIds = savedMetadata.Select(m => m.Id).ToList();
+            }
 
             return newBook;
         }

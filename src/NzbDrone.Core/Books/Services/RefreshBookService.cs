@@ -41,6 +41,8 @@ namespace NzbDrone.Core.Books
         private readonly IEventAggregator _eventAggregator;
         private readonly ICheckIfBookShouldBeRefreshed _checkIfBookShouldBeRefreshed;
         private readonly IMapCoversToLocal _mediaCoverService;
+        private readonly IAuthorMetadataService _authorMetadataService;
+        private readonly IAuthorMetadataRepository _authorMetadataRepository;
         private readonly Logger _logger;
 
         public RefreshBookService(IBookService bookService,
@@ -57,6 +59,7 @@ namespace NzbDrone.Core.Books
                                   IEventAggregator eventAggregator,
                                   ICheckIfBookShouldBeRefreshed checkIfBookShouldBeRefreshed,
                                   IMapCoversToLocal mediaCoverService,
+                                  IAuthorMetadataRepository authorMetadataRepository,
                                   Logger logger)
         : base(logger, authorMetadataService)
         {
@@ -73,6 +76,8 @@ namespace NzbDrone.Core.Books
             _eventAggregator = eventAggregator;
             _checkIfBookShouldBeRefreshed = checkIfBookShouldBeRefreshed;
             _mediaCoverService = mediaCoverService;
+            _authorMetadataService = authorMetadataService;
+            _authorMetadataRepository = authorMetadataRepository;
             _logger = logger;
         }
 
@@ -88,6 +93,18 @@ namespace NzbDrone.Core.Books
                 newbook.AuthorMetadata = author.Metadata.Value;
                 newbook.AuthorMetadataId = book.AuthorMetadataId;
                 newbook.AuthorMetadata.Value.Id = book.AuthorMetadataId;
+
+                // Save all author metadata to database and store their IDs
+                if (tuple.Item3 != null && tuple.Item3.Any())
+                {
+                    _authorMetadataService.UpsertMany(tuple.Item3);
+                    
+                    // Fetch the saved metadata to get their IDs
+                    var foreignIds = tuple.Item3.Select(m => m.ForeignAuthorId).ToList();
+                    var savedMetadata = _authorMetadataRepository.FindById(foreignIds);
+                    
+                    newbook.AuthorMetadataIds = savedMetadata.Select(m => m.Id).ToList();
+                }
 
                 author.Books = new List<Book> { newbook };
                 return author;
@@ -201,6 +218,13 @@ namespace NzbDrone.Core.Books
             local.UseMetadataFrom(remote);
 
             local.AuthorMetadataId = remote.AuthorMetadata.Value.Id;
+            
+            // Update author metadata IDs if they're available in the remote book
+            if (remote.AuthorMetadataIds != null && remote.AuthorMetadataIds.Any())
+            {
+                local.AuthorMetadataIds = remote.AuthorMetadataIds;
+            }
+            
             local.LastInfoSync = DateTime.UtcNow;
 
             return result;

@@ -421,7 +421,12 @@ namespace NzbDrone.Core.Books
                     }
 
                     _suppressLastInfoSync = isNew;
-                    var data = GetSkyhookData(author.ForeignAuthorId, isNew, batchHandler, updatedSince);
+                    // For journals, always limit works to prevent auto-importing all papers
+                    // Only import papers when user explicitly adds/refreshes the journal
+                    var isJournal = author.Metadata?.Value?.Type == AuthorMetadataType.Journal ||
+                                    string.Equals(author.Metadata?.Value?.Disambiguation, "Journal", System.StringComparison.InvariantCultureIgnoreCase);
+                    var shouldLimitWorks = isJournal ? true : isNew; // Always limit for journals, limit for new person authors
+                    var data = GetSkyhookData(author.ForeignAuthorId, shouldLimitWorks, batchHandler, updatedSince);
                     updated |= RefreshEntityInfo(author, null, data, true, false, null);
                     _suppressLastInfoSync = false;
                 }
@@ -475,7 +480,11 @@ namespace NzbDrone.Core.Books
                         try
                         {
                             LogProgress(author);
-                            var data = GetSkyhookData(author.ForeignAuthorId, false);
+                            // For journals, always limit works to prevent auto-importing all papers
+                            var isJournal = author.Metadata?.Value?.Type == AuthorMetadataType.Journal ||
+                                            string.Equals(author.Metadata?.Value?.Disambiguation, "Journal", System.StringComparison.InvariantCultureIgnoreCase);
+                            var shouldLimitWorks = isJournal; // Always limit for journals
+                            var data = GetSkyhookData(author.ForeignAuthorId, shouldLimitWorks);
                             updated |= RefreshEntityInfo(author, null, data, manualTrigger, false, message.LastStartTime);
                         }
                         catch (Exception e)

@@ -52,9 +52,17 @@ namespace NzbDrone.Core.Indexers.Core
                     var authors = item["authors"] as JArray;
                     var author = authors?.FirstOrDefault()?["name"]?.ToString() ?? "Unknown Author";
 
+                    // Extract journal name from journals array or venue field
+                    var journal = (item["journals"] as JArray)?.FirstOrDefault()?["name"]?.ToString() ??
+                                  item["venue"]?.ToString() ??
+                                  item["publisher"]?.ToString();
+
                     var release = new ReleaseInfo();
                     release.Guid = $"Core-{id}";
                     release.Title = $"{author} - {title}";
+                    release.Book = title;
+                    release.Author = author;
+                    release.Source = journal; // Store journal name in Source field
                     release.DownloadUrl = downloadUrl;
                     release.InfoUrl = $"https://core.ac.uk/display/{id}";
                     release.Size = 0;

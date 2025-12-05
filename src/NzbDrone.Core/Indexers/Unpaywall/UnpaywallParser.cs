@@ -46,12 +46,18 @@ namespace NzbDrone.Core.Indexers.Unpaywall
 
             var doi = json["doi"]?.ToString() ?? Guid.NewGuid().ToString();
 
+            // Extract journal name from journal_name or venue fields
+            var journal = json["journal_name"]?.ToString() ?? 
+                          json["venue"]?.ToString() ??
+                          json["z_authors"]?.FirstOrDefault()?["journal_name"]?.ToString();
+
             var release = new ReleaseInfo();
             release.Guid = $"Unpaywall-{doi}";
             release.Title = $"{author} - {title}";
             release.Author = author;
             release.Book = title;
             release.Doi = doi;
+            release.Source = journal; // Store journal name in Source field
             release.DownloadUrl = url;
             release.InfoUrl = $"https://doi.org/{doi}";
             release.Size = 0;

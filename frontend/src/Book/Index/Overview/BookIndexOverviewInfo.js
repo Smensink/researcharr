@@ -132,7 +132,7 @@ function getInfoRowProps(row, props) {
     return {
       title: 'Path',
       iconName: icons.FOLDER,
-      label: props.author.path
+      label: props.author?.path ?? ''
     };
   }
 
@@ -191,8 +191,8 @@ BookIndexOverviewInfo.propTypes = {
   showPath: PropTypes.bool.isRequired,
   showSizeOnDisk: PropTypes.bool.isRequired,
   monitored: PropTypes.bool.isRequired,
-  qualityProfile: PropTypes.object.isRequired,
-  author: PropTypes.object.isRequired,
+  qualityProfile: PropTypes.object,
+  author: PropTypes.object,
   releaseDate: PropTypes.string,
   added: PropTypes.string,
   sizeOnDisk: PropTypes.number,

@@ -134,8 +134,8 @@ class BookDetailsHeader extends Component {
               <div>
                 <AuthorNameLink
                   className={styles.authorLink}
-                  titleSlug={author.titleSlug}
-                  authorName={author.authorName}
+                  titleSlug={author?.titleSlug ?? 'unknown'}
+                  authorName={author?.authorName ?? 'Unknown'}
                 />
 
                 {

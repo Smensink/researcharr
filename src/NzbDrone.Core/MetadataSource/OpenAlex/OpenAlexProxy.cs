@@ -291,8 +291,17 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             var book = MapBook(response);
             var authors = response.Authorships?.Select(a => MapAuthorMetadata(a.Author)).ToList() ?? new List<AuthorMetadata>();
 
-            // Note: Source/journal information is stored in Edition.Disambiguation, not as an author
-            // Journals should not appear in the authors/researchers list
+            // Include journal/source metadata in the authors list so it can be used as the primary entity
+            // The journal is already set as book.Author in MapBook, but we need it in the authors list too
+            if (response.PrimaryLocation?.Source != null && book.Author?.Value?.Metadata?.Value != null)
+            {
+                // Add journal metadata to the list if not already present
+                var journalMetadata = book.Author.Value.Metadata.Value;
+                if (!authors.Any(a => a.ForeignAuthorId == journalMetadata.ForeignAuthorId))
+                {
+                    authors.Insert(0, journalMetadata); // Insert at beginning to prioritize
+                }
+            }
 
             return new Tuple<string, Book, List<AuthorMetadata>>(workId, book, authors);
         }
@@ -472,6 +481,37 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
             return author;
         }
 
+        private Author MapSource(Source source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var metadata = new AuthorMetadata
+            {
+                ForeignAuthorId = NormalizeId(source.Id),
+                TitleSlug = NormalizeId(source.Id),
+                Name = source.DisplayName,
+                Disambiguation = "Journal",
+                SortName = source.DisplayName?.ToLowerInvariant(),
+                NameLastFirst = source.DisplayName,
+                SortNameLastFirst = source.DisplayName?.ToLowerInvariant(),
+                Status = AuthorStatusType.Continuing,
+                Type = AuthorMetadataType.Journal,
+                Links = new List<Links>()
+            };
+
+            var author = new Author
+            {
+                CleanName = source.DisplayName.CleanAuthorName(),
+                Metadata = metadata,
+                Series = new LazyLoaded<List<Series>>(new List<Series>())
+            };
+
+            return author;
+        }
+
         private AuthorMetadata MapAuthorMetadata(OpenAlexAuthor source)
         {
             if (source == null)
@@ -551,8 +591,16 @@ namespace NzbDrone.Core.MetadataSource.OpenAlex
 
             book.Editions = new List<Edition> { edition };
 
-            if (source.Authorships != null && source.Authorships.Any())
+            // Prefer journal/source over person authors for papers
+            // The journal information is stored in edition.Disambiguation (from PrimaryLocation.Source)
+            if (source.PrimaryLocation?.Source != null)
             {
+                // Map the source/journal as the primary author
+                book.Author = MapSource(source.PrimaryLocation.Source);
+            }
+            else if (source.Authorships != null && source.Authorships.Any())
+            {
+                // Fallback to first author if no journal/source available
                 var primaryAuthor = source.Authorships.FirstOrDefault()?.Author;
                 book.Author = MapAuthor(primaryAuthor);
             }

@@ -42,17 +42,17 @@ namespace Readarr.Api.V1.History
         {
             var resource = model.ToResource(_formatCalculator);
 
-            if (includeAuthor)
+            if (includeAuthor && model.Author != null)
             {
                 resource.Author = model.Author.ToResource();
             }
 
-            if (includeBook)
+            if (includeBook && model.Book != null)
             {
                 resource.Book = model.Book.ToResource();
             }
 
-            if (model.Author != null)
+            if (model.Author != null && model.Author.QualityProfile?.Value != null)
             {
                 resource.QualityCutoffNotMet = _upgradableSpecification.QualityCutoffNotMet(model.Author.QualityProfile.Value, model.Quality);
             }
@@ -94,7 +94,17 @@ namespace Readarr.Api.V1.History
         [HttpGet("author")]
         public List<HistoryResource> GetAuthorHistory(int authorId, int? bookId = null, EntityHistoryEventType? eventType = null, bool includeAuthor = false, bool includeBook = false)
         {
-            var author = _authorService.GetAuthor(authorId);
+            // Try to get the author, but handle the case where it doesn't exist (e.g., deleted or migrated)
+            NzbDrone.Core.Books.Author author = null;
+            try
+            {
+                author = _authorService.GetAuthor(authorId);
+            }
+            catch (ModelNotFoundException)
+            {
+                // Author doesn't exist - return empty list instead of throwing 500 error
+                return new List<HistoryResource>();
+            }
 
             if (bookId.HasValue)
             {

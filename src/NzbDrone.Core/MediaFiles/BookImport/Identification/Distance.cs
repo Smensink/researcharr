@@ -12,6 +12,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
         {
             { "source", 2.0 },
             { "author", 3.0 },
+            { "author_secondary", 1.0 },  // Lower weight for author names when matching journals (papers have multiple authors)
             { "book", 3.0 },
             { "doi", 15.0 },  // DOI is highest priority - unique identifier for academic papers
             { "doi_missing", 0.1 },
@@ -131,7 +132,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
             return new string(arr);
         }
 
-        private double StringScore(string value, string target)
+        public static double StringScore(string value, string target)
         {
             // Adds a penaltly based on the distance between value and target
             var cleanValue = Clean(value);

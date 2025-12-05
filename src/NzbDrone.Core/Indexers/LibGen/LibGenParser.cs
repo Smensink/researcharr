@@ -152,6 +152,17 @@ namespace NzbDrone.Core.Indexers.LibGen
                 doi = StripTags(cells[doiIndex]);
             }
 
+            // Extract journal from journal or source column if available
+            string journal = null;
+            if (headerMap.TryGetValue("journal", out var journalIndex) && journalIndex < cells.Count)
+            {
+                journal = StripTags(cells[journalIndex]);
+            }
+            else if (headerMap.TryGetValue("source", out var sourceIndex) && sourceIndex < cells.Count)
+            {
+                journal = StripTags(cells[sourceIndex]);
+            }
+
             // Fallback: regex in row for title anchor (md5-based)
             if (title == "Unknown Title" && md5 != null)
             {
@@ -228,6 +239,7 @@ namespace NzbDrone.Core.Indexers.LibGen
             release.Author = author;
             release.Book = title;
             release.Doi = DoiUtility.Normalize(doi);
+            release.Source = journal; // Store journal name in Source field
             release.DownloadUrl = downloadUrl;
             release.InfoUrl = md5 != null ? $"{baseUrl}/book/index.php?md5={md5}" : $"{baseUrl}/edition.php?id={editionId}";
             release.Size = size;

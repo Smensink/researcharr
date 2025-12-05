@@ -8,7 +8,8 @@ namespace NzbDrone.Core.Indexers
         RssSync = 0,
         Search = 1,
         Test = 2,
-        Parse = 3
+        Parse = 3,
+        Download = 4
     }
 
     public enum IndexerErrorType

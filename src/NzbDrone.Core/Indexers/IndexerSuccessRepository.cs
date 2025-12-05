@@ -33,7 +33,7 @@ namespace NzbDrone.Core.Indexers
             
             if (startDate.HasValue)
             {
-                query = query.Where(x => x.Timestamp >= startDate.Value);
+                return query.Where(x => x.Timestamp >= startDate.Value).Count();
             }
             
             return query.Count();

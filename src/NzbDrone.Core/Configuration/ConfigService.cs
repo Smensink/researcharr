@@ -212,6 +212,13 @@ namespace NzbDrone.Core.Configuration
             set { SetValue("CopyUsingHardlinks", value); }
         }
 
+        public bool CreateMultiAuthorHardlinks
+        {
+            get { return GetValueBoolean("CreateMultiAuthorHardlinks", true); }
+
+            set { SetValue("CreateMultiAuthorHardlinks", value); }
+        }
+
         public bool ImportExtraFiles
         {
             get { return GetValueBoolean("ImportExtraFiles", false); }

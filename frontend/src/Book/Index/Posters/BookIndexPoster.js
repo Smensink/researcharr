@@ -239,7 +239,7 @@ class BookIndexPoster extends Component {
           {
             showAuthor &&
               <div className={styles.title}>
-                {author.authorName}
+                {author?.authorName ?? 'Unknown'}
               </div>
           }
 
@@ -313,7 +313,7 @@ BookIndexPoster.propTypes = {
   id: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
   authorId: PropTypes.number.isRequired,
-  author: PropTypes.object.isRequired,
+  author: PropTypes.object,
   monitored: PropTypes.bool.isRequired,
   titleSlug: PropTypes.string.isRequired,
   nextAiring: PropTypes.string,
@@ -326,7 +326,7 @@ BookIndexPoster.propTypes = {
   showAuthor: PropTypes.bool.isRequired,
   showMonitored: PropTypes.bool.isRequired,
   showQualityProfile: PropTypes.bool.isRequired,
-  qualityProfile: PropTypes.object.isRequired,
+  qualityProfile: PropTypes.object,
   showSearchAction: PropTypes.bool.isRequired,
   showRelativeDates: PropTypes.bool.isRequired,
   shortDateFormat: PropTypes.string.isRequired,

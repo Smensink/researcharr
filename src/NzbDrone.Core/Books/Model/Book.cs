@@ -17,6 +17,7 @@ namespace NzbDrone.Core.Books
             Links = new List<Links>();
             Genres = new List<string>();
             RelatedBooks = new List<int>();
+            AuthorMetadataIds = new List<int>();
             Ratings = new Ratings();
             Author = new Author();
             AddOptions = new AddBookOptions();
@@ -33,6 +34,7 @@ namespace NzbDrone.Core.Books
         public List<Links> Links { get; set; }
         public List<string> Genres { get; set; }
         public List<int> RelatedBooks { get; set; }
+        public List<int> AuthorMetadataIds { get; set; }
         public Ratings Ratings { get; set; }
         public DateTime? LastSearchTime { get; set; }
 
@@ -80,6 +82,7 @@ namespace NzbDrone.Core.Books
             Links = other.Links;
             Genres = other.Genres;
             RelatedBooks = other.RelatedBooks;
+            AuthorMetadataIds = other.AuthorMetadataIds;
             Ratings = other.Ratings;
             CleanTitle = other.CleanTitle;
         }

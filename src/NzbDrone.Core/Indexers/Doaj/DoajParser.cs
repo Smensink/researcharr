@@ -61,6 +61,11 @@ namespace NzbDrone.Core.Indexers.Doaj
                     var doi = identifiers?.FirstOrDefault(i => string.Equals(i["type"]?.ToString(), "doi", StringComparison.OrdinalIgnoreCase))?["id"]?.ToString();
                     doi = DoiUtility.Normalize(doi);
 
+                    // Extract journal name from bibjson.journal or bibjson.publisher
+                    var journal = bibjson["journal"]?["title"]?.ToString() ??
+                                   bibjson["journal"]?["name"]?.ToString() ??
+                                   bibjson["publisher"]?.ToString();
+
                     if (downloadUrl.StartsWith("//"))
                     {
                         downloadUrl = "https:" + downloadUrl;
@@ -76,6 +81,7 @@ namespace NzbDrone.Core.Indexers.Doaj
                     release.Book = title;
                     release.Author = author;
                     release.Doi = doi;
+                    release.Source = journal; // Store journal name in Source field
                     release.DownloadUrl = downloadUrl;
                     release.InfoUrl = string.IsNullOrWhiteSpace(id) ? downloadUrl : $"https://doaj.org/article/{id}";
                     release.Size = 0;

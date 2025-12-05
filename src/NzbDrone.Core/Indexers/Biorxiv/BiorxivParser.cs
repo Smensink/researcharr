@@ -75,6 +75,9 @@ namespace NzbDrone.Core.Indexers.Biorxiv
                     var author = GetFirstAuthor(item.Value<string>("authors"));
                     var publishDate = item.Value<string>("date");
 
+                    // Biorxiv/Medrxiv are preprint servers, but may have published_in field if published
+                    var journal = item.Value<string>("published_in");
+
                     var release = new ReleaseInfo
                     {
                         Guid = $"{SourceName}-{doi}-{versionSuffix}",
@@ -82,6 +85,7 @@ namespace NzbDrone.Core.Indexers.Biorxiv
                         Book = title,
                         Author = author,
                         Doi = doi,
+                        Source = journal, // Store journal name in Source field (if published)
                         DownloadUrl = $"{ContentBaseUrl}/content/{doi}{versionSuffix}.full.pdf",
                         InfoUrl = $"{ContentBaseUrl}/content/{doi}{versionSuffix}",
                         Container = "PDF",

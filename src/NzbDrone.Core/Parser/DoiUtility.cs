@@ -50,6 +50,53 @@ namespace NzbDrone.Core.Parser
                     extractedDoi = extractedDoi.Substring(0, httpsIndex);
                 }
                 
+                // Stop at word boundaries - if we see a transition from alphanumeric/special chars
+                // to lowercase letters that form words (like "casereport" after "736048"),
+                // truncate at that point. This handles cases where DOI is concatenated with text.
+                var slashIndex = extractedDoi.IndexOf('/');
+                if (slashIndex > 0 && slashIndex < extractedDoi.Length - 1)
+                {
+                    var suffix = extractedDoi.Substring(slashIndex + 1);
+                    
+                    // Look for word boundaries: transition from numbers/special chars to lowercase letters
+                    // Pattern: number or special char followed by 3+ lowercase letters (likely a word)
+                    var wordBoundaryMatch = Regex.Match(
+                        suffix, 
+                        @"^([\d\-_\.\(\)]+)([a-z]{3,})", 
+                        RegexOptions.IgnoreCase);
+                    
+                    if (wordBoundaryMatch.Success && wordBoundaryMatch.Groups[1].Length > 0)
+                    {
+                        // Truncate at the word boundary
+                        var validSuffix = wordBoundaryMatch.Groups[1].Value;
+                        extractedDoi = extractedDoi.Substring(0, slashIndex + 1) + validSuffix;
+                    }
+                    else
+                    {
+                        // Also check for very long suffixes (DOIs typically have reasonable length suffixes)
+                        // If suffix is > 100 chars, it's likely concatenated text - truncate at first word-like pattern
+                        if (suffix.Length > 100)
+                        {
+                            // Find the last position before word-like text starts
+                            var wordStartMatch = Regex.Match(
+                                suffix,
+                                @"^([\d\-_\.\(\)]{1,100})([a-z]{3,})",
+                                RegexOptions.IgnoreCase);
+                            
+                            if (wordStartMatch.Success && wordStartMatch.Groups[1].Length > 0)
+                            {
+                                var validSuffix = wordStartMatch.Groups[1].Value;
+                                extractedDoi = extractedDoi.Substring(0, slashIndex + 1) + validSuffix;
+                            }
+                            else
+                            {
+                                // Just truncate to reasonable length
+                                extractedDoi = extractedDoi.Substring(0, slashIndex + 1) + suffix.Substring(0, 100);
+                            }
+                        }
+                    }
+                }
+                
                 extractedDoi = extractedDoi.Trim().ToLowerInvariant();
                 
                 if (extractedDoi.StartsWith("10.", StringComparison.OrdinalIgnoreCase) && extractedDoi.Contains("/"))
@@ -85,6 +132,41 @@ namespace NzbDrone.Core.Parser
             if (httpsIdx > 0)
             {
                 trimmed = trimmed.Substring(0, httpsIdx);
+            }
+            
+            // Stop at word boundaries - same logic as above
+            var slashIdx = trimmed.IndexOf('/');
+            if (slashIdx > 0 && slashIdx < trimmed.Length - 1)
+            {
+                var suffix = trimmed.Substring(slashIdx + 1);
+                var wordBoundaryMatch = Regex.Match(
+                    suffix,
+                    @"^([\d\-_\.\(\)]+)([a-z]{3,})",
+                    RegexOptions.IgnoreCase);
+                
+                if (wordBoundaryMatch.Success && wordBoundaryMatch.Groups[1].Length > 0)
+                {
+                    var validSuffix = wordBoundaryMatch.Groups[1].Value;
+                    trimmed = trimmed.Substring(0, slashIdx + 1) + validSuffix;
+                }
+                else if (suffix.Length > 100)
+                {
+                    // Truncate very long suffixes
+                    var wordStartMatch = Regex.Match(
+                        suffix,
+                        @"^([\d\-_\.\(\)]{1,100})([a-z]{3,})",
+                        RegexOptions.IgnoreCase);
+                    
+                    if (wordStartMatch.Success && wordStartMatch.Groups[1].Length > 0)
+                    {
+                        var validSuffix = wordStartMatch.Groups[1].Value;
+                        trimmed = trimmed.Substring(0, slashIdx + 1) + validSuffix;
+                    }
+                    else
+                    {
+                        trimmed = trimmed.Substring(0, slashIdx + 1) + suffix.Substring(0, 100);
+                    }
+                }
             }
             
             trimmed = trimmed.Trim();

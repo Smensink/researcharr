@@ -64,13 +64,24 @@ namespace Readarr.Api.V1.Books
             var seriesLinks = model.SeriesLinks?.Value?.OrderBy(x => x.SeriesPosition);
             var seriesTitle = seriesLinks?.Select(x => x?.Series?.Value?.Title + (x?.Position.IsNotNullOrWhiteSpace() ?? false ? $" #{x.Position}" : string.Empty)).ConcatToString("; ");
 
+            // Ensure TitleSlug is never null or empty - required by frontend
+            var titleSlug = model.TitleSlug;
+            if (string.IsNullOrWhiteSpace(titleSlug))
+            {
+                titleSlug = model.ForeignBookId;
+            }
+            if (string.IsNullOrWhiteSpace(titleSlug))
+            {
+                titleSlug = model.Id > 0 ? model.Id.ToString() : "unknown";
+            }
+
             return new BookResource
             {
                 Id = model.Id,
                 AuthorId = model.AuthorId,
                 ForeignBookId = model.ForeignBookId,
                 ForeignEditionId = model.Editions?.Value?.SingleOrDefault(x => x.Monitored)?.ForeignEditionId,
-                TitleSlug = model.TitleSlug,
+                TitleSlug = titleSlug,
                 Monitored = model.Monitored,
                 AnyEditionOk = model.AnyEditionOk,
                 ReleaseDate = model.ReleaseDate,

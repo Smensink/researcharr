@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.Model;
@@ -58,8 +59,8 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.Search
                         var wordDelimiters = new HashSet<char>(" .,_-=()[]|\"`'’");
                         var hasSimilarity = searchTitles.Any(searchTitle =>
                         {
-                            var (_, _, score) = parsedTitle.ToLowerInvariant().FuzzyMatch(searchTitle.ToLowerInvariant(), 0.5, wordDelimiters);
-                            return score >= 0.5; // Require at least 50% similarity even with DOI match
+                            var result = parsedTitle.ToLowerInvariant().FuzzyMatch(searchTitle.ToLowerInvariant(), 0.5, wordDelimiters);
+                            return result.Item3 >= 0.5; // Require at least 50% similarity even with DOI match
                         });
 
                         if (!hasSimilarity)
@@ -102,8 +103,8 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.Search
                 var wordDelimiters = new HashSet<char>(" .,_-=()[]|\"`''");
                 var hasSimilarity = searchTitles.Any(searchTitle =>
                 {
-                    var (_, _, score) = parsedTitle.ToLowerInvariant().FuzzyMatch(searchTitle.ToLowerInvariant(), 0.5, wordDelimiters);
-                    return score >= 0.6; // Require at least 60% similarity for automatic searches
+                    var result = parsedTitle.ToLowerInvariant().FuzzyMatch(searchTitle.ToLowerInvariant(), 0.5, wordDelimiters);
+                    return result.Item3 >= 0.6; // Require at least 60% similarity for automatic searches
                 });
 
                 if (!hasSimilarity)

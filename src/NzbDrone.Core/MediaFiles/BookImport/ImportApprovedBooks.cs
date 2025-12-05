@@ -48,6 +48,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
         private readonly IHistoryService _historyService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IManageCommandQueue _commandQueueManager;
+        private readonly IBookFileHardlinkService _hardlinkService;
         private readonly Logger _logger;
 
         public ImportApprovedBooks(IUpgradeMediaFiles bookFileUpgrader,
@@ -64,6 +65,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                                    IHistoryService historyService,
                                    IEventAggregator eventAggregator,
                                    IManageCommandQueue commandQueueManager,
+                                   IBookFileHardlinkService hardlinkService,
                                    Logger logger)
         {
             _bookFileUpgrader = bookFileUpgrader;
@@ -80,6 +82,7 @@ namespace NzbDrone.Core.MediaFiles.BookImport
             _historyService = historyService;
             _eventAggregator = eventAggregator;
             _commandQueueManager = commandQueueManager;
+            _hardlinkService = hardlinkService;
             _logger = logger;
         }
 
@@ -331,6 +334,47 @@ namespace NzbDrone.Core.MediaFiles.BookImport
             _mediaFileService.AddMany(filesToAdd);
             _logger.Debug("Inserted new trackfiles in {0}ms", watch.ElapsedMilliseconds);
 
+            // Create hardlinks for multi-author papers (after files are added to DB so we have IDs)
+            foreach (var bookFile in allImportedTrackFiles)
+            {
+                try
+                {
+                    var book = bookFile.Edition?.Value?.Book?.Value;
+                    
+                    if (book == null)
+                    {
+                        continue;
+                    }
+
+                    // Get the journal author from the book's AuthorMetadataId
+                    // This works regardless of how the paper was added (via journal or author search)
+                    Author journalAuthor = null;
+                    if (book.AuthorMetadataId > 0)
+                    {
+                        journalAuthor = _authorService.GetAuthorByMetadataId(book.AuthorMetadataId);
+                    }
+                    
+                    // Fallback to lazy-loaded author if available
+                    if (journalAuthor == null)
+                    {
+                        journalAuthor = book.Author?.Value;
+                    }
+                    
+                    if (journalAuthor != null)
+                    {
+                        _hardlinkService.CreateHardlinksForBook(bookFile, book, journalAuthor);
+                    }
+                    else
+                    {
+                        _logger.Debug("Could not find journal author for book {0}, skipping hardlink creation", book);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn(ex, "Failed to create hardlinks for book file {0}", bookFile);
+                }
+            }
+
             // now that trackfiles have been inserted and ids generated, publish the import events
             foreach (var trackImportedEvent in trackImportedEvents)
             {
@@ -390,7 +434,22 @@ namespace NzbDrone.Core.MediaFiles.BookImport
 
                 if (dbAuthor == null)
                 {
-                    _logger.Debug("Adding remote author {0}", author);
+                    // Check if this is a journal (which we allow auto-adding) or a person author (which we don't)
+                    var isJournal = author.Metadata?.Value?.Type == AuthorMetadataType.Journal ||
+                                    string.Equals(author.Metadata?.Value?.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase);
+
+                    if (!isJournal)
+                    {
+                        // Person authors should not be auto-added - they must be explicitly added by the user
+                        _logger.Debug("Person author {0} not found in database. Person authors are not auto-added - add the journal or author explicitly.", author.Metadata?.Value?.Name ?? "Unknown");
+                        foreach (var decision in decisions)
+                        {
+                            decision.Reject(new Rejection($"Person author '{author.Metadata?.Value?.Name ?? "Unknown"}' not found in database. Person authors must be explicitly added - papers should be linked to journals.", RejectionType.Permanent));
+                        }
+                        return null;
+                    }
+
+                    _logger.Debug("Adding remote journal {0}", author);
 
                     var path = decisions.First().Item.Path;
                     var rootFolder = _rootFolderService.GetBestRootFolder(path);
@@ -428,10 +487,10 @@ namespace NzbDrone.Core.MediaFiles.BookImport
                     }
                     catch (Exception e)
                     {
-                        _logger.Error(e, "Failed to add author {0}", author);
+                        _logger.Error(e, "Failed to add journal {0}", author);
                         foreach (var decision in decisions)
                         {
-                            decision.Reject(new Rejection("Failed to add missing author", RejectionType.Temporary));
+                            decision.Reject(new Rejection("Failed to add missing journal", RejectionType.Temporary));
                         }
 
                         return null;

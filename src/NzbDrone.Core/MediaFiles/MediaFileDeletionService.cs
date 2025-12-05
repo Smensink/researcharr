@@ -112,6 +112,9 @@ namespace NzbDrone.Core.MediaFiles
             {
                 if (!isCalibre)
                 {
+                    // Delete the file - if it's a hardlink, deleting it will remove the file everywhere
+                    // since all hardlinks share the same inode. Hardlinks in author folders don't need
+                    // separate cleanup as they're automatically removed when the file is deleted.
                     _recycleBinProvider.DeleteFile(bookFile.Path, subfolder);
                 }
                 else

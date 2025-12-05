@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NLog;
 using NzbDrone.Common.Http;
 using NzbDrone.Common.Serializer;
@@ -35,6 +36,29 @@ namespace NzbDrone.Core.MetadataSource.CrossRef
             if (string.IsNullOrWhiteSpace(normalizedDoi))
             {
                 return null;
+            }
+
+            // Additional validation: ensure DOI doesn't contain invalid characters or is too long
+            // DOIs should be reasonable length (typically < 200 chars total)
+            // and should not contain spaces or obvious word boundaries
+            if (normalizedDoi.Length > 200)
+            {
+                _logger.Debug("DOI too long, likely malformed: {0} (length: {1})", normalizedDoi.Substring(0, 100) + "...", normalizedDoi.Length);
+                return null;
+            }
+
+            // Check for word-like patterns that suggest concatenated text
+            // Pattern: lowercase letters that form words (3+ consecutive lowercase letters)
+            if (Regex.IsMatch(normalizedDoi, @"[a-z]{3,}", RegexOptions.IgnoreCase))
+            {
+                // This might be a false positive if the DOI suffix legitimately contains words
+                // But if it's very long, it's likely concatenated text
+                var slashIndex = normalizedDoi.IndexOf('/');
+                if (slashIndex > 0 && normalizedDoi.Length - slashIndex > 50)
+                {
+                    _logger.Debug("DOI contains word-like patterns and is long, likely malformed: {0}", normalizedDoi.Substring(0, Math.Min(100, normalizedDoi.Length)));
+                    return null;
+                }
             }
 
             try

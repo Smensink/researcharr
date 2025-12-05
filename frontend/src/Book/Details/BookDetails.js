@@ -208,8 +208,8 @@ class BookDetails extends Component {
                 className={styles.bookUpButton}
                 name={icons.ARROW_UP}
                 size={30}
-                title={translate('GoToInterp', [author.authorName])}
-                to={`/author/${author.titleSlug}`}
+                title={translate('GoToInterp', [author?.authorName ?? 'Author'])}
+                to={`/author/${author?.titleSlug ?? 'unknown'}`}
               />
 
               <IconButton
@@ -311,7 +311,7 @@ class BookDetails extends Component {
           <EditBookModalConnector
             isOpen={isEditBookModalOpen}
             bookId={id}
-            authorId={author.id}
+            authorId={author?.id ?? 0}
             onModalClose={this.onEditBookModalClose}
             onDeleteAuthorPress={this.onDeleteBookPress}
           />
@@ -319,7 +319,7 @@ class BookDetails extends Component {
           <DeleteBookModal
             isOpen={isDeleteBookModalOpen}
             bookId={id}
-            authorSlug={author.titleSlug}
+            authorSlug={author?.titleSlug ?? 'unknown'}
             onModalClose={this.onDeleteBookModalClose}
           />
 

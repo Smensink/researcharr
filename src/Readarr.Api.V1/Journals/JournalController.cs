@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +23,13 @@ namespace Readarr.Api.V1.Journals
         [HttpGet]
         public List<JournalResource> GetJournals()
         {
-            // Get all authors where Type == Journal
-            var journals = _authorService.GetAllAuthors()
-                .Where(a => a.Metadata.Value.Type == AuthorMetadataType.Journal)
+            // Get all authors where Type == Journal or Disambiguation == "Journal"
+            // Check both for backwards compatibility with migrated data
+            var allAuthors = _authorService.GetAllAuthors();
+            var journals = allAuthors
+                .Where(a => a.Metadata?.Value != null && 
+                           (a.Metadata.Value.Type == AuthorMetadataType.Journal ||
+                            string.Equals(a.Metadata.Value.Disambiguation, "Journal", global::System.StringComparison.InvariantCultureIgnoreCase)))
                 .ToList();
 
             var authorStats = _authorStatisticsService.AuthorStatistics()

@@ -390,59 +390,111 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
                 }
             }
 
-            var authorMetadataId = book.AuthorMetadata?.Value?.ForeignAuthorId;
-            var authorIdFromBook = book.Author?.Value?.Metadata?.Value?.ForeignAuthorId;
-            var targetAuthorId = authorMetadataId ?? authorIdFromBook ?? authorId;
-
+            // Prefer journal metadata over person authors for papers
+            // Journals are identified by Type == Journal or Disambiguation == "Journal"
             AuthorMetadata metadata = null;
-            if (!string.IsNullOrWhiteSpace(targetAuthorId) && authors != null)
-            {
-                authors.TryGetValue(targetAuthorId, out metadata);
-            }
+            Author author = null;
 
-            if (metadata == null && authors != null)
+            if (authors != null)
             {
-                metadata = authors.Values.FirstOrDefault(x => !string.Equals(x.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase));
-            }
-
-            var author = metadata != null ? _authorService.FindById(metadata.ForeignAuthorId) : null;
-
-            if (author == null && metadata != null)
-            {
-                author = new Author
-                {
-                    CleanName = Parser.Parser.CleanAuthorName(metadata.Name),
-                    Metadata = metadata
-                };
-            }
-
-            if ((author == null || metadata == null) && authors != null)
-            {
-                var journalMetadata = authors.Values.FirstOrDefault(x => string.Equals(x.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase));
+                // First, try to find journal metadata (preferred for papers)
+                var journalMetadata = authors.Values.FirstOrDefault(x => 
+                    x.Type == AuthorMetadataType.Journal || 
+                    string.Equals(x.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase));
 
                 if (journalMetadata != null)
                 {
                     metadata = journalMetadata;
-                    author = _authorService.FindById(journalMetadata.ForeignAuthorId) ?? new Author
+                    author = _authorService.FindById(journalMetadata.ForeignAuthorId);
+                    
+                    // If journal doesn't exist in DB, create a transient Author object (don't persist unless explicitly added)
+                    if (author == null)
                     {
-                        CleanName = Parser.Parser.CleanAuthorName(journalMetadata.Name),
-                        Metadata = journalMetadata,
-                        AddOptions = new AddAuthorOptions
+                        author = new Author
                         {
-                            BooksToMonitor = new List<string> { book.ForeignBookId }
+                            CleanName = Parser.Parser.CleanAuthorName(journalMetadata.Name),
+                            Metadata = journalMetadata,
+                            AddOptions = new AddAuthorOptions
+                            {
+                                BooksToMonitor = new List<string> { book.ForeignBookId }
+                            }
+                        };
+                    }
+                }
+                else
+                {
+                    // Fallback: try to find by target author ID if specified
+                    var authorMetadataId = book.AuthorMetadata?.Value?.ForeignAuthorId;
+                    var authorIdFromBook = book.Author?.Value?.Metadata?.Value?.ForeignAuthorId;
+                    var targetAuthorId = authorMetadataId ?? authorIdFromBook ?? authorId;
+
+                    if (!string.IsNullOrWhiteSpace(targetAuthorId))
+                    {
+                        authors.TryGetValue(targetAuthorId, out metadata);
+                    }
+
+                    // If still no metadata, try first non-journal author
+                    if (metadata == null)
+                    {
+                        metadata = authors.Values.FirstOrDefault(x => 
+                            x.Type != AuthorMetadataType.Journal && 
+                            !string.Equals(x.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase));
+                    }
+
+                    // Only create Author entity if it already exists in DB (don't auto-add person authors)
+                    if (metadata != null)
+                    {
+                        author = _authorService.FindById(metadata.ForeignAuthorId);
+                        
+                        // If person author doesn't exist in DB, don't create it - papers should use journal
+                        // This prevents auto-adding person authors when adding papers
+                        if (author == null)
+                        {
+                            _logger.Debug("Person author {0} not found in database, but paper will be linked to journal if available", metadata.Name);
+                            metadata = null;
+                            author = null;
                         }
-                    };
+                    }
+                }
+            }
+
+            // If we still don't have metadata, try to get it from the book's existing author metadata
+            if (metadata == null && book.AuthorMetadata != null && book.AuthorMetadata.IsLoaded)
+            {
+                metadata = book.AuthorMetadata.Value;
+                if (metadata.Type == AuthorMetadataType.Journal || 
+                    string.Equals(metadata.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    author = _authorService.FindById(metadata.ForeignAuthorId);
+                    if (author == null)
+                    {
+                        author = new Author
+                        {
+                            CleanName = Parser.Parser.CleanAuthorName(metadata.Name),
+                            Metadata = metadata
+                        };
+                    }
+                }
+                else
+                {
+                    // Person author - only use if it exists in DB
+                    author = _authorService.FindById(metadata.ForeignAuthorId);
+                    if (author == null)
+                    {
+                        metadata = null;
+                        author = null;
+                    }
                 }
             }
 
             if (author == null || metadata == null)
             {
-                throw new BookInfoException(string.Format("Expected author or journal metadata for book data {0}", book));
+                throw new BookInfoException(string.Format("Expected journal metadata for book data {0}. Person authors are not auto-added - add the journal explicitly.", book));
             }
 
             book.Author = author;
             book.AuthorMetadata = metadata;
-            book.AuthorMetadataId = author.AuthorMetadataId;
+            book.AuthorMetadataId = metadata.Id;
         }
 
         private string GetDoiFromLinks(Book book)

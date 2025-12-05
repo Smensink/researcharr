@@ -51,10 +51,11 @@ namespace NzbDrone.Core.Indexers.SciHub
                     pdfUrl = $"{baseUri.Scheme}://{baseUri.Host}{pdfUrl}";
                 }
 
-                // Try to extract title/author/doi from meta tags first
+                // Try to extract title/author/doi/journal from meta tags first
                 var metaTitle = Regex.Match(html, @"<meta\s+name=[""']citation_title[""']\s+content=[""']([^""]+)[""']", RegexOptions.IgnoreCase);
                 var metaAuthor = Regex.Match(html, @"<meta\s+name=[""']citation_author[""']\s+content=[""']([^""]+)[""']", RegexOptions.IgnoreCase);
                 var metaDoi = Regex.Match(html, @"<meta\s+name=[""']citation_doi[""']\s+content=[""']([^""]+)[""']", RegexOptions.IgnoreCase);
+                var metaJournal = Regex.Match(html, @"<meta\s+name=[""']citation_journal[""']\s+content=[""']([^""]+)[""']", RegexOptions.IgnoreCase);
 
                 var titleMatch = Regex.Match(html, @"<title>(.*?)</title>", RegexOptions.IgnoreCase);
                 
@@ -75,6 +76,7 @@ namespace NzbDrone.Core.Indexers.SciHub
                 }
 
                 var author = metaAuthor.Success ? metaAuthor.Groups[1].Value : null;
+                var journal = metaJournal.Success ? metaJournal.Groups[1].Value : null;
 
                 var release = new ReleaseInfo();
                 release.Guid = $"SciHub-{Guid.NewGuid()}"; // Random GUID since we don't have a stable ID from search
@@ -82,6 +84,7 @@ namespace NzbDrone.Core.Indexers.SciHub
                 release.Book = title;
                 release.Author = author;
                 release.Doi = doi;
+                release.Source = journal; // Store journal name in Source field
                 release.Container = "PDF";
                 release.DownloadUrl = pdfUrl;
                 release.InfoUrl = baseUrl;

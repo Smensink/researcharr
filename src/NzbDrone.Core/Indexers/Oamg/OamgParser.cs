@@ -64,12 +64,17 @@ namespace NzbDrone.Core.Indexers.Oamg
 
                     var doi = DoiUtility.Normalize(item["doi"]?.ToString() ?? item["ids"]?["doi"]?.ToString());
 
+                    // Extract journal name from primary_location.source.display_name (OpenAlex structure)
+                    var journal = item["primary_location"]?["source"]?["display_name"]?.ToString() ??
+                                  item["raw_source_name"]?.ToString();
+
                     var release = new ReleaseInfo();
                     release.Guid = $"Oamg-{id}";
                     release.Title = $"{author} - {title}";
                     release.Book = title;
                     release.Author = author;
                     release.Doi = doi;
+                    release.Source = journal; // Store journal name in Source field
                     release.DownloadUrl = downloadUrl;
                     release.InfoUrl = $"https://oa.mg/work/{id}";
                     release.Size = 0;

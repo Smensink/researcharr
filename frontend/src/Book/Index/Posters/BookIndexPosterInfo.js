@@ -19,7 +19,7 @@ function BookIndexPosterInfo(props) {
     timeFormat
   } = props;
 
-  if (sortKey === 'qualityProfileId' && !showQualityProfile) {
+  if (sortKey === 'qualityProfileId' && !showQualityProfile && qualityProfile?.name) {
     return (
       <div className={styles.info}>
         {qualityProfile.name}
@@ -82,7 +82,7 @@ function BookIndexPosterInfo(props) {
   if (sortKey === 'path') {
     return (
       <div className={styles.info}>
-        {author.path}
+        {author?.path ?? ''}
       </div>
     );
   }
@@ -99,9 +99,9 @@ function BookIndexPosterInfo(props) {
 }
 
 BookIndexPosterInfo.propTypes = {
-  qualityProfile: PropTypes.object.isRequired,
+  qualityProfile: PropTypes.object,
   showQualityProfile: PropTypes.bool.isRequired,
-  author: PropTypes.object.isRequired,
+  author: PropTypes.object,
   added: PropTypes.string,
   releaseDate: PropTypes.string,
   bookFileCount: PropTypes.number.isRequired,

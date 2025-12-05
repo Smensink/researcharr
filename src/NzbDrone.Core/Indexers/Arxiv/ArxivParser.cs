@@ -40,6 +40,11 @@ namespace NzbDrone.Core.Indexers.Arxiv
                     XNamespace arxiv = "http://arxiv.org/schemas/atom";
                     var doi = DoiUtility.Normalize(entry.Element(arxiv + "doi")?.Value);
 
+                    // Arxiv is a preprint server, so typically no journal
+                    // However, if a paper has been published, journal info might be in comments
+                    // For now, we'll leave Source as null since Arxiv doesn't provide journal info
+                    string journal = null;
+
                     // Find PDF link
                     var pdfLink = entry.Elements(ns + "link")
                         .FirstOrDefault(l => (string)l.Attribute("title") == "pdf" || (string)l.Attribute("type") == "application/pdf")?
@@ -56,6 +61,7 @@ namespace NzbDrone.Core.Indexers.Arxiv
                     release.Book = title;
                     release.Author = author;
                     release.Doi = doi;
+                    release.Source = journal; // Arxiv doesn't provide journal info (preprint server)
                     release.DownloadUrl = pdfLink;
                     release.InfoUrl = id; // Usually the abstract URL
                     release.Container = "PDF";

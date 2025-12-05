@@ -14,24 +14,27 @@ import translate from 'Utilities/String/translate';
 import IndexerErrorsRow from './IndexerErrorsRow';
 import styles from './IndexerErrors.css';
 
+// Map operation types to their display labels
+// Using inline translations to avoid missing key warnings for enum values
 const operationTypeLabels = {
-  Unknown: translate('Unknown'),
-  RssSync: translate('RssSync'),
-  Search: translate('Search'),
-  Test: translate('Test'),
-  Download: translate('Download')
+  Unknown: 'Unknown',
+  RssSync: 'RSS Sync',
+  Search: 'Search',
+  Test: 'Test',
+  Download: 'Download'
 };
 
+// Map error types to their display labels
 const errorTypeLabels = {
-  Unknown: translate('Unknown'),
-  ConnectionFailure: translate('ConnectionFailure'),
-  Timeout: translate('Timeout'),
-  HttpError: translate('HttpError'),
-  AuthError: translate('AuthError'),
-  RateLimit: translate('RateLimit'),
-  CloudflareCaptcha: translate('CloudflareCaptcha'),
-  ParseError: translate('ParseError'),
-  ReleaseUnavailable: translate('ReleaseUnavailable')
+  Unknown: 'Unknown',
+  ConnectionFailure: 'Connection Failure',
+  Timeout: 'Timeout',
+  HttpError: 'HTTP Error',
+  AuthError: 'Auth Error',
+  RateLimit: 'Rate Limit',
+  CloudflareCaptcha: 'Cloudflare Captcha',
+  ParseError: 'Parse Error',
+  ReleaseUnavailable: 'Release Unavailable'
 };
 
 class IndexerErrors extends Component {

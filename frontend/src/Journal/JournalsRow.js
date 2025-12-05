@@ -81,4 +81,10 @@ JournalsRow.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
+JournalsRow.defaultProps = {
+  monitored: false,
+  titleSlug: 'unknown',
+  paperCount: 0
+};
+
 export default JournalsRow;

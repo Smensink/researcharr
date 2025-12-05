@@ -31,11 +31,19 @@ namespace NzbDrone.Core.Books
 
             if (useExistingRelativeFolder && author.Path.IsNotNullOrWhiteSpace())
             {
+                // Preserve existing paths for backward compatibility (don't move existing authors/journals)
                 var relativePath = GetExistingRelativePath(author);
                 return Path.Combine(author.RootFolderPath, relativePath);
             }
 
-            return Path.Combine(author.RootFolderPath, _fileNameBuilder.GetAuthorFolder(author));
+            // For new authors, separate researchers and journals into subfolders
+            var isJournal = author.Metadata?.Value?.Type == AuthorMetadataType.Journal ||
+                           string.Equals(author.Metadata?.Value?.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase);
+            
+            var folderName = _fileNameBuilder.GetAuthorFolder(author);
+            var subfolder = isJournal ? "journals" : "authors";
+            
+            return Path.Combine(author.RootFolderPath, subfolder, folderName);
         }
 
         private string GetExistingRelativePath(Author author)
