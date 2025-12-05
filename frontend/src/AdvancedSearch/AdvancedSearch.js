@@ -442,7 +442,7 @@ function AdvancedSearch() {
         cursor: cursorValue
       }
     }).request;
-  }, [buildFilterString, fullSearchString, mergeResults, perPage, searchConceptOperator, selectedConcepts.length, sort]);
+  }, [buildFilterString, fullSearchString, mergeResults, perPage, searchConceptOperator, selectedConcepts, sort]);
 
   const fetchWorks = useCallback((cursorValue = '*', trailOverride = null, overrides = {}, append = false) => {
     setLoading(true);
@@ -660,8 +660,8 @@ function AdvancedSearch() {
     setSelectedConcepts((search.selectedConcepts || []).map((c) => ({ ...c, groupId: c.groupId || 1 })));
     setKeywordMeshOperator(search.keywordMeshOperator || 'AND');
     setSearchConceptOperator(search.searchConceptOperator || 'AND');
-    setConceptGroupOperators(search.conceptGroupOperators || search.conceptGroupOperator ? { 1: search.conceptGroupOperator || 'OR' } : { 1: 'OR', 2: 'OR', 3: 'OR' });
-    setMeshGroupOperators(search.meshGroupOperators || search.meshGroupOperator ? { 1: search.meshGroupOperator || 'OR' } : { 1: 'OR', 2: 'OR', 3: 'OR' });
+    setConceptGroupOperators((search.conceptGroupOperators || search.conceptGroupOperator) ? { 1: search.conceptGroupOperator || 'OR' } : { 1: 'OR', 2: 'OR', 3: 'OR' });
+    setMeshGroupOperators((search.meshGroupOperators || search.meshGroupOperator) ? { 1: search.meshGroupOperator || 'OR' } : { 1: 'OR', 2: 'OR', 3: 'OR' });
     setCursorHistory(['*']);
     fetchWorks('*', ['*'], { searchString, filterString, sortString });
   };
