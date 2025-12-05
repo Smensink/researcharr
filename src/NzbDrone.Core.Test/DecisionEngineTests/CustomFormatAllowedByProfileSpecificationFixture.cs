@@ -112,5 +112,21 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
 
             Subject.IsSatisfiedBy(_remoteAlbum, null).Accepted.Should().BeTrue();
         }
+
+        [Test]
+        public void should_allow_when_quality_profile_missing()
+        {
+            _remoteAlbum.Author.QualityProfile = null;
+
+            Subject.IsSatisfiedBy(_remoteAlbum, null).Accepted.Should().BeTrue();
+        }
+
+        [Test]
+        public void should_allow_when_author_missing()
+        {
+            _remoteAlbum.Author = null;
+
+            Subject.IsSatisfiedBy(_remoteAlbum, null).Accepted.Should().BeTrue();
+        }
     }
 }

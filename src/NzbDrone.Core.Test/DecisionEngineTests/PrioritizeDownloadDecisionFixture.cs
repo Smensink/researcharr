@@ -550,5 +550,49 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             qualifiedReports.First().RemoteBook.ParsedBookInfo.Quality.Revision.Real.Should().Be(0);
             qualifiedReports.First().RemoteBook.CustomFormatScore.Should().Be(10);
         }
+
+        [Test]
+        public void should_handle_missing_quality_profile_without_throwing()
+        {
+            var remoteBook1 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.FLAC));
+            var remoteBook2 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.AZW3));
+
+            remoteBook1.Author.QualityProfile = null;
+
+            var decisions = new List<DownloadDecision>
+            {
+                new DownloadDecision(remoteBook1),
+                new DownloadDecision(remoteBook2)
+            };
+
+            Action act = () => Subject.PrioritizeDecisions(decisions);
+
+            act.Should().NotThrow();
+
+            var prioritized = Subject.PrioritizeDecisions(decisions);
+            prioritized.Last().RemoteBook.Should().Be(remoteBook1);
+        }
+
+        [Test]
+        public void should_handle_missing_author_without_throwing()
+        {
+            var remoteBook1 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.FLAC));
+            var remoteBook2 = GivenRemoteBook(new List<Book> { GivenBook(1) }, new QualityModel(Quality.AZW3));
+
+            remoteBook1.Author = null;
+
+            var decisions = new List<DownloadDecision>
+            {
+                new DownloadDecision(remoteBook1),
+                new DownloadDecision(remoteBook2)
+            };
+
+            Action act = () => Subject.PrioritizeDecisions(decisions);
+
+            act.Should().NotThrow();
+
+            var prioritized = Subject.PrioritizeDecisions(decisions);
+            prioritized.Last().RemoteBook.Should().Be(remoteBook1);
+        }
     }
 }
