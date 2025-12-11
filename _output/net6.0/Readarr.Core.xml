@@ -152,5 +152,11 @@
             Extract all DOIs from text content
             </summary>
         </member>
+        <member name="M:NzbDrone.Core.Parser.Parser.NormalizeTitleSeparators(System.String)">
+            <summary>
+            Normalizes title separators by converting " - " (dash with spaces) to ": " (colon with space).
+            This helps match Sci-Hub formatted titles (which use dashes) with library titles (which use colons).
+            </summary>
+        </member>
     </members>
 </doc>
