@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { memo } from 'react';
 import Icon from 'Components/Icon';
 import { icons } from 'Helpers/Props';
 import styles from './StarRating.css';
 
-function StarRating({ rating, votes, iconSize }) {
+// By wrapping StarRating with React.memo, we prevent it from re-rendering
+// if its props (rating, votes, iconSize) have not changed. This is a performance
+// optimization for cases where StarRating is used in a list of items.
+const StarRating = memo(function StarRating({ rating, votes, iconSize }) {
   const starWidth = {
     width: `${rating * 20}%`
   };
@@ -29,7 +32,7 @@ function StarRating({ rating, votes, iconSize }) {
       </div>
     </span>
   );
-}
+});
 
 StarRating.propTypes = {
   rating: PropTypes.number.isRequired,
