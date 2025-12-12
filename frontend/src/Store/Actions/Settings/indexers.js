@@ -1,7 +1,5 @@
 import { createAction } from 'redux-actions';
 import { sortDirections } from 'Helpers/Props';
-import translate from 'Utilities/String/translate';
-import createAjaxRequest from 'Utilities/createAjaxRequest';
 import createBulkEditItemHandler from 'Store/Actions/Creators/createBulkEditItemHandler';
 import createBulkRemoveItemHandler from 'Store/Actions/Creators/createBulkRemoveItemHandler';
 import createFetchHandler from 'Store/Actions/Creators/createFetchHandler';
@@ -14,10 +12,12 @@ import createSetClientSideCollectionSortReducer from 'Store/Actions/Creators/Red
 import createSetProviderFieldValueReducer from 'Store/Actions/Creators/Reducers/createSetProviderFieldValueReducer';
 import createSetSettingValueReducer from 'Store/Actions/Creators/Reducers/createSetSettingValueReducer';
 import { createThunk } from 'Store/thunks';
-import { set } from '../baseActions';
+import createAjaxRequest from 'Utilities/createAjaxRequest';
 import getSectionState from 'Utilities/State/getSectionState';
 import selectProviderSchema from 'Utilities/State/selectProviderSchema';
 import updateSectionState from 'Utilities/State/updateSectionState';
+import translate from 'Utilities/String/translate';
+import { set } from '../baseActions';
 
 //
 // Variables
@@ -170,16 +170,16 @@ export default {
 
     [FETCH_INDEXER_FAILURES]: function(getState, payload, dispatch) {
       const { indexerId, since, operationType, errorType, page, pageSize } = payload || {};
-      
-      dispatch(set({ 
-        section, 
+
+      dispatch(set({
+        section,
         isFailuresFetching: true,
         failuresError: null
       }));
 
       let url = `/indexer/${indexerId}/failures?`;
       const params = [];
-      
+
       if (since) {
         params.push(`since=${encodeURIComponent(since.toISOString())}`);
       }
@@ -195,11 +195,11 @@ export default {
       if (pageSize) {
         params.push(`pageSize=${pageSize}`);
       }
-      
+
       url += params.join('&');
 
       const { request, abortRequest } = createAjaxRequest({
-        url: url,
+        url,
         traditional: true
       });
 

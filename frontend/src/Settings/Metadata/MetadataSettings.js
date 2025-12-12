@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
+import Button from 'Components/Link/Button';
 import PageContent from 'Components/Page/PageContent';
 import PageContentBody from 'Components/Page/PageContentBody';
 import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
-import Button from 'Components/Link/Button';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import translate from 'Utilities/String/translate';
 // import MetadatasConnector from './Metadata/MetadatasConnector';
@@ -121,16 +121,18 @@ class MetadataSettings extends Component {
             onChildMounted={this.onChildMounted}
             onChildStateChange={this.onChildStateChange}
           />
-            <div style={{ marginTop: 12 }}>
-              <div style={{ marginBottom: 8 }}>
-                <Button onPress={onImportMeshUrl}>
-                  Import latest MeSH descriptors (download)
-                </Button>
-              </div>
+          <div style={{ marginTop: 12 }}>
+            <div style={{ marginBottom: 8 }}>
+              <Button onPress={onImportMeshUrl}>
+                Import latest MeSH descriptors (download)
+              </Button>
+            </div>
             <div>
               <label>
                 Import MeSH from local XML:
-                <input type="file" accept=".xml" onChange={onPickMeshFile} />
+                <input type="file" accept=".xml"
+                  onChange={onPickMeshFile}
+                />
               </label>
               <div style={{ marginTop: 8 }}>
                 <Button onPress={onImportMeshFile} disabled={!meshFile}>

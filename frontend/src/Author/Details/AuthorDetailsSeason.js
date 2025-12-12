@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import TextInput from 'Components/Form/TextInput';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
 import TablePager from 'Components/Table/TablePager';
-import TextInput from 'Components/Form/TextInput';
 import { sortDirections } from 'Helpers/Props';
 import hasDifferentItemsOrOrder from 'Utilities/Object/hasDifferentItemsOrOrder';
 import getToggledRange from 'Utilities/Table/getToggledRange';
@@ -129,16 +129,16 @@ class AuthorDetailsSeason extends Component {
     const { page, pageSize, filter } = this.state;
 
     const lowerFilter = filter.trim().toLowerCase();
-    const filteredItems = lowerFilter.length === 0
-      ? items
-      : items.filter((item) => {
-          const title = item.title?.toLowerCase() || '';
-          const authorName = item.author?.name?.toLowerCase() || '';
-          const topics = (item.topics || item.genres || []).join(' ').toLowerCase();
-          return title.includes(lowerFilter) ||
+    const filteredItems = lowerFilter.length === 0 ?
+      items :
+      items.filter((item) => {
+        const title = item.title?.toLowerCase() || '';
+        const authorName = item.author?.name?.toLowerCase() || '';
+        const topics = (item.topics || item.genres || []).join(' ').toLowerCase();
+        return title.includes(lowerFilter) ||
             authorName.includes(lowerFilter) ||
             topics.includes(lowerFilter);
-        });
+      });
 
     const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize));
     const start = (page - 1) * pageSize;
