@@ -7,7 +7,7 @@ import styles from './StarRating.css';
 // By wrapping StarRating with React.memo, we prevent it from re-rendering
 // if its props (rating, votes, iconSize) have not changed. This is a performance
 // optimization for cases where StarRating is used in a list of items.
-const StarRating = memo(function StarRating({ rating, votes, iconSize }) {
+const StarRating = memo(({ rating, votes, iconSize }) => {
   const starWidth = {
     width: `${rating * 20}%`
   };

@@ -191,8 +191,8 @@ class IndexerErrors extends Component {
               </Alert>
           }
 
-      {
-        isPopulated && !error && failures && failures.length > 0 &&
+          {
+            isPopulated && !error && failures && failures.length > 0 &&
               <div>
                 <Table columns={columns}>
                   <TableBody>

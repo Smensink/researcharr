@@ -16,7 +16,7 @@ function createMapStateToProps() {
     (state) => state.settings.indexers,
     createUISettingsSelector(),
     (indexerId, indexers, uiSettings) => {
-      const indexer = indexers.items.find(i => i.id === indexerId);
+      const indexer = indexers.items.find((i) => i.id === indexerId);
       const failures = indexers.failures && indexers.failures[indexerId] ? indexers.failures[indexerId] : [];
       const statistics = indexers.statistics && indexers.statistics[indexerId] ? indexers.statistics[indexerId] : null;
 

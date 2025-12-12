@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import Link from 'Components/Link/Link';
 import Icon from 'Components/Icon';
 import Label from 'Components/Label';
+import Link from 'Components/Link/Link';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
 import TableSelectCell from 'Components/Table/Cells/TableSelectCell';
 import Column from 'Components/Table/Column';
@@ -101,22 +101,27 @@ function ManageIndexersModalRow(props: ManageIndexersModalRowProps) {
               <Link to={`/settings/indexers/${id}/errors`}>
                 <Label
                   kind={kinds.WARNING}
-                  title={translate('RecentFailures', { count: statistics.recentFailures })}
+                  title={translate('RecentFailures', {
+                    count: statistics.recentFailures,
+                  })}
                 >
                   {statistics.recentFailures} {translate('Failures')}
                 </Label>
               </Link>
             )}
-            {statistics.totalFailures > 0 && statistics.recentFailures === 0 && (
-              <Link to={`/settings/indexers/${id}/errors`}>
-                <Label
-                  kind={kinds.INFO}
-                  title={translate('TotalFailures', { count: statistics.totalFailures })}
-                >
-                  {statistics.totalFailures} {translate('Total')}
-                </Label>
-              </Link>
-            )}
+            {statistics.totalFailures > 0 &&
+              statistics.recentFailures === 0 && (
+                <Link to={`/settings/indexers/${id}/errors`}>
+                  <Label
+                    kind={kinds.INFO}
+                    title={translate('TotalFailures', {
+                      count: statistics.totalFailures,
+                    })}
+                  >
+                    {statistics.totalFailures} {translate('Total')}
+                  </Label>
+                </Link>
+              )}
             {statistics.isHealthy === false && (
               <Link to={`/settings/indexers/${id}/errors`}>
                 <Label
@@ -127,18 +132,18 @@ function ManageIndexersModalRow(props: ManageIndexersModalRowProps) {
                 </Label>
               </Link>
             )}
-            {statistics.isHealthy === true && statistics.recentFailures === 0 && statistics.totalFailures === 0 && (
-              <Label
-                kind={kinds.SUCCESS}
-                title={translate('IndexerHealthy')}
-              >
-                {translate('Healthy')}
-              </Label>
-            )}
-            {!statistics.recentFailures && !statistics.totalFailures && statistics.isHealthy !== false && (
-              <span>-</span>
-            )}
-            {(statistics.totalFailures > 0 || statistics.recentFailures > 0) && (
+            {statistics.isHealthy === true &&
+              statistics.recentFailures === 0 &&
+              statistics.totalFailures === 0 && (
+                <Label kind={kinds.SUCCESS} title={translate('IndexerHealthy')}>
+                  {translate('Healthy')}
+                </Label>
+              )}
+            {!statistics.recentFailures &&
+              !statistics.totalFailures &&
+              statistics.isHealthy !== false && <span>-</span>}
+            {(statistics.totalFailures > 0 ||
+              statistics.recentFailures > 0) && (
               <Link
                 to={`/settings/indexers/${id}/errors`}
                 className={styles.errorsLink}
