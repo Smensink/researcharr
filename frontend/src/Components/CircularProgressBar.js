@@ -1,120 +1,91 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import styles from './CircularProgressBar.css';
 
-class CircularProgressBar extends Component {
+// This component is wrapped in React.memo to prevent unnecessary re-renders.
+// Since it's a purely presentational component, it will only re-render when its props change,
+// improving performance in lists or frequently updated UIs.
+const CircularProgressBar = memo((props) => {
+  const {
+    className,
+    containerClassName,
+    size,
+    strokeWidth,
+    strokeColor,
+    showProgressText,
+    progress: targetProgress
+  } = props;
 
-  //
-  // Lifecycle
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+  const requestRef = useRef();
 
-  constructor(props, context) {
-    super(props, context);
+  useEffect(() => {
+    // Reset animation when target progress changes, mimicking the old lifecycle.
+    setAnimatedProgress(0);
+  }, [targetProgress]);
 
-    this.state = {
-      progress: 0
+  useEffect(() => {
+    const step = () => {
+      if (animatedProgress < targetProgress) {
+        setAnimatedProgress((prev) => prev + 1);
+      }
     };
-  }
 
-  componentDidMount() {
-    this._progressStep();
-  }
-
-  componentDidUpdate(prevProps) {
-    const progress = this.props.progress;
-
-    if (prevProps.progress !== progress) {
-      this._cancelProgressStep();
-      this._progressStep();
+    if (animatedProgress < targetProgress) {
+      requestRef.current = requestAnimationFrame(step);
     }
-  }
 
-  componentWillUnmount() {
-    this._cancelProgressStep();
-  }
+    // Cleanup function to cancel the animation frame on unmount or re-render.
+    return () => {
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+      }
+    };
+  }, [animatedProgress, targetProgress]);
 
-  //
-  // Control
+  const center = size / 2;
+  const radius = center - strokeWidth;
+  const circumference = Math.PI * (radius * 2);
+  const sizeInPixels = `${size}px`;
+  const strokeDashoffset = ((100 - animatedProgress) / 100) * circumference;
+  const progressText = `${Math.round(animatedProgress)}%`;
 
-  _progressStep() {
-    this.requestAnimationFrame = window.requestAnimationFrame(() => {
-      this.setState({
-        progress: this.state.progress + 1
-      }, () => {
-        if (this.state.progress < this.props.progress) {
-          this._progressStep();
-        }
-      });
-    });
-  }
-
-  _cancelProgressStep() {
-    if (this.requestAnimationFrame) {
-      window.cancelAnimationFrame(this.requestAnimationFrame);
-    }
-  }
-
-  //
-  // Render
-
-  render() {
-    const {
-      className,
-      containerClassName,
-      size,
-      strokeWidth,
-      strokeColor,
-      showProgressText
-    } = this.props;
-
-    const progress = this.state.progress;
-
-    const center = size / 2;
-    const radius = center - strokeWidth;
-    const circumference = Math.PI * (radius * 2);
-    const sizeInPixels = `${size}px`;
-    const strokeDashoffset = ((100 - progress) / 100) * circumference;
-    const progressText = `${Math.round(progress)}%`;
-
-    return (
-      <div
-        className={containerClassName}
-        style={{
-          width: sizeInPixels,
-          height: sizeInPixels,
-          lineHeight: sizeInPixels
-        }}
+  return (
+    <div
+      className={containerClassName}
+      style={{
+        width: sizeInPixels,
+        height: sizeInPixels,
+        lineHeight: sizeInPixels
+      }}
+    >
+      <svg
+        className={className}
+        version='1.1'
+        xmlns='http://www.w3.org/2000/svg'
+        width={size}
+        height={size}
       >
-        <svg
-          className={className}
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-        >
-          <circle
-            fill="transparent"
-            r={radius}
-            cx={center}
-            cy={center}
-            strokeDasharray={circumference}
-            style={{
-              stroke: strokeColor,
-              strokeWidth,
-              strokeDashoffset
-            }}
-          />
-        </svg>
+        <circle
+          fill='transparent'
+          r={radius}
+          cx={center}
+          cy={center}
+          strokeDasharray={circumference}
+          style={{
+            stroke: strokeColor,
+            strokeWidth,
+            strokeDashoffset
+          }}
+        />
+      </svg>
 
-        {
-          showProgressText &&
-            <div className={styles.circularProgressBarText}>
-              {progressText}
-            </div>
-        }
-      </div>
-    );
-  }
-}
+      {showProgressText && (
+        <div className={styles.circularProgressBarText}>{progressText}</div>
+      )}
+    </div>
+  );
+});
 
 CircularProgressBar.propTypes = {
   className: PropTypes.string,
