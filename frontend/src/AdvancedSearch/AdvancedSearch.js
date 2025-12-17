@@ -324,7 +324,9 @@ function AdvancedSearch() {
       setConceptSuggestions([]);
       return undefined;
     }
-    const timer = setTimeout(() => fetchConcepts(conceptQuery), 120);
+    // Debounce API calls to avoid excessive requests while typing.
+    // 300ms is a standard delay that balances responsiveness with efficiency.
+    const timer = setTimeout(() => fetchConcepts(conceptQuery), 300);
     return () => clearTimeout(timer);
   }, [conceptQuery, fetchConcepts]);
 
@@ -333,7 +335,9 @@ function AdvancedSearch() {
       setMeshSuggestions([]);
       return undefined;
     }
-    const timer = setTimeout(() => fetchMesh(meshQuery), 120);
+    // Debounce API calls to avoid excessive requests while typing.
+    // 300ms is a standard delay that balances responsiveness with efficiency.
+    const timer = setTimeout(() => fetchMesh(meshQuery), 300);
     return () => clearTimeout(timer);
   }, [meshQuery, fetchMesh]);
 
