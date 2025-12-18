@@ -38,3 +38,7 @@
 /workspace/_temp/obj/Readarr.Update/Debug/net6.0/Readarr.Update.pdb
 /workspace/_temp/obj/Readarr.Update/Debug/net6.0/Readarr.Update.genruntimeconfig.cache
 /workspace/_temp/obj/Readarr.Update/Debug/net6.0/ref/Readarr.Update.dll
+/app/_temp/obj/Readarr.Update/Debug/net6.0/Readarr.Update.dll
+/app/_temp/obj/Readarr.Update/Debug/net6.0/ref/Readarr.Update.dll
+/app/_temp/obj/Readarr.Update/Debug/net6.0/Readarr.Update.xml
+/app/_temp/obj/Readarr.Update/Debug/net6.0/Readarr.Update.pdb

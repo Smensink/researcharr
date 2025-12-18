@@ -32,3 +32,7 @@
 /workspace/_temp/obj/Readarr.Windows/Debug/net6.0/Readarr.Windows.xml
 /workspace/_temp/obj/Readarr.Windows/Debug/net6.0/Readarr.Windows.pdb
 /workspace/_temp/obj/Readarr.Windows/Debug/net6.0/ref/Readarr.Windows.dll
+/app/_temp/obj/Readarr.Windows/Debug/net6.0/Readarr.Windows.dll
+/app/_temp/obj/Readarr.Windows/Debug/net6.0/ref/Readarr.Windows.dll
+/app/_temp/obj/Readarr.Windows/Debug/net6.0/Readarr.Windows.xml
+/app/_temp/obj/Readarr.Windows/Debug/net6.0/Readarr.Windows.pdb

@@ -162,3 +162,7 @@
 /workspace/_temp/obj/Readarr.Windows.Test/Debug/net6.0/Readarr.Windows.Test.pdb
 /workspace/_temp/obj/Readarr.Windows.Test/Debug/net6.0/Readarr.Windows.Test.genruntimeconfig.cache
 /workspace/_temp/obj/Readarr.Windows.Test/Debug/net6.0/ref/Readarr.Windows.Test.dll
+/app/_temp/obj/Readarr.Windows.Test/Debug/net6.0/Readarr.Windows.Test.dll
+/app/_temp/obj/Readarr.Windows.Test/Debug/net6.0/ref/Readarr.Windows.Test.dll
+/app/_temp/obj/Readarr.Windows.Test/Debug/net6.0/Readarr.Windows.Test.xml
+/app/_temp/obj/Readarr.Windows.Test/Debug/net6.0/Readarr.Windows.Test.pdb

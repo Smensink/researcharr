@@ -161,3 +161,7 @@
 /workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/refint/Readarr.Core.Test.dll
 /workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.xml
 /workspace/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.pdb
+/app/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.dll
+/app/_temp/obj/Readarr.Core.Test/Debug/net6.0/ref/Readarr.Core.Test.dll
+/app/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.xml
+/app/_temp/obj/Readarr.Core.Test/Debug/net6.0/Readarr.Core.Test.pdb

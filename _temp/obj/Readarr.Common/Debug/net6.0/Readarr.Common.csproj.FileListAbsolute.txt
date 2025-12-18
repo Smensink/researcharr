@@ -34,3 +34,16 @@
 /workspace/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.xml
 /workspace/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.pdb
 /workspace/_temp/obj/Readarr.Common/Debug/net6.0/ref/Readarr.Common.dll
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.csproj.AssemblyReference.cache
+/app/_temp/obj/Readarr.Common/Debug/net6.0/NzbDrone.Common.EnsureThat.Resources.ExceptionMessages.resources
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.csproj.GenerateResource.cache
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.GeneratedMSBuildEditorConfig.editorconfig
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Sentry.Attributes.cs
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.AssemblyInfoInputs.cache
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.AssemblyInfo.cs
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.csproj.CoreCompileInputs.cache
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.sourcelink.json
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.dll
+/app/_temp/obj/Readarr.Common/Debug/net6.0/ref/Readarr.Common.dll
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.xml
+/app/_temp/obj/Readarr.Common/Debug/net6.0/Readarr.Common.pdb

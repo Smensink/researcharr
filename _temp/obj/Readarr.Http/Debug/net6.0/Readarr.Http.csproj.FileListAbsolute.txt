@@ -122,3 +122,7 @@
 /workspace/_temp/obj/Readarr.Http/Debug/net6.0/Readarr.Http.xml
 /workspace/_temp/obj/Readarr.Http/Debug/net6.0/Readarr.Http.pdb
 /workspace/_temp/obj/Readarr.Http/Debug/net6.0/ref/Readarr.Http.dll
+/app/_temp/obj/Readarr.Http/Debug/net6.0/Readarr.Http.dll
+/app/_temp/obj/Readarr.Http/Debug/net6.0/ref/Readarr.Http.dll
+/app/_temp/obj/Readarr.Http/Debug/net6.0/Readarr.Http.xml
+/app/_temp/obj/Readarr.Http/Debug/net6.0/Readarr.Http.pdb

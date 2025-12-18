@@ -32,3 +32,7 @@
 /workspace/_temp/obj/Readarr.Mono/Debug/net6.0/Readarr.Mono.xml
 /workspace/_temp/obj/Readarr.Mono/Debug/net6.0/Readarr.Mono.pdb
 /workspace/_temp/obj/Readarr.Mono/Debug/net6.0/ref/Readarr.Mono.dll
+/app/_temp/obj/Readarr.Mono/Debug/net6.0/Readarr.Mono.dll
+/app/_temp/obj/Readarr.Mono/Debug/net6.0/ref/Readarr.Mono.dll
+/app/_temp/obj/Readarr.Mono/Debug/net6.0/Readarr.Mono.xml
+/app/_temp/obj/Readarr.Mono/Debug/net6.0/Readarr.Mono.pdb

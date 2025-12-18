@@ -635,22 +635,22 @@
     ]
   },
   "packageFolders": {
-    "/root/.nuget/packages/": {}
+    "/home/jules/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/workspace/src/NzbDrone.Test.Dummy/Readarr.Test.Dummy.csproj",
+      "projectUniqueName": "/app/src/NzbDrone.Test.Dummy/Readarr.Test.Dummy.csproj",
       "projectName": "Readarr.Test.Dummy",
-      "projectPath": "/workspace/src/NzbDrone.Test.Dummy/Readarr.Test.Dummy.csproj",
-      "packagesPath": "/root/.nuget/packages/",
-      "outputPath": "/workspace/src/NzbDrone.Test.Dummy/../../_temp/obj/Readarr.Test.Dummy/",
+      "projectPath": "/app/src/NzbDrone.Test.Dummy/Readarr.Test.Dummy.csproj",
+      "packagesPath": "/home/jules/.nuget/packages/",
+      "outputPath": "/app/src/NzbDrone.Test.Dummy/../../_temp/obj/Readarr.Test.Dummy/",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "centralPackageVersionsManagementEnabled": true,
       "configFilePaths": [
-        "/workspace/src/nuget.config",
-        "/root/.nuget/NuGet/NuGet.Config"
+        "/app/src/NuGet.config",
+        "/home/jules/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
@@ -769,8 +769,7 @@
           "net47",
           "net471",
           "net472",
-          "net48",
-          "net481"
+          "net48"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -817,6 +816,10 @@
           },
           {
             "name": "Microsoft.NETCore.App.Host.linux-arm",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-arm64",
             "version": "[6.0.36, 6.0.36]"
           },
           {
@@ -897,7 +900,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.428/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/6.0.136/RuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {

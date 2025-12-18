@@ -167,3 +167,7 @@
 /workspace/_temp/obj/Readarr.Integration.Test/Debug/net6.0/Readarr.Integration.Test.pdb
 /workspace/_temp/obj/Readarr.Integration.Test/Debug/net6.0/Readarr.Integration.Test.genruntimeconfig.cache
 /workspace/_temp/obj/Readarr.Integration.Test/Debug/net6.0/ref/Readarr.Integration.Test.dll
+/app/_temp/obj/Readarr.Integration.Test/Debug/net6.0/Readarr.Integration.Test.dll
+/app/_temp/obj/Readarr.Integration.Test/Debug/net6.0/ref/Readarr.Integration.Test.dll
+/app/_temp/obj/Readarr.Integration.Test/Debug/net6.0/Readarr.Integration.Test.xml
+/app/_temp/obj/Readarr.Integration.Test/Debug/net6.0/Readarr.Integration.Test.pdb
