@@ -122,3 +122,7 @@
 /workspace/_temp/obj/Readarr.Api.V1/Debug/net6.0/Readarr.Api.V1.xml
 /workspace/_temp/obj/Readarr.Api.V1/Debug/net6.0/Readarr.Api.V1.pdb
 /workspace/_temp/obj/Readarr.Api.V1/Debug/net6.0/ref/Readarr.Api.V1.dll
+/app/_temp/obj/Readarr.Api.V1/Debug/net6.0/Readarr.Api.V1.dll
+/app/_temp/obj/Readarr.Api.V1/Debug/net6.0/ref/Readarr.Api.V1.dll
+/app/_temp/obj/Readarr.Api.V1/Debug/net6.0/Readarr.Api.V1.xml
+/app/_temp/obj/Readarr.Api.V1/Debug/net6.0/Readarr.Api.V1.pdb

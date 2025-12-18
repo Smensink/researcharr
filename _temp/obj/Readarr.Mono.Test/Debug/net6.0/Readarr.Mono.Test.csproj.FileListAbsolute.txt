@@ -170,3 +170,7 @@
 /workspace/_temp/obj/Readarr.Mono.Test/Debug/net6.0/Readarr.Mono.Test.pdb
 /workspace/_temp/obj/Readarr.Mono.Test/Debug/net6.0/Readarr.Mono.Test.genruntimeconfig.cache
 /workspace/_temp/obj/Readarr.Mono.Test/Debug/net6.0/ref/Readarr.Mono.Test.dll
+/app/_temp/obj/Readarr.Mono.Test/Debug/net6.0/Readarr.Mono.Test.dll
+/app/_temp/obj/Readarr.Mono.Test/Debug/net6.0/ref/Readarr.Mono.Test.dll
+/app/_temp/obj/Readarr.Mono.Test/Debug/net6.0/Readarr.Mono.Test.xml
+/app/_temp/obj/Readarr.Mono.Test/Debug/net6.0/Readarr.Mono.Test.pdb

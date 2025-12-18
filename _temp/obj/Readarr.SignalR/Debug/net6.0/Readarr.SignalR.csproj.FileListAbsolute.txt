@@ -133,3 +133,7 @@
 /workspace/_temp/obj/Readarr.SignalR/Debug/net6.0/Readarr.SignalR.xml
 /workspace/_temp/obj/Readarr.SignalR/Debug/net6.0/Readarr.SignalR.pdb
 /workspace/_temp/obj/Readarr.SignalR/Debug/net6.0/ref/Readarr.SignalR.dll
+/app/_temp/obj/Readarr.SignalR/Debug/net6.0/Readarr.SignalR.dll
+/app/_temp/obj/Readarr.SignalR/Debug/net6.0/ref/Readarr.SignalR.dll
+/app/_temp/obj/Readarr.SignalR/Debug/net6.0/Readarr.SignalR.xml
+/app/_temp/obj/Readarr.SignalR/Debug/net6.0/Readarr.SignalR.pdb

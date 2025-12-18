@@ -128,3 +128,7 @@
 /workspace/_temp/obj/Readarr.Test.Common/Debug/net6.0/Readarr.Test.Common.xml
 /workspace/_temp/obj/Readarr.Test.Common/Debug/net6.0/Readarr.Test.Common.pdb
 /workspace/_temp/obj/Readarr.Test.Common/Debug/net6.0/ref/Readarr.Test.Common.dll
+/app/_temp/obj/Readarr.Test.Common/Debug/net6.0/Readarr.Test.Common.dll
+/app/_temp/obj/Readarr.Test.Common/Debug/net6.0/ref/Readarr.Test.Common.dll
+/app/_temp/obj/Readarr.Test.Common/Debug/net6.0/Readarr.Test.Common.xml
+/app/_temp/obj/Readarr.Test.Common/Debug/net6.0/Readarr.Test.Common.pdb

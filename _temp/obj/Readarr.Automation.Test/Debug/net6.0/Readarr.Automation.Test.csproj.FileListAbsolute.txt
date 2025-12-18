@@ -152,3 +152,7 @@
 /workspace/_temp/obj/Readarr.Automation.Test/Debug/net6.0/Readarr.Automation.Test.pdb
 /workspace/_temp/obj/Readarr.Automation.Test/Debug/net6.0/Readarr.Automation.Test.genruntimeconfig.cache
 /workspace/_temp/obj/Readarr.Automation.Test/Debug/net6.0/ref/Readarr.Automation.Test.dll
+/app/_temp/obj/Readarr.Automation.Test/Debug/net6.0/Readarr.Automation.Test.dll
+/app/_temp/obj/Readarr.Automation.Test/Debug/net6.0/ref/Readarr.Automation.Test.dll
+/app/_temp/obj/Readarr.Automation.Test/Debug/net6.0/Readarr.Automation.Test.xml
+/app/_temp/obj/Readarr.Automation.Test/Debug/net6.0/Readarr.Automation.Test.pdb

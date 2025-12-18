@@ -152,3 +152,7 @@
 /workspace/_temp/obj/Readarr.Host.Test/Debug/net6.0/Readarr.Host.Test.pdb
 /workspace/_temp/obj/Readarr.Host.Test/Debug/net6.0/Readarr.Host.Test.genruntimeconfig.cache
 /workspace/_temp/obj/Readarr.Host.Test/Debug/net6.0/ref/Readarr.Host.Test.dll
+/app/_temp/obj/Readarr.Host.Test/Debug/net6.0/Readarr.Host.Test.dll
+/app/_temp/obj/Readarr.Host.Test/Debug/net6.0/ref/Readarr.Host.Test.dll
+/app/_temp/obj/Readarr.Host.Test/Debug/net6.0/Readarr.Host.Test.xml
+/app/_temp/obj/Readarr.Host.Test/Debug/net6.0/Readarr.Host.Test.pdb

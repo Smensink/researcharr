@@ -128,3 +128,7 @@
 /workspace/_temp/obj/Readarr.Console/Debug/net6.0/Readarr.pdb
 /workspace/_temp/obj/Readarr.Console/Debug/net6.0/Readarr.Console.genruntimeconfig.cache
 /workspace/_temp/obj/Readarr.Console/Debug/net6.0/ref/Readarr.dll
+/app/_temp/obj/Readarr.Console/Debug/net6.0/Readarr.dll
+/app/_temp/obj/Readarr.Console/Debug/net6.0/ref/Readarr.dll
+/app/_temp/obj/Readarr.Console/Debug/net6.0/Readarr.xml
+/app/_temp/obj/Readarr.Console/Debug/net6.0/Readarr.pdb

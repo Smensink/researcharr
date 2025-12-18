@@ -133,3 +133,7 @@
 /workspace/_temp/obj/Readarr.Host/Debug/net6.0/Readarr.Host.xml
 /workspace/_temp/obj/Readarr.Host/Debug/net6.0/Readarr.Host.pdb
 /workspace/_temp/obj/Readarr.Host/Debug/net6.0/ref/Readarr.Host.dll
+/app/_temp/obj/Readarr.Host/Debug/net6.0/Readarr.Host.dll
+/app/_temp/obj/Readarr.Host/Debug/net6.0/ref/Readarr.Host.dll
+/app/_temp/obj/Readarr.Host/Debug/net6.0/Readarr.Host.xml
+/app/_temp/obj/Readarr.Host/Debug/net6.0/Readarr.Host.pdb

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "/workspace/src/NzbDrone.Mono/Readarr.Mono.csproj": {}
+    "/app/src/NzbDrone.Mono/Readarr.Mono.csproj": {}
   },
   "projects": {
-    "/workspace/src/NzbDrone.Common/Readarr.Common.csproj": {
+    "/app/src/NzbDrone.Common/Readarr.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspace/src/NzbDrone.Common/Readarr.Common.csproj",
+        "projectUniqueName": "/app/src/NzbDrone.Common/Readarr.Common.csproj",
         "projectName": "Readarr.Common",
-        "projectPath": "/workspace/src/NzbDrone.Common/Readarr.Common.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/workspace/src/NzbDrone.Common/../../_temp/obj/Readarr.Common/",
+        "projectPath": "/app/src/NzbDrone.Common/Readarr.Common.csproj",
+        "packagesPath": "/home/jules/.nuget/packages/",
+        "outputPath": "/app/src/NzbDrone.Common/../../_temp/obj/Readarr.Common/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "centralPackageVersionsManagementEnabled": true,
         "configFilePaths": [
-          "/workspace/src/nuget.config",
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/app/src/NuGet.config",
+          "/home/jules/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -221,8 +221,7 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -269,6 +268,10 @@
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-arm",
+              "version": "[6.0.36, 6.0.36]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.linux-arm64",
               "version": "[6.0.36, 6.0.36]"
             },
             {
@@ -349,7 +352,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.428/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/6.0.136/RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {
@@ -385,20 +388,20 @@
         }
       }
     },
-    "/workspace/src/NzbDrone.Mono/Readarr.Mono.csproj": {
+    "/app/src/NzbDrone.Mono/Readarr.Mono.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspace/src/NzbDrone.Mono/Readarr.Mono.csproj",
+        "projectUniqueName": "/app/src/NzbDrone.Mono/Readarr.Mono.csproj",
         "projectName": "Readarr.Mono",
-        "projectPath": "/workspace/src/NzbDrone.Mono/Readarr.Mono.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/workspace/src/NzbDrone.Mono/../../_temp/obj/Readarr.Mono/",
+        "projectPath": "/app/src/NzbDrone.Mono/Readarr.Mono.csproj",
+        "packagesPath": "/home/jules/.nuget/packages/",
+        "outputPath": "/app/src/NzbDrone.Mono/../../_temp/obj/Readarr.Mono/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "centralPackageVersionsManagementEnabled": true,
         "configFilePaths": [
-          "/workspace/src/nuget.config",
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/app/src/NuGet.config",
+          "/home/jules/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -415,8 +418,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "/workspace/src/NzbDrone.Common/Readarr.Common.csproj": {
-                "projectPath": "/workspace/src/NzbDrone.Common/Readarr.Common.csproj"
+              "/app/src/NzbDrone.Common/Readarr.Common.csproj": {
+                "projectPath": "/app/src/NzbDrone.Common/Readarr.Common.csproj"
               }
             }
           }
@@ -536,8 +539,7 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -584,6 +586,10 @@
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-arm",
+              "version": "[6.0.36, 6.0.36]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.linux-arm64",
               "version": "[6.0.36, 6.0.36]"
             },
             {
@@ -664,7 +670,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.428/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/6.0.136/RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

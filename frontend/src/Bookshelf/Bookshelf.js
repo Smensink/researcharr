@@ -380,7 +380,7 @@ class Bookshelf extends Component {
                     columns={columns}
                     scroller={scroller}
                     isSmallScreen={isSmallScreen}
-                    overscanRowCount={5}
+                    overscanRowCount={10}
                     rowRenderer={this.rowRenderer}
                     header={
                       <BookshelfTableHeader
