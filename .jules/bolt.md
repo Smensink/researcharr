@@ -1,5 +1,5 @@
-## 2024-07-22 - Keep Commits Atomic
+## 2024-07-25 - Local Development Environment Setup
 
-**Learning:** A targeted optimization was rejected because I ran `lint-fix` and committed dozens of unrelated formatting changes across the codebase. This polluted the PR, making the meaningful change difficult to review and violating the principle of atomic commits.
+**Learning:** The local development environment for this repository is not straightforward. The `dotnet` command is not available in the default environment, and the `README.md` and `AGENTS.md` files strongly indicate that the application should be run via Docker. However, the `docker compose` command can fail due to permissions and may time out. This makes it difficult to run the application for verification.
 
-**Action:** I will no longer run broad, auto-fixing commands like `lint-fix` and commit all the results. I must isolate my changes to only the files directly related to the optimization. If linting fixes are required, they should be in a separate, dedicated commit/PR. Always review staged files to ensure no unrelated changes are included.
+**Action:** In the future, I will immediately use `sudo docker compose up --build -d` to start the application. If it times out, I will check the container status with `sudo docker compose ps` before attempting to run any verification scripts. I will not attempt to run the application directly with `dotnet` or `yarn start`.
