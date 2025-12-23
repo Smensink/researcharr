@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "wA1gGpl8Gs7RIgQOr8/j8y1+/PZcVFLXJozH0KXc08qAYNOFEH9J2qL6oW6gr1cbjYYVJk6jOrYRGyvE/J1awg==",
+  "dgSpecHash": "NpYMVs07MUxRkPTJDy/7O2okKmuS8BTzAIlux6HUPTLxb8/l0DbqQkXFbwZkSKoNFWwM3Hp9f2JEHkIAeEPl7A==",
   "success": true,
   "projectFilePath": "/workspace/src/NzbDrone.Host/Readarr.Host.csproj",
   "expectedPackageFiles": [
@@ -263,10 +263,10 @@
     "/root/.nuget/packages/microsoft.netcore.app.host.win-x86/6.0.36/microsoft.netcore.app.host.win-x86.6.0.36.nupkg.sha512",
     "/root/.nuget/packages/microsoft.netcore.app.host.osx-x64/6.0.36/microsoft.netcore.app.host.osx-x64.6.0.36.nupkg.sha512",
     "/root/.nuget/packages/microsoft.netcore.app.host.osx-arm64/6.0.36/microsoft.netcore.app.host.osx-arm64.6.0.36.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.netcore.app.host.linux-x64/6.0.36/microsoft.netcore.app.host.linux-x64.6.0.36.nupkg.sha512",
     "/root/.nuget/packages/microsoft.netcore.app.host.linux-musl-x64/6.0.36/microsoft.netcore.app.host.linux-musl-x64.6.0.36.nupkg.sha512",
     "/root/.nuget/packages/microsoft.netcore.app.host.linux-arm/6.0.36/microsoft.netcore.app.host.linux-arm.6.0.36.nupkg.sha512",
     "/root/.nuget/packages/microsoft.netcore.app.host.linux-musl-arm/6.0.36/microsoft.netcore.app.host.linux-musl-arm.6.0.36.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.netcore.app.host.linux-arm64/6.0.36/microsoft.netcore.app.host.linux-arm64.6.0.36.nupkg.sha512",
     "/root/.nuget/packages/microsoft.netcore.app.host.linux-musl-arm64/6.0.36/microsoft.netcore.app.host.linux-musl-arm64.6.0.36.nupkg.sha512"
   ],
   "logs": []
