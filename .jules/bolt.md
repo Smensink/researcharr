@@ -1,5 +1,3 @@
-## 2024-07-22 - Keep Commits Atomic
-
-**Learning:** A targeted optimization was rejected because I ran `lint-fix` and committed dozens of unrelated formatting changes across the codebase. This polluted the PR, making the meaningful change difficult to review and violating the principle of atomic commits.
-
-**Action:** I will no longer run broad, auto-fixing commands like `lint-fix` and commit all the results. I must isolate my changes to only the files directly related to the optimization. If linting fixes are required, they should be in a separate, dedicated commit/PR. Always review staged files to ensure no unrelated changes are included.
+## 2024-07-25 - Rejected PR: Never Commit Build Artifacts
+**Learning:** A pull request was rejected because it included thousands of lines of build artifacts (`_output/`, `_temp/`, `.dll`, `.pdb`, `.cache` files) and unrelated feature changes alongside a single, valid optimization. This bloated the repository, made the actual change impossible to review, and violated fundamental source control best practices.
+**Action:** Always ensure commits are atomic and contain only intentional, focused source code changes. Use `git status` or other tools to check for unintended additions before committing. Never commit build outputs, dependencies, or IDE-generated files. When in doubt, reset the workspace to a clean state and re-apply only the necessary changes.
