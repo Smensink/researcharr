@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { memo } from 'react';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
 import formatTime from 'Utilities/Date/formatTime';
 import formatTimeSpan from 'Utilities/Date/formatTimeSpan';
@@ -80,4 +80,7 @@ TimeleftCell.propTypes = {
   timeFormat: PropTypes.string.isRequired
 };
 
-export default TimeleftCell;
+// ⚡ Bolt: Memoize the component to prevent unnecessary re-renders in the queue view,
+// which can update frequently. This is a pure component, so it will only re-render
+// when its props have changed.
+export default memo(TimeleftCell);
