@@ -1,12 +1,12 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v6.0/linux-arm64",
+    "name": ".NETCoreApp,Version=v6.0/linux-x64",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {},
-    ".NETCoreApp,Version=v6.0/linux-arm64": {
+    ".NETCoreApp,Version=v6.0/linux-x64": {
       "Readarr.Api.V1/1.0.0": {
         "dependencies": {
           "FluentValidation": "9.5.4",
