@@ -46720,7 +46720,7 @@
       "crossTargeting": true,
       "centralPackageVersionsManagementEnabled": true,
       "configFilePaths": [
-        "/workspace/src/nuget.config",
+        "/workspace/src/NuGet.config",
         "/root/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
@@ -46913,6 +46913,10 @@
             "version": "[6.0.36, 6.0.36]"
           },
           {
+            "name": "Microsoft.NETCore.App.Host.linux-arm64",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
             "name": "Microsoft.NETCore.App.Host.linux-musl-arm",
             "version": "[6.0.36, 6.0.36]"
           },
@@ -46922,10 +46926,6 @@
           },
           {
             "name": "Microsoft.NETCore.App.Host.linux-musl-x64",
-            "version": "[6.0.36, 6.0.36]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.linux-x64",
             "version": "[6.0.36, 6.0.36]"
           },
           {
