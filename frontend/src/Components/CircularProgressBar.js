@@ -1,120 +1,114 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './CircularProgressBar.css';
 
-class CircularProgressBar extends Component {
+// ⚡ Bolt: Refactored to a functional component with hooks.
+// `useMemo` is used to cache expensive geometric calculations,
+// preventing them from being re-run on every animation frame.
+// `React.memo` prevents re-renders if props haven't changed.
+const CircularProgressBar = React.memo(({
+  className,
+  containerClassName,
+  size,
+  strokeWidth,
+  strokeColor,
+  showProgressText,
+  progress: targetProgress
+}) => {
+  const [progress, setProgress] = useState(0);
+  const requestRef = useRef();
 
-  //
-  // Lifecycle
+  // Memoize geometric calculations
+  const { center, radius, circumference } = useMemo(() => {
+    // ⚡ Bolt: These values are now calculated only when size or strokeWidth change,
+    // not on every single animation frame.
+    const centerVal = size / 2;
+    const radiusVal = centerVal - strokeWidth;
+    const circumferenceVal = Math.PI * (radiusVal * 2);
 
-  constructor(props, context) {
-    super(props, context);
+    return { center: centerVal, radius: radiusVal, circumference: circumferenceVal };
+  }, [size, strokeWidth]);
 
-    this.state = {
-      progress: 0
-    };
-  }
+  // Animation effect
+  useEffect(() => {
+    // ⚡ Bolt: Improved animation logic to handle both increasing and
+    // decreasing progress values, making the component more robust.
+    const step = () => {
+      setProgress((prevProgress) => {
+        if (prevProgress < targetProgress) {
+          // Animate upwards
+          requestRef.current = window.requestAnimationFrame(step);
 
-  componentDidMount() {
-    this._progressStep();
-  }
-
-  componentDidUpdate(prevProps) {
-    const progress = this.props.progress;
-
-    if (prevProps.progress !== progress) {
-      this._cancelProgressStep();
-      this._progressStep();
-    }
-  }
-
-  componentWillUnmount() {
-    this._cancelProgressStep();
-  }
-
-  //
-  // Control
-
-  _progressStep() {
-    this.requestAnimationFrame = window.requestAnimationFrame(() => {
-      this.setState({
-        progress: this.state.progress + 1
-      }, () => {
-        if (this.state.progress < this.props.progress) {
-          this._progressStep();
+          return prevProgress + 1;
         }
+
+        if (prevProgress > targetProgress) {
+          // Animate downwards
+          requestRef.current = window.requestAnimationFrame(step);
+
+          return prevProgress - 1;
+        }
+
+        // Stop animation
+        return prevProgress;
       });
-    });
-  }
+    };
 
-  _cancelProgressStep() {
-    if (this.requestAnimationFrame) {
-      window.cancelAnimationFrame(this.requestAnimationFrame);
-    }
-  }
+    // Start the animation
+    requestRef.current = window.requestAnimationFrame(step);
 
-  //
-  // Render
+    // Cleanup: cancel animation frame on unmount or if targetProgress changes
+    return () => {
+      if (requestRef.current) {
+        window.cancelAnimationFrame(requestRef.current);
+      }
+    };
+  }, [targetProgress]);
 
-  render() {
-    const {
-      className,
-      containerClassName,
-      size,
-      strokeWidth,
-      strokeColor,
-      showProgressText
-    } = this.props;
+  const sizeInPixels = `${size}px`;
+  const strokeDashoffset = ((100 - progress) / 100) * circumference;
+  const progressText = `${Math.round(progress)}%`;
 
-    const progress = this.state.progress;
-
-    const center = size / 2;
-    const radius = center - strokeWidth;
-    const circumference = Math.PI * (radius * 2);
-    const sizeInPixels = `${size}px`;
-    const strokeDashoffset = ((100 - progress) / 100) * circumference;
-    const progressText = `${Math.round(progress)}%`;
-
-    return (
-      <div
-        className={containerClassName}
-        style={{
-          width: sizeInPixels,
-          height: sizeInPixels,
-          lineHeight: sizeInPixels
-        }}
+  return (
+    <div
+      className={containerClassName}
+      style={{
+        width: sizeInPixels,
+        height: sizeInPixels,
+        lineHeight: sizeInPixels
+      }}
+    >
+      <svg
+        className={className}
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
       >
-        <svg
-          className={className}
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-        >
-          <circle
-            fill="transparent"
-            r={radius}
-            cx={center}
-            cy={center}
-            strokeDasharray={circumference}
-            style={{
-              stroke: strokeColor,
-              strokeWidth,
-              strokeDashoffset
-            }}
-          />
-        </svg>
+        <circle
+          fill="transparent"
+          r={radius}
+          cx={center}
+          cy={center}
+          strokeDasharray={circumference}
+          style={{
+            stroke: strokeColor,
+            strokeWidth,
+            strokeDashoffset
+          }}
+        />
+      </svg>
 
-        {
-          showProgressText &&
-            <div className={styles.circularProgressBarText}>
-              {progressText}
-            </div>
-        }
-      </div>
-    );
-  }
-}
+      {showProgressText && (
+        <div className={styles.circularProgressBarText}>
+          {progressText}
+        </div>
+      )}
+    </div>
+  );
+});
+
+CircularProgressBar.displayName = 'CircularProgressBar';
 
 CircularProgressBar.propTypes = {
   className: PropTypes.string,
