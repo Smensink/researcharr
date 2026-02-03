@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Books;
@@ -18,9 +20,12 @@ namespace NzbDrone.Core.Parser
             @"(?:doi[:\s]*)?(?:https?://(?:dx\.)?doi\.org/)?(?<doi>10\.\d{4,}/[^\s""'<>\[\]]+)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        // Pattern for DOIs in filenames where / is replaced with _ or -
+        // Pattern for DOIs in filenames where / is replaced with _, -, or +
+        // Allow dots in the suffix (DOIs can have dots like 10.1046/j.1365-2559.2002.01346.x)
+        // Stop at Sci-Hub suffixes (_Sci-Hub, _sci-hub, etc.), spaces, quotes, or other non-DOI indicators
+        // Note: We exclude _ from the main match to stop at _Sci-Hub, but allow . to handle DOI suffixes with dots
         private static readonly Regex DoiFilenameRegex = new Regex(
-            @"(?<doi>10\.\d{4,}[_\-][^\s""'<>\[\].]+)",
+            @"(?<doi>10\.\d{4,}[_\-\+][^\s""'<>\[\]_]+?)(?:_[Ss]ci[-_]?[Hh]ub|_Sci-Hub|[\s""'<>\[\]]|$)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public static string Normalize(string doi)
@@ -57,6 +62,14 @@ namespace NzbDrone.Core.Parser
                 if (slashIndex > 0 && slashIndex < extractedDoi.Length - 1)
                 {
                     var suffix = extractedDoi.Substring(slashIndex + 1);
+                    
+                    // Strip Sci-Hub suffixes (e.g., _sci-hub-2025, _Sci-Hub:2025, _scihub-2025) - handles both : and -
+                    var sciHubMatch = Regex.Match(suffix, @"^([^_]+)(?:_[Ss]ci[-_]?[Hh]ub[-_:]?\d+.*)$", RegexOptions.IgnoreCase);
+                    if (sciHubMatch.Success && sciHubMatch.Groups[1].Length > 0)
+                    {
+                        suffix = sciHubMatch.Groups[1].Value;
+                        extractedDoi = extractedDoi.Substring(0, slashIndex + 1) + suffix;
+                    }
                     
                     // Look for word boundaries: transition from numbers/special chars to lowercase letters
                     // Pattern: number or special char followed by 3+ lowercase letters (likely a word)
@@ -139,6 +152,15 @@ namespace NzbDrone.Core.Parser
             if (slashIdx > 0 && slashIdx < trimmed.Length - 1)
             {
                 var suffix = trimmed.Substring(slashIdx + 1);
+                
+                // Strip Sci-Hub suffixes (e.g., _sci-hub-2025, _Sci-Hub:2025, _scihub-2025) - handles both : and -
+                var sciHubMatch = Regex.Match(suffix, @"^([^_]+)(?:_[Ss]ci[-_]?[Hh]ub[-_:]?\d+.*)$", RegexOptions.IgnoreCase);
+                if (sciHubMatch.Success && sciHubMatch.Groups[1].Length > 0)
+                {
+                    suffix = sciHubMatch.Groups[1].Value;
+                    trimmed = trimmed.Substring(0, slashIdx + 1) + suffix;
+                }
+                
                 var wordBoundaryMatch = Regex.Match(
                     suffix,
                     @"^([\d\-_\.\(\)]+)([a-z]{3,})",
@@ -268,13 +290,42 @@ namespace NzbDrone.Core.Parser
             if (filenameMatch.Success)
             {
                 var doi = filenameMatch.Groups["doi"].Value;
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "doi-extraction", hypothesisId = "H", location = "DoiUtility.cs:ExtractFromFilename", message = "DOI extracted from filename (filename format)", data = new { filename = filename, extractedDoi = doi }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+                // #endregion
+
+                // The regex should already stop at _Sci-Hub, but strip any remaining Sci-Hub suffixes just in case
+                // Pattern: _sci-hub-2025, _Sci-Hub:2025, _scihub-2025, etc. (handles both : and -)
+                var sciHubMatch = Regex.Match(doi, @"^(.+?)(?:_[Ss]ci[-_]?[Hh]ub[-_:]?\d+.*)$", RegexOptions.IgnoreCase);
+                if (sciHubMatch.Success && sciHubMatch.Groups[1].Length > 0)
+                {
+                    doi = sciHubMatch.Groups[1].Value;
+                }
 
                 // Convert filename separator back to /
-                // Find the position after the registrant code (first _ or - after 10.XXXX)
-                var registrantEnd = doi.IndexOfAny(new[] { '_', '-' });
+                // Find the position after the registrant code (first _, -, or + after 10.XXXX)
+                var registrantEnd = doi.IndexOfAny(new[] { '_', '-', '+' });
                 if (registrantEnd > 0)
                 {
-                    doi = doi.Substring(0, registrantEnd) + "/" + doi.Substring(registrantEnd + 1);
+                    // For DOIs with multiple + signs (e.g., 10.1155+2013+736048), convert all + to /
+                    // This handles cases where / is replaced with + in filenames
+                    // Also handle cases like 10.1046+j.1365-2559.2002.01346.x where + should become /
+                    var prefix = doi.Substring(0, registrantEnd);
+                    var suffix = doi.Substring(registrantEnd + 1);
+                    // Replace all + with / in the suffix (DOIs can have multiple / separators)
+                    suffix = suffix.Replace('+', '/');
+                    doi = prefix + "/" + suffix;
                 }
 
                 doi = doi.TrimEnd('.', ',', ';', ':', ')', ']');

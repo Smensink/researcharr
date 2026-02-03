@@ -1,0 +1,66 @@
+.container {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: var(--tableAlternateRowBackgroundColor);
+  border-radius: 4px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.progress {
+  color: var(--dimColor);
+  font-size: 12px;
+}
+
+.indexerList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.indexerStatus {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 3px;
+  background-color: var(--tableRowBackgroundColor);
+}
+
+.searching {
+  color: var(--infoColor);
+}
+
+.completed {
+  color: var(--successColor);
+}
+
+.failed {
+  color: var(--dangerColor);
+}
+
+.indexerName {
+  font-weight: 500;
+}
+
+.resultCount {
+  color: var(--dimColor);
+  font-size: 11px;
+}
+
+.errorMessage {
+  color: var(--dangerColor);
+  font-size: 11px;
+  cursor: help;
+}

@@ -62,7 +62,9 @@ namespace NzbDrone.Core.Download.Clients.HttpDownload
                     RemainingSize = item.Status == DownloadItemStatus.Completed ? 0 : item.TotalSize,
                     Status = item.Status,
                     Message = item.Message,
-                    OutputPath = new OsPath(item.OutputPath)
+                    OutputPath = new OsPath(item.OutputPath),
+                    CanMoveFiles = item.Status == DownloadItemStatus.Completed,
+                    CanBeRemoved = item.Status == DownloadItemStatus.Completed
                 };
             }
         }

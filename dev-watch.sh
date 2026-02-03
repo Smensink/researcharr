@@ -78,4 +78,4 @@ trap "echo 'Stopping...'; kill $YARN_PID 2>/dev/null || true; exit" INT TERM EXI
 echo "Starting backend watch (dotnet)..."
 echo ""
 export DOTNET_ROOT=/usr/share/dotnet
-dotnet run --project src/NzbDrone.Console/Readarr.Console.csproj --framework net6.0 --nobrowser --data=/data --Urls=http://0.0.0.0:7337
+dotnet watch run --project src/NzbDrone.Console/Readarr.Console.csproj --framework net6.0 --nobrowser --data=/data --Urls=http://0.0.0.0:7337

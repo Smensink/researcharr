@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation.Extensions;
@@ -204,10 +206,40 @@ namespace NzbDrone.Core.MediaFiles.BookImport
 
         private ImportDecision<LocalEdition> GetDecision(LocalEdition localEdition, DownloadClientItem downloadClientItem, ImportDecisionMakerConfig config = null)
         {
+            // #region agent log
+            try
+            {
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "F", location = "ImportDecisionMaker.cs:205", message = "GetDecision entry", data = new { hasEdition = localEdition.Edition != null, editionId = localEdition.Edition?.Id, bookId = localEdition.Edition?.Book?.Value?.Id, authorId = localEdition.Edition?.Book?.Value?.AuthorId, fileCount = localEdition.LocalBooks.Count, configKeepAll = config?.KeepAllEditions, configAddNew = config?.AddNewAuthors }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+            }
+            catch { }
+
+            // #endregion
             ImportDecision<LocalEdition> decision = null;
 
             if (localEdition.Edition == null)
             {
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "F", location = "ImportDecisionMaker.cs:209", message = "Edition is null - checking config", data = new { configKeepAll = config?.KeepAllEditions, configAddNew = config?.AddNewAuthors, willApprove = config != null && config.KeepAllEditions && !config.AddNewAuthors }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
                 // For manual imports (indicated by KeepAllEditions=true and AddNewAuthors=false),
                 // don't reject unmatched files - allow user to manually assign them
                 if (config != null && config.KeepAllEditions && !config.AddNewAuthors)

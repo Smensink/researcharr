@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
 using NLog;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
@@ -79,10 +81,40 @@ namespace NzbDrone.Core.Download
 
         public void Import(TrackedDownload trackedDownload)
         {
+            // #region agent log
+            try
+            {
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "D", location = "CompletedDownloadService.cs:80", message = "Import called", data = new { title = trackedDownload.DownloadItem.Title, state = trackedDownload.State.ToString() }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+            }
+            catch { }
+
+            // #endregion
             SetImportItem(trackedDownload);
 
             if (!ValidatePath(trackedDownload))
             {
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "D", location = "CompletedDownloadService.cs:84", message = "ValidatePath failed", data = new { title = trackedDownload.DownloadItem.Title, outputPath = trackedDownload.ImportItem != null ? trackedDownload.ImportItem.OutputPath.FullPath : "null" }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
                 return;
             }
 
@@ -91,7 +123,37 @@ namespace NzbDrone.Core.Download
             try
             {
                 var outputPath = trackedDownload.ImportItem.OutputPath.FullPath;
-                var importResults = _downloadedTracksImportService.ProcessPath(outputPath, ImportMode.Auto, trackedDownload.RemoteBook?.Author, trackedDownload.DownloadItem);
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "D", location = "CompletedDownloadService.cs:93", message = "About to ProcessPath", data = new { title = trackedDownload.DownloadItem.Title, outputPath = outputPath, pathExists = System.IO.Directory.Exists(outputPath) || System.IO.File.Exists(outputPath) }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
+                var importResults = _downloadedTracksImportService.ProcessPath(outputPath, ImportMode.Auto, trackedDownload.RemoteBook?.Author, trackedDownload.DownloadItem, trackedDownload.RemoteBook);
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "D", location = "CompletedDownloadService.cs:94", message = "ProcessPath completed", data = new { title = trackedDownload.DownloadItem.Title, resultCount = importResults.Count, results = importResults.Select(r => new { result = r.Result.ToString(), path = r.ImportDecision?.Item?.Path ?? "null", errors = r.Errors }).ToList() }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
 
                 if (importResults.Empty())
                 {

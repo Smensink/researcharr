@@ -9,6 +9,7 @@ import { removeItem, update, updateItem } from 'Store/Actions/baseActions';
 import { deleteAuthorBooks } from 'Store/Actions/bookActions';
 import { fetchCommands, finishCommand, updateCommand } from 'Store/Actions/commandActions';
 import { fetchQueue, fetchQueueDetails } from 'Store/Actions/queueActions';
+import { addStreamingResults, streamingSearchComplete, updateSearchProgress } from 'Store/Actions/releaseActions';
 import { fetchQualityDefinitions, fetchRootFolders } from 'Store/Actions/settingsActions';
 import { fetchHealth } from 'Store/Actions/systemActions';
 import { fetchTagDetails, fetchTags } from 'Store/Actions/tagActions';
@@ -54,7 +55,10 @@ const mapDispatchToProps = {
   dispatchFetchQueueDetails: fetchQueueDetails,
   dispatchFetchRootFolders: fetchRootFolders,
   dispatchFetchTags: fetchTags,
-  dispatchFetchTagDetails: fetchTagDetails
+  dispatchFetchTagDetails: fetchTagDetails,
+  dispatchAddStreamingResults: addStreamingResults,
+  dispatchStreamingSearchComplete: streamingSearchComplete,
+  dispatchUpdateSearchProgress: updateSearchProgress
 };
 
 function Logger(minimumLogLevel) {
@@ -291,6 +295,55 @@ class SignalRConnector extends Component {
     }
   };
 
+  handleReleasesearch = (body) => {
+    const {
+      searchId,
+      action,
+      results,
+      indexerId,
+      indexerName,
+      totalIndexers,
+      completedIndexers,
+      indexerStatuses
+    } = body;
+
+    switch (action) {
+      case 'results':
+        this.props.dispatchAddStreamingResults({
+          searchId,
+          results: results || [],
+          indexerId,
+          indexerName,
+          totalIndexers,
+          completedIndexers,
+          indexerStatuses
+        });
+        break;
+
+      case 'indexerComplete':
+      case 'indexerFailed':
+        this.props.dispatchUpdateSearchProgress({
+          searchId,
+          totalIndexers,
+          completedIndexers,
+          indexerStatuses
+        });
+        break;
+
+      case 'complete':
+        this.props.dispatchStreamingSearchComplete({
+          searchId,
+          totalIndexers,
+          completedIndexers,
+          indexerStatuses
+        });
+        break;
+
+      default:
+        console.warn(`[signalR] Unknown releaseSearch action: ${action}`);
+    }
+  };
+
   //
   // Listeners
 
@@ -381,7 +434,10 @@ SignalRConnector.propTypes = {
   dispatchFetchQueueDetails: PropTypes.func.isRequired,
   dispatchFetchRootFolders: PropTypes.func.isRequired,
   dispatchFetchTags: PropTypes.func.isRequired,
-  dispatchFetchTagDetails: PropTypes.func.isRequired
+  dispatchFetchTagDetails: PropTypes.func.isRequired,
+  dispatchAddStreamingResults: PropTypes.func.isRequired,
+  dispatchStreamingSearchComplete: PropTypes.func.isRequired,
+  dispatchUpdateSearchProgress: PropTypes.func.isRequired
 };
 
 export default connect(createMapStateToProps, mapDispatchToProps)(SignalRConnector);

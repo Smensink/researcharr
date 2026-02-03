@@ -8,6 +8,7 @@ import TableBody from 'Components/Table/TableBody';
 import { icons, kinds, sortDirections } from 'Helpers/Props';
 import translate from 'Utilities/String/translate';
 import InteractiveSearchRow from './InteractiveSearchRow';
+import SearchProgress from './SearchProgress';
 import styles from './InteractiveSearch.css';
 
 const columns = [
@@ -95,6 +96,8 @@ function InteractiveSearch(props) {
     searchPayload,
     isFetching,
     isPopulated,
+    isStreamingSearch,
+    searchProgress,
     error,
     totalReleasesCount,
     items,
@@ -108,8 +111,13 @@ function InteractiveSearch(props) {
 
   return (
     <div>
+      <SearchProgress
+        isStreamingSearch={isStreamingSearch}
+        searchProgress={searchProgress}
+      />
+
       {
-        isFetching ? <LoadingIndicator /> : null
+        isFetching && !isStreamingSearch ? <LoadingIndicator /> : null
       }
 
       {
@@ -179,6 +187,8 @@ InteractiveSearch.propTypes = {
   searchPayload: PropTypes.object.isRequired,
   isFetching: PropTypes.bool.isRequired,
   isPopulated: PropTypes.bool.isRequired,
+  isStreamingSearch: PropTypes.bool,
+  searchProgress: PropTypes.object,
   error: PropTypes.object,
   totalReleasesCount: PropTypes.number.isRequired,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,

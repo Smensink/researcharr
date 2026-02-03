@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using LazyCache;
 using LazyCache.Providers;
@@ -68,21 +69,24 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
 
         public HashSet<string> GetChangedAuthors(DateTime startTime)
         {
-            var httpRequest = _requestBuilder.GetRequestBuilder().Create()
-                .SetSegment("route", "author/changed")
-                .AddQueryParam("since", startTime.ToString("o"))
-                .Build();
-
-            httpRequest.SuppressHttpError = true;
-
-            var httpResponse = _httpClient.Get<RecentUpdatesResource>(httpRequest);
-
-            if (httpResponse.Resource == null || httpResponse.Resource.Limited)
+            // #region agent log
+            try
             {
-                return null;
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "post-fix", hypothesisId = "FIX", location = "BookInfoProxy.cs:69", message = "GetChangedAuthors delegating to OpenAlex", data = new { startTime = startTime.ToString("o") }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
             }
+            catch { }
 
-            return new HashSet<string>(httpResponse.Resource.Ids.Select(x => x.ToString()));
+            // #endregion
+            // Researcharr uses OpenAlex for metadata, not the old bookinfo.club API
+            // Delegate to OpenAlexProxy which returns empty HashSet (OpenAlex doesn't support "changed since" queries)
+            return _openAlexProxy.GetChangedAuthors(startTime);
         }
 
         public Author GetAuthorInfo(string foreignAuthorId, bool useCache = true, bool limitWorks = false, Action<List<Book>, int?> onWorkBatch = null, DateTime? updatedSince = null)
@@ -459,7 +463,39 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
             }
 
             // If we still don't have metadata, try to get it from the book's existing author metadata
-            if (metadata == null && book.AuthorMetadata != null && book.AuthorMetadata.IsLoaded)
+            // First check book.Author (set by MapBook) then book.AuthorMetadata
+            if (metadata == null && book.Author != null && book.Author.IsLoaded && book.Author.Value?.Metadata?.Value != null)
+            {
+                metadata = book.Author.Value.Metadata.Value;
+                if (metadata.Type == AuthorMetadataType.Journal || 
+                    string.Equals(metadata.Disambiguation, "Journal", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    author = _authorService.FindById(metadata.ForeignAuthorId);
+                    if (author == null)
+                    {
+                        author = new Author
+                        {
+                            CleanName = Parser.Parser.CleanAuthorName(metadata.Name),
+                            Metadata = metadata,
+                            AddOptions = new AddAuthorOptions
+                            {
+                                BooksToMonitor = new List<string> { book.ForeignBookId }
+                            }
+                        };
+                    }
+                }
+                else
+                {
+                    // Person author - only use if it exists in DB
+                    author = _authorService.FindById(metadata.ForeignAuthorId);
+                    if (author == null)
+                    {
+                        metadata = null;
+                        author = null;
+                    }
+                }
+            }
+            else if (metadata == null && book.AuthorMetadata != null && book.AuthorMetadata.IsLoaded)
             {
                 metadata = book.AuthorMetadata.Value;
                 if (metadata.Type == AuthorMetadataType.Journal || 
@@ -471,7 +507,11 @@ namespace NzbDrone.Core.MetadataSource.BookInfo
                         author = new Author
                         {
                             CleanName = Parser.Parser.CleanAuthorName(metadata.Name),
-                            Metadata = metadata
+                            Metadata = metadata,
+                            AddOptions = new AddAuthorOptions
+                            {
+                                BooksToMonitor = new List<string> { book.ForeignBookId }
+                            }
                         };
                     }
                 }

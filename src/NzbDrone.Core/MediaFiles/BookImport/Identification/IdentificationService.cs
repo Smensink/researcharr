@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation.Extensions;
@@ -129,11 +131,40 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
 
         private void IdentifyRelease(LocalEdition localBookRelease, IdentificationOverrides idOverrides, ImportDecisionMakerConfig config)
         {
+            // #region agent log
+            try
+            {
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "E", location = "IdentificationService.cs:130", message = "IdentifyRelease entry", data = new { fileCount = localBookRelease.LocalBooks.Count, filePaths = localBookRelease.LocalBooks.Select(x => x.Path).ToList(), hasIdOverrides = idOverrides != null, hasAuthor = idOverrides?.Author != null, hasBook = idOverrides?.Book != null }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+            }
+            catch { }
+
+            // #endregion
             var watch = System.Diagnostics.Stopwatch.StartNew();
             var usedRemote = false;
 
             IEnumerable<CandidateEdition> candidateReleases = _candidateService.GetDbCandidatesFromTags(localBookRelease, idOverrides, config.IncludeExisting);
+            // #region agent log
+            try
+            {
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "E", location = "IdentificationService.cs:135", message = "DB candidates retrieved", data = new { candidateCount = candidateReleases.Count() }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+            }
+            catch { }
 
+            // #endregion
             // convert all the TrackFiles that represent extra files to List<LocalTrack>
             // local candidates are actually a list so this is fine to enumerate
             var allLocalTracks = ToLocalTrack(candidateReleases
@@ -146,6 +177,21 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
             {
                 _logger.Debug("No local candidates found, trying remote");
                 candidateReleases = _candidateService.GetRemoteCandidates(localBookRelease, idOverrides);
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "E", location = "IdentificationService.cs:148", message = "Remote candidates retrieved", data = new { candidateCount = candidateReleases.Count(), addNewAuthors = config.AddNewAuthors }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
                 if (!config.AddNewAuthors)
                 {
                     candidateReleases = candidateReleases.Where(x => x.Edition.Book.Value.Id > 0 && x.Edition.Book.Value.AuthorId > 0);
@@ -155,9 +201,38 @@ namespace NzbDrone.Core.MediaFiles.BookImport.Identification
             }
 
             GetBestRelease(localBookRelease, candidateReleases, allLocalTracks, out var seenCandidate);
+            // #region agent log
+            try
+            {
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "E", location = "IdentificationService.cs:157", message = "GetBestRelease completed", data = new { seenCandidate = seenCandidate, hasEdition = localBookRelease.Edition != null, distance = localBookRelease.Edition != null ? localBookRelease.Distance?.NormalizedDistance().ToString() : "null" }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+            }
+            catch { }
 
+            // #endregion
             if (!seenCandidate)
             {
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "import-debug", hypothesisId = "E", location = "IdentificationService.cs:159", message = "No candidate found - will fail import", data = new { filePaths = localBookRelease.LocalBooks.Select(x => x.Path).ToList(), hasIdOverrides = idOverrides != null }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
                 // can't find any candidates even after using remote search
                 // populate the overrides and return
                 foreach (var localTrack in localBookRelease.LocalBooks)

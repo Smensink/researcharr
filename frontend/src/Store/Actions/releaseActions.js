@@ -27,6 +27,15 @@ export const defaultState = {
   items: [],
   sortKey: 'releaseWeight',
   sortDirection: sortDirections.ASCENDING,
+
+  // Streaming search state
+  isStreamingSearch: false,
+  searchId: null,
+  searchProgress: {
+    totalIndexers: 0,
+    completedIndexers: 0,
+    indexerStatuses: {}
+  },
   sortPredicates: {
     age: function(item, direction) {
       return item.ageMinutes;
@@ -236,6 +245,12 @@ export const UPDATE_RELEASE = 'releases/updateRelease';
 export const SET_BOOK_RELEASES_FILTER = 'releases/setBookReleasesFilter';
 export const SET_AUTHOR_RELEASES_FILTER = 'releases/setAuthorReleasesFilter';
 
+// Streaming search actions
+export const START_STREAMING_SEARCH = 'releases/startStreamingSearch';
+export const ADD_STREAMING_RESULTS = 'releases/addStreamingResults';
+export const UPDATE_SEARCH_PROGRESS = 'releases/updateSearchProgress';
+export const STREAMING_SEARCH_COMPLETE = 'releases/streamingSearchComplete';
+
 //
 // Action Creators
 
@@ -247,6 +262,12 @@ export const grabRelease = createThunk(GRAB_RELEASE);
 export const updateRelease = createAction(UPDATE_RELEASE);
 export const setBookReleasesFilter = createAction(SET_BOOK_RELEASES_FILTER);
 export const setAuthorReleasesFilter = createAction(SET_AUTHOR_RELEASES_FILTER);
+
+// Streaming search action creators
+export const startStreamingSearch = createThunk(START_STREAMING_SEARCH);
+export const addStreamingResults = createAction(ADD_STREAMING_RESULTS);
+export const updateSearchProgress = createAction(UPDATE_SEARCH_PROGRESS);
+export const streamingSearchComplete = createAction(STREAMING_SEARCH_COMPLETE);
 
 //
 // Helpers
@@ -302,6 +323,67 @@ export const actionHandlers = handleThunks({
         grabError
       }));
     });
+  },
+
+  [START_STREAMING_SEARCH]: function(getState, payload, dispatch) {
+    // Clear previous results and start streaming search
+    dispatch({
+      type: CLEAR_RELEASES
+    });
+
+    dispatch({
+      type: 'releases/set',
+      payload: {
+        section,
+        isFetching: true,
+        isStreamingSearch: true,
+        searchId: null,
+        items: [],
+        searchProgress: {
+          totalIndexers: 0,
+          completedIndexers: 0,
+          indexerStatuses: {}
+        }
+      }
+    });
+
+    const promise = createAjaxRequest({
+      url: '/release/search',
+      method: 'POST',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify(payload)
+    }).request;
+
+    promise.done((data) => {
+      dispatch({
+        type: 'releases/set',
+        payload: {
+          section,
+          searchId: data.searchId,
+          isFetching: false,
+          isPopulated: true,
+          isStreamingSearch: false,
+          searchProgress: {
+            totalIndexers: data.totalIndexers,
+            completedIndexers: data.completedIndexers,
+            indexerStatuses: {}
+          }
+        }
+      });
+    });
+
+    promise.fail((xhr) => {
+      dispatch({
+        type: 'releases/set',
+        payload: {
+          section,
+          isFetching: false,
+          isStreamingSearch: false,
+          error: xhr
+        }
+      });
+    });
   }
 });
 
@@ -341,6 +423,65 @@ export const reducers = createHandleActions({
 
   [SET_RELEASES_SORT]: createSetClientSideCollectionSortReducer(section),
   [SET_BOOK_RELEASES_FILTER]: createSetClientSideCollectionFilterReducer(bookSection),
-  [SET_AUTHOR_RELEASES_FILTER]: createSetClientSideCollectionFilterReducer(authorSection)
+  [SET_AUTHOR_RELEASES_FILTER]: createSetClientSideCollectionFilterReducer(authorSection),
+
+  [ADD_STREAMING_RESULTS]: (state, { payload }) => {
+    const { results, indexerId, indexerName, totalIndexers, completedIndexers, indexerStatuses } = payload;
+    const newState = Object.assign({}, state);
+    const existingItems = [...newState.items];
+
+    // Add new results, update existing ones if better (fewer rejections)
+    results.forEach((result) => {
+      const existingIndex = existingItems.findIndex((item) => item.guid === result.guid);
+
+      if (existingIndex >= 0) {
+        // Update if this one has fewer rejections
+        const existing = existingItems[existingIndex];
+        if (result.rejections.length < existing.rejections.length) {
+          existingItems[existingIndex] = result;
+        }
+      } else {
+        existingItems.push(result);
+      }
+    });
+
+    newState.items = existingItems;
+    newState.isPopulated = true;
+    newState.searchProgress = {
+      totalIndexers: totalIndexers || state.searchProgress.totalIndexers,
+      completedIndexers: completedIndexers || state.searchProgress.completedIndexers,
+      indexerStatuses: indexerStatuses || state.searchProgress.indexerStatuses
+    };
+
+    return newState;
+  },
+
+  [UPDATE_SEARCH_PROGRESS]: (state, { payload }) => {
+    const { totalIndexers, completedIndexers, indexerStatuses } = payload;
+
+    return {
+      ...state,
+      searchProgress: {
+        totalIndexers: totalIndexers !== undefined ? totalIndexers : state.searchProgress.totalIndexers,
+        completedIndexers: completedIndexers !== undefined ? completedIndexers : state.searchProgress.completedIndexers,
+        indexerStatuses: indexerStatuses || state.searchProgress.indexerStatuses
+      }
+    };
+  },
+
+  [STREAMING_SEARCH_COMPLETE]: (state, { payload }) => {
+    const { totalIndexers, completedIndexers, indexerStatuses } = payload;
+
+    return {
+      ...state,
+      isFetching: false,
+      isStreamingSearch: false,
+      searchProgress: {
+        totalIndexers: totalIndexers || state.searchProgress.totalIndexers,
+        completedIndexers: completedIndexers || state.searchProgress.completedIndexers,
+        indexerStatuses: indexerStatuses || state.searchProgress.indexerStatuses
+      }
+    };
+  }
 
 }, defaultState, section);

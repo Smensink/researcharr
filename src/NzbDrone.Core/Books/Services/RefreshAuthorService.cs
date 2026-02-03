@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation.Extensions;
@@ -446,6 +448,21 @@ namespace NzbDrone.Core.Books
 
         public void Execute(RefreshAuthorCommand message)
         {
+            // #region agent log
+            try
+            {
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "run1", hypothesisId = "A", location = "RefreshAuthorService.cs:447", message = "Execute called", data = new { hasAuthorId = message.AuthorId.HasValue, authorId = message.AuthorId?.ToString(), isNewAuthor = message.IsNewAuthor, trigger = message.Trigger.ToString(), lastExecutionTime = message.LastExecutionTime?.ToString("o") }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+            }
+            catch { }
+
+            // #endregion
             if (message.AuthorId.HasValue)
             {
                 RefreshSelectedAuthors(new List<int> { message.AuthorId.Value }, message.IsNewAuthor, message.Trigger);
@@ -466,7 +483,37 @@ namespace NzbDrone.Core.Books
 
                 if (message.LastExecutionTime.HasValue && message.LastExecutionTime.Value.AddDays(14) > DateTime.UtcNow)
                 {
+                    // #region agent log
+                    try
+                    {
+                        var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                        if (!System.IO.File.Exists(logPath))
+                        {
+                            logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                            logPath = System.IO.Path.GetFullPath(logPath);
+                        }
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                        System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "run1", hypothesisId = "A", location = "RefreshAuthorService.cs:469", message = "About to call GetChangedAuthors", data = new { lastStartTime = message.LastStartTime?.ToString("o") }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                    }
+                    catch { }
+
+                    // #endregion
                     updatedGoodreadsAuthors = _authorInfo.GetChangedAuthors(message.LastStartTime.Value);
+                    // #region agent log
+                    try
+                    {
+                        var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                        if (!System.IO.File.Exists(logPath))
+                        {
+                            logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                            logPath = System.IO.Path.GetFullPath(logPath);
+                        }
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                        System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "run1", hypothesisId = "A", location = "RefreshAuthorService.cs:470", message = "GetChangedAuthors returned", data = new { resultCount = updatedGoodreadsAuthors?.Count ?? -1 }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                    }
+                    catch { }
+
+                    // #endregion
                 }
 
                 foreach (var author in authors)

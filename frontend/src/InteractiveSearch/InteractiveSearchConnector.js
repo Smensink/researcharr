@@ -10,11 +10,15 @@ import InteractiveSearch from './InteractiveSearch';
 function createMapStateToProps(appState, { type }) {
   return createSelector(
     (state) => state.releases.items.length,
+    (state) => state.releases.isStreamingSearch,
+    (state) => state.releases.searchProgress,
     createClientSideCollectionSelector('releases', `releases.${type}`),
     createUISettingsSelector(),
-    (totalReleasesCount, releases, uiSettings) => {
+    (totalReleasesCount, isStreamingSearch, searchProgress, releases, uiSettings) => {
       return {
         totalReleasesCount,
+        isStreamingSearch,
+        searchProgress,
         longDateFormat: uiSettings.longDateFormat,
         timeFormat: uiSettings.timeFormat,
         ...releases
@@ -27,6 +31,10 @@ function createMapDispatchToProps(dispatch, props) {
   return {
     dispatchFetchReleases(payload) {
       dispatch(releaseActions.fetchReleases(payload));
+    },
+
+    dispatchStartStreamingSearch(payload) {
+      dispatch(releaseActions.startStreamingSearch(payload));
     },
 
     onSortPress(sortKey, sortDirection) {
@@ -56,14 +64,14 @@ class InteractiveSearchConnector extends Component {
     const {
       searchPayload,
       isPopulated,
-      dispatchFetchReleases
+      dispatchStartStreamingSearch
     } = this.props;
 
-    // If search results are not yet isPopulated fetch them,
+    // If search results are not yet isPopulated, start streaming search
     // otherwise re-show the existing props.
 
     if (!isPopulated) {
-      dispatchFetchReleases(searchPayload);
+      dispatchStartStreamingSearch(searchPayload);
     }
   }
 
@@ -73,6 +81,7 @@ class InteractiveSearchConnector extends Component {
   render() {
     const {
       dispatchFetchReleases,
+      dispatchStartStreamingSearch,
       ...otherProps
     } = this.props;
 
@@ -88,7 +97,10 @@ class InteractiveSearchConnector extends Component {
 InteractiveSearchConnector.propTypes = {
   searchPayload: PropTypes.object.isRequired,
   isPopulated: PropTypes.bool.isRequired,
-  dispatchFetchReleases: PropTypes.func.isRequired
+  isStreamingSearch: PropTypes.bool,
+  searchProgress: PropTypes.object,
+  dispatchFetchReleases: PropTypes.func.isRequired,
+  dispatchStartStreamingSearch: PropTypes.func.isRequired
 };
 
 export default connect(createMapStateToProps, createMapDispatchToProps)(InteractiveSearchConnector);

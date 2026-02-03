@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
@@ -325,6 +326,21 @@ namespace NzbDrone.Common.Http.Dispatchers
 
         private static async ValueTask<Stream> attemptConnection(AddressFamily addressFamily, SocketsHttpConnectionContext context, CancellationToken cancellationToken)
         {
+            // #region agent log
+            try
+            {
+                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                if (!System.IO.File.Exists(logPath))
+                {
+                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                    logPath = System.IO.Path.GetFullPath(logPath);
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "run1", hypothesisId = "C", location = "ManagedHttpDispatcher.cs:326", message = "attemptConnection entry", data = new { addressFamily = addressFamily.ToString(), host = context.DnsEndPoint?.Host, port = context.DnsEndPoint?.Port }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+            }
+            catch { }
+
+            // #endregion
             // The following socket constructor will create a dual-mode socket on systems where IPV6 is available.
             var socket = new Socket(addressFamily, SocketType.Stream, ProtocolType.Tcp)
             {
@@ -334,14 +350,44 @@ namespace NzbDrone.Common.Http.Dispatchers
 
             try
             {
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "run1", hypothesisId = "C", location = "ManagedHttpDispatcher.cs:337", message = "About to connect", data = new { host = context.DnsEndPoint?.Host, port = context.DnsEndPoint?.Port, addressFamily = addressFamily.ToString() }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
                 await socket.ConnectAsync(context.DnsEndPoint, cancellationToken).ConfigureAwait(false);
 
                 // The stream should take the ownership of the underlying socket,
                 // closing it when it's disposed.
                 return new NetworkStream(socket, ownsSocket: true);
             }
-            catch
+            catch (Exception ex)
             {
+                // #region agent log
+                try
+                {
+                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                    if (!System.IO.File.Exists(logPath))
+                    {
+                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                        logPath = System.IO.Path.GetFullPath(logPath);
+                    }
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "run1", hypothesisId = "C", location = "ManagedHttpDispatcher.cs:343", message = "Connection failed", data = new { host = context.DnsEndPoint?.Host, port = context.DnsEndPoint?.Port, addressFamily = addressFamily.ToString(), exceptionType = ex.GetType().Name, exceptionMessage = ex.Message, socketError = (ex as System.Net.Sockets.SocketException)?.SocketErrorCode.ToString() }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                }
+                catch { }
+
+                // #endregion
                 socket.Dispose();
                 throw;
             }

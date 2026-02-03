@@ -112,6 +112,11 @@
             Extract DOI from an Edition's Links or its parent Book's Links
             </summary>
         </member>
+        <member name="M:NzbDrone.Core.MediaFiles.DownloadedBooksImportService.CreateIdentificationOverrides(NzbDrone.Core.Books.Author,System.String,NzbDrone.Core.Parser.Model.RemoteBook)">
+            <summary>
+            Create IdentificationOverrides with DOI matching from filename to RemoteBook
+            </summary>
+        </member>
         <member name="M:NzbDrone.Core.MetadataSource.CrossRef.ICrossRefProxy.GetBookByDoi(System.String,System.Boolean)">
             <summary>
             Get book/paper information by DOI

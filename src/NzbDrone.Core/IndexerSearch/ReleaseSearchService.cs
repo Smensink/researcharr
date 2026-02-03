@@ -17,6 +17,10 @@ namespace NzbDrone.Core.IndexerSearch
     {
         Task<List<DownloadDecision>> BookSearch(int bookId, bool missingOnly, bool userInvokedSearch, bool interactiveSearch);
         Task<List<DownloadDecision>> AuthorSearch(int authorId, bool missingOnly, bool userInvokedSearch, bool interactiveSearch);
+
+        // Streaming search methods
+        Task<SearchSession> BookSearchStreaming(int bookId, bool userInvokedSearch, bool interactiveSearch, Func<SearchSession, IIndexer, List<DownloadDecision>, Task> onResultsCallback);
+        Task<SearchSession> AuthorSearchStreaming(int authorId, bool userInvokedSearch, bool interactiveSearch, Func<SearchSession, IIndexer, List<DownloadDecision>, Task> onResultsCallback);
     }
 
     public class ReleaseSearchService : ISearchForReleases
@@ -26,6 +30,7 @@ namespace NzbDrone.Core.IndexerSearch
         private readonly IBookService _bookService;
         private readonly IAuthorService _authorService;
         private readonly IMakeDownloadDecision _makeDownloadDecision;
+        private readonly ISearchSessionService _searchSessionService;
         private readonly Logger _logger;
 
         public ReleaseSearchService(IIndexerFactory indexerFactory,
@@ -33,6 +38,7 @@ namespace NzbDrone.Core.IndexerSearch
                                 IBookService bookService,
                                 IAuthorService authorService,
                                 IMakeDownloadDecision makeDownloadDecision,
+                                ISearchSessionService searchSessionService,
                                 Logger logger)
         {
             _indexerFactory = indexerFactory;
@@ -40,6 +46,7 @@ namespace NzbDrone.Core.IndexerSearch
             _bookService = bookService;
             _authorService = authorService;
             _makeDownloadDecision = makeDownloadDecision;
+            _searchSessionService = searchSessionService;
             _logger = logger;
         }
 
@@ -240,6 +247,149 @@ namespace NzbDrone.Core.IndexerSearch
             }
 
             return null;
+        }
+
+        public async Task<SearchSession> BookSearchStreaming(int bookId, bool userInvokedSearch, bool interactiveSearch, Func<SearchSession, IIndexer, List<DownloadDecision>, Task> onResultsCallback)
+        {
+            var book = _bookService.GetBook(bookId);
+            var author = _authorService.GetAuthor(book.AuthorId);
+
+            var searchSpec = Get<BookSearchCriteria>(author, new List<Book> { book }, userInvokedSearch, interactiveSearch);
+
+            var monitoredEdition = book.Editions.Value.SingleOrDefault(x => x.Monitored);
+            searchSpec.BookTitle = monitoredEdition?.Title ?? book.Title;
+
+            // Extract DOI from book
+            var doiLink = book.Links?.FirstOrDefault(l => l.Name?.Equals("DOI", StringComparison.OrdinalIgnoreCase) == true);
+            if (doiLink != null && !string.IsNullOrWhiteSpace(doiLink.Url))
+            {
+                searchSpec.BookDoi = Parser.DoiUtility.Normalize(doiLink.Url);
+            }
+            else if (monitoredEdition != null && !string.IsNullOrWhiteSpace(monitoredEdition.Isbn13))
+            {
+                var normalizedDoi = Parser.DoiUtility.Normalize(monitoredEdition.Isbn13);
+                if (normalizedDoi != null)
+                {
+                    searchSpec.BookDoi = normalizedDoi;
+                }
+                else
+                {
+                    searchSpec.BookIsbn = monitoredEdition.Isbn13;
+                }
+            }
+
+            if (monitoredEdition != null)
+            {
+                searchSpec.Disambiguation = monitoredEdition.Disambiguation;
+            }
+
+            if (book.ReleaseDate.HasValue)
+            {
+                searchSpec.BookYear = book.ReleaseDate.Value.Year;
+            }
+
+            return await DispatchStreaming(indexer => indexer.Fetch(searchSpec), searchSpec, onResultsCallback, bookId: bookId);
+        }
+
+        public async Task<SearchSession> AuthorSearchStreaming(int authorId, bool userInvokedSearch, bool interactiveSearch, Func<SearchSession, IIndexer, List<DownloadDecision>, Task> onResultsCallback)
+        {
+            var author = _authorService.GetAuthor(authorId);
+            var searchSpec = Get<AuthorSearchCriteria>(author, userInvokedSearch, interactiveSearch);
+            var books = _bookService.GetBooksByAuthor(author.Id);
+
+            books = books.Where(a => a.Monitored).ToList();
+            searchSpec.Books = books;
+
+            return await DispatchStreaming(indexer => indexer.Fetch(searchSpec), searchSpec, onResultsCallback, authorId: authorId);
+        }
+
+        private async Task<SearchSession> DispatchStreaming(
+            Func<IIndexer, Task<IList<ReleaseInfo>>> searchAction,
+            SearchCriteriaBase criteriaBase,
+            Func<SearchSession, IIndexer, List<DownloadDecision>, Task> onResultsCallback,
+            int? bookId = null,
+            int? authorId = null)
+        {
+            var indexers = criteriaBase.InteractiveSearch ?
+                _indexerFactory.InteractiveSearchEnabled() :
+                _indexerFactory.AutomaticSearchEnabled();
+
+            // Filter indexers to untagged indexers and indexers with intersecting tags
+            indexers = indexers.Where(i => i.Definition.Tags.Empty() || i.Definition.Tags.Intersect(criteriaBase.Author.Tags).Any()).ToList();
+
+            _logger.ProgressInfo("Starting streaming search for {0}. {1} active indexers", criteriaBase, indexers.Count);
+
+            // Create a session to track this search
+            var session = _searchSessionService.CreateSession(criteriaBase, indexers, bookId, authorId);
+
+            if (!indexers.Any())
+            {
+                _searchSessionService.MarkSearchComplete(session.SearchId);
+                return session;
+            }
+
+            // Create a dictionary mapping tasks to their indexers
+            var taskToIndexer = new Dictionary<Task<IList<ReleaseInfo>>, IIndexer>();
+            foreach (var indexer in indexers)
+            {
+                var task = DispatchIndexer(searchAction, indexer, criteriaBase);
+                taskToIndexer.Add(task, indexer);
+            }
+
+            // Process results as each indexer completes
+            while (taskToIndexer.Any())
+            {
+                var completedTask = await Task.WhenAny(taskToIndexer.Keys);
+                var indexer = taskToIndexer[completedTask];
+                taskToIndexer.Remove(completedTask);
+
+                try
+                {
+                    var results = await completedTask;
+
+                    // Process through decision engine
+                    var decisions = _makeDownloadDecision.GetSearchDecision(results.ToList(), criteriaBase).ToList();
+
+                    // Merge with session (handles deduplication)
+                    var newOrBetterDecisions = _searchSessionService.MergeDecisions(session.SearchId, indexer, decisions);
+
+                    // Mark indexer as complete
+                    _searchSessionService.MarkIndexerComplete(session.SearchId, indexer.Definition.Id, results.Count);
+
+                    // Notify callback with new/better decisions
+                    if (newOrBetterDecisions.Any())
+                    {
+                        await onResultsCallback(session, indexer, newOrBetterDecisions);
+                    }
+                    else
+                    {
+                        // Still notify so frontend knows indexer completed
+                        await onResultsCallback(session, indexer, new List<DownloadDecision>());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error processing results from indexer {0}", indexer.Definition.Name);
+                    _searchSessionService.MarkIndexerFailed(session.SearchId, indexer.Definition.Id, ex.Message);
+
+                    // Notify callback about the failure (empty results)
+                    await onResultsCallback(session, indexer, new List<DownloadDecision>());
+                }
+            }
+
+            // Update last search time
+            if (indexers.Any())
+            {
+                var lastSearchTime = DateTime.UtcNow;
+                _logger.Debug("Setting last search time to: {0}", lastSearchTime);
+                criteriaBase.Books.ForEach(a => a.LastSearchTime = lastSearchTime);
+                _bookService.UpdateLastSearchTime(criteriaBase.Books);
+            }
+
+            _searchSessionService.MarkSearchComplete(session.SearchId);
+            _logger.ProgressInfo("Streaming search complete for {0}. Total results: {1}", criteriaBase, session.BestDecisionByGuid.Count);
+
+            return session;
         }
 
         private List<DownloadDecision> DeDupeDecisions(List<DownloadDecision> decisions)

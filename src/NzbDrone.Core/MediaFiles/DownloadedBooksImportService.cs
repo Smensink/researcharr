@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Text.Json;
 using NLog;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.EnvironmentInfo;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Books;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download;
@@ -21,6 +23,7 @@ namespace NzbDrone.Core.MediaFiles
     {
         List<ImportResult> ProcessRootFolder(IDirectoryInfo directoryInfo);
         List<ImportResult> ProcessPath(string path, ImportMode importMode = ImportMode.Auto, Author author = null, DownloadClientItem downloadClientItem = null);
+        List<ImportResult> ProcessPath(string path, ImportMode importMode, Author author, DownloadClientItem downloadClientItem, Parser.Model.RemoteBook remoteBook);
         bool ShouldDeleteFolder(IDirectoryInfo directoryInfo);
     }
 
@@ -34,6 +37,8 @@ namespace NzbDrone.Core.MediaFiles
         private readonly IImportApprovedBooks _importApprovedTracks;
         private readonly IEventAggregator _eventAggregator;
         private readonly IRuntimeInfo _runtimeInfo;
+        private readonly IBookService _bookService;
+        private readonly IEditionService _editionService;
         private readonly Logger _logger;
 
         public DownloadedBooksImportService(IDiskProvider diskProvider,
@@ -44,6 +49,8 @@ namespace NzbDrone.Core.MediaFiles
                                              IImportApprovedBooks importApprovedTracks,
                                              IEventAggregator eventAggregator,
                                              IRuntimeInfo runtimeInfo,
+                                             IBookService bookService,
+                                             IEditionService editionService,
                                              Logger logger)
         {
             _diskProvider = diskProvider;
@@ -54,6 +61,8 @@ namespace NzbDrone.Core.MediaFiles
             _importApprovedTracks = importApprovedTracks;
             _eventAggregator = eventAggregator;
             _runtimeInfo = runtimeInfo;
+            _bookService = bookService;
+            _editionService = editionService;
             _logger = logger;
         }
 
@@ -78,6 +87,11 @@ namespace NzbDrone.Core.MediaFiles
 
         public List<ImportResult> ProcessPath(string path, ImportMode importMode = ImportMode.Auto, Author author = null, DownloadClientItem downloadClientItem = null)
         {
+            return ProcessPath(path, importMode, author, downloadClientItem, null);
+        }
+
+        public List<ImportResult> ProcessPath(string path, ImportMode importMode, Author author, DownloadClientItem downloadClientItem, Parser.Model.RemoteBook remoteBook)
+        {
             _logger.Debug("Processing path: {0}", path);
 
             if (_diskProvider.FolderExists(path))
@@ -86,10 +100,10 @@ namespace NzbDrone.Core.MediaFiles
 
                 if (author == null)
                 {
-                    return ProcessFolder(directoryInfo, importMode, downloadClientItem);
+                    return ProcessFolder(directoryInfo, importMode, downloadClientItem, remoteBook);
                 }
 
-                return ProcessFolder(directoryInfo, importMode, author, downloadClientItem);
+                return ProcessFolder(directoryInfo, importMode, author, downloadClientItem, remoteBook);
             }
 
             if (_diskProvider.FileExists(path))
@@ -98,10 +112,10 @@ namespace NzbDrone.Core.MediaFiles
 
                 if (author == null)
                 {
-                    return ProcessFile(fileInfo, importMode, downloadClientItem);
+                    return ProcessFile(fileInfo, importMode, downloadClientItem, remoteBook);
                 }
 
-                return ProcessFile(fileInfo, importMode, author, downloadClientItem);
+                return ProcessFile(fileInfo, importMode, author, downloadClientItem, remoteBook);
             }
 
             LogInaccessiblePathError(path);
@@ -153,15 +167,15 @@ namespace NzbDrone.Core.MediaFiles
             }
         }
 
-        private List<ImportResult> ProcessFolder(IDirectoryInfo directoryInfo, ImportMode importMode, DownloadClientItem downloadClientItem)
+        private List<ImportResult> ProcessFolder(IDirectoryInfo directoryInfo, ImportMode importMode, DownloadClientItem downloadClientItem, Parser.Model.RemoteBook remoteBook = null)
         {
             var cleanedUpName = GetCleanedUpFolderName(directoryInfo.Name);
             var author = _parsingService.GetAuthor(cleanedUpName);
 
-            return ProcessFolder(directoryInfo, importMode, author, downloadClientItem);
+            return ProcessFolder(directoryInfo, importMode, author, downloadClientItem, remoteBook);
         }
 
-        private List<ImportResult> ProcessFolder(IDirectoryInfo directoryInfo, ImportMode importMode, Author author, DownloadClientItem downloadClientItem)
+        private List<ImportResult> ProcessFolder(IDirectoryInfo directoryInfo, ImportMode importMode, Author author, DownloadClientItem downloadClientItem, Parser.Model.RemoteBook remoteBook = null)
         {
             if (_authorService.AuthorPathExists(directoryInfo.FullName))
             {
@@ -207,10 +221,7 @@ namespace NzbDrone.Core.MediaFiles
                 }
             }
 
-            var idOverrides = new IdentificationOverrides
-            {
-                Author = author
-            };
+            var idOverrides = CreateIdentificationOverrides(author, directoryInfo.FullName, remoteBook);
             var idInfo = new ImportDecisionMakerInfo
             {
                 DownloadClientItem = downloadClientItem,
@@ -252,7 +263,7 @@ namespace NzbDrone.Core.MediaFiles
             return importResults;
         }
 
-        private List<ImportResult> ProcessFile(IFileInfo fileInfo, ImportMode importMode, DownloadClientItem downloadClientItem)
+        private List<ImportResult> ProcessFile(IFileInfo fileInfo, ImportMode importMode, DownloadClientItem downloadClientItem, Parser.Model.RemoteBook remoteBook = null)
         {
             var author = _parsingService.GetAuthor(Path.GetFileNameWithoutExtension(fileInfo.Name));
 
@@ -266,10 +277,10 @@ namespace NzbDrone.Core.MediaFiles
                        };
             }
 
-            return ProcessFile(fileInfo, importMode, author, downloadClientItem);
+            return ProcessFile(fileInfo, importMode, author, downloadClientItem, remoteBook);
         }
 
-        private List<ImportResult> ProcessFile(IFileInfo fileInfo, ImportMode importMode, Author author, DownloadClientItem downloadClientItem)
+        private List<ImportResult> ProcessFile(IFileInfo fileInfo, ImportMode importMode, Author author, DownloadClientItem downloadClientItem, Parser.Model.RemoteBook remoteBook = null)
         {
             if (Path.GetFileNameWithoutExtension(fileInfo.Name).StartsWith("._"))
             {
@@ -292,10 +303,7 @@ namespace NzbDrone.Core.MediaFiles
                 }
             }
 
-            var idOverrides = new IdentificationOverrides
-            {
-                Author = author
-            };
+            var idOverrides = CreateIdentificationOverrides(author, fileInfo.FullName, remoteBook);
 
             // Try to extract ParsedBookInfo from downloadClientItem title to help with book matching
             ParsedBookInfo parsedBookInfo = null;
@@ -324,8 +332,35 @@ namespace NzbDrone.Core.MediaFiles
             };
 
             var decisions = _importDecisionMaker.GetImportDecisions(new List<IFileInfo>() { fileInfo }, idOverrides, idInfo, idConfig);
+            var importResults = _importApprovedTracks.Import(decisions, true, downloadClientItem, importMode);
 
-            return _importApprovedTracks.Import(decisions, true, downloadClientItem, importMode);
+            // Determine actual import mode for cleanup
+            if (importMode == ImportMode.Auto)
+            {
+                importMode = (downloadClientItem == null || downloadClientItem.CanMoveFiles) ? ImportMode.Move : ImportMode.Copy;
+            }
+
+            // If files were imported and we're in Move mode, delete the source file
+            if (importMode == ImportMode.Move &&
+                importResults.Any(i => i.Result == ImportResultType.Imported) &&
+                _diskProvider.FileExists(fileInfo.FullName))
+            {
+                _logger.Debug("Deleting source file after importing: {0}", fileInfo.FullName);
+                try
+                {
+                    _diskProvider.DeleteFile(fileInfo.FullName);
+                }
+                catch (IOException e)
+                {
+                    _logger.Debug(e, "Unable to delete source file after importing: {0}", e.Message);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    _logger.Debug(e, "Unable to delete source file after importing: {0}", e.Message);
+                }
+            }
+
+            return importResults;
         }
 
         private string GetCleanedUpFolderName(string folder)
@@ -379,6 +414,132 @@ namespace NzbDrone.Core.MediaFiles
             }
 
             _logger.Error("Import failed, path does not exist or is not accessible by Readarr: {0}. Ensure the path exists and the user running Readarr has the correct permissions to access this file/folder", path);
+        }
+
+        /// <summary>
+        /// Create IdentificationOverrides with DOI matching from filename to RemoteBook
+        /// </summary>
+        private IdentificationOverrides CreateIdentificationOverrides(Author author, string filePath, Parser.Model.RemoteBook remoteBook)
+        {
+            var idOverrides = new IdentificationOverrides
+            {
+                Author = author
+            };
+
+            // If we have a RemoteBook, try to match DOI from filename to requested DOI
+            if (remoteBook != null && remoteBook.Books != null && remoteBook.Books.Any())
+            {
+                // Extract DOI from filename
+                var filename = Path.GetFileNameWithoutExtension(filePath);
+                var fileDoi = Parser.DoiUtility.ExtractFromFilename(filename);
+                var normalizedFileDoi = Parser.DoiUtility.Normalize(fileDoi);
+
+                if (normalizedFileDoi.IsNotNullOrWhiteSpace())
+                {
+                    _logger.Debug($"Extracted DOI from filename '{filename}': {normalizedFileDoi}");
+                    // #region agent log
+                    try
+                    {
+                        var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                        if (!System.IO.File.Exists(logPath))
+                        {
+                            logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                            logPath = System.IO.Path.GetFullPath(logPath);
+                        }
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                        System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "doi-matching", hypothesisId = "F", location = "DownloadedBooksImportService.cs:CreateIdentificationOverrides", message = "Extracted DOI from filename", data = new { filename = filename, extractedDoi = normalizedFileDoi, remoteBookCount = remoteBook.Books.Count }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                    }
+                    catch { }
+                    // #endregion
+
+                    // Try to find matching book by DOI in RemoteBook
+                    foreach (var book in remoteBook.Books)
+                    {
+                        // Get DOI from book's Links
+                        var bookDoi = book.Links?.FirstOrDefault(l => 
+                            l.Name?.Equals("DOI", StringComparison.OrdinalIgnoreCase) == true ||
+                            l.Name?.Equals("doi", StringComparison.OrdinalIgnoreCase) == true)?.Url;
+                        
+                        if (bookDoi.IsNotNullOrWhiteSpace())
+                        {
+                            var normalizedBookDoi = Parser.DoiUtility.Normalize(bookDoi);
+                            // #region agent log
+                            try
+                            {
+                                var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                                if (!System.IO.File.Exists(logPath))
+                                {
+                                    logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                                    logPath = System.IO.Path.GetFullPath(logPath);
+                                }
+                                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                                System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "doi-matching", hypothesisId = "F", location = "DownloadedBooksImportService.cs:CreateIdentificationOverrides", message = "Comparing DOIs", data = new { fileDoi = normalizedFileDoi, bookDoi = normalizedBookDoi, bookId = book.Id, match = normalizedBookDoi == normalizedFileDoi }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                            }
+                            catch { }
+                            // #endregion
+                            
+                            if (normalizedBookDoi == normalizedFileDoi)
+                            {
+                                _logger.Debug($"DOI match found: {normalizedFileDoi} -> Book ID {book.Id}, setting Book and Edition in IdentificationOverrides");
+                                // #region agent log
+                                try
+                                {
+                                    var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                                    if (!System.IO.File.Exists(logPath))
+                                    {
+                                        logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                                        logPath = System.IO.Path.GetFullPath(logPath);
+                                    }
+                                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                                    System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "doi-matching", hypothesisId = "F", location = "DownloadedBooksImportService.cs:CreateIdentificationOverrides", message = "DOI match found, setting Book and Edition", data = new { fileDoi = normalizedFileDoi, bookId = book.Id }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                                }
+                                catch { }
+                                // #endregion
+                                
+                                // Get the book from database (RemoteBook might have incomplete data)
+                                var dbBook = _bookService.GetBook(book.Id);
+                                if (dbBook != null)
+                                {
+                                    idOverrides.Book = dbBook;
+                                    
+                                    // Try to find edition by ForeignEditionId (which is often the DOI)
+                                    var edition = _editionService.GetEditionByForeignEditionId(normalizedBookDoi);
+                                    if (edition == null && dbBook.Editions?.Value != null)
+                                    {
+                                        // Fallback: use the monitored edition or first edition
+                                        edition = dbBook.Editions.Value.FirstOrDefault(e => e.Monitored) ?? 
+                                                 dbBook.Editions.Value.FirstOrDefault();
+                                    }
+                                    
+                                    if (edition != null)
+                                    {
+                                        idOverrides.Edition = edition;
+                                        _logger.Debug($"Set Edition ID {edition.Id} in IdentificationOverrides");
+                                        // #region agent log
+                                        try
+                                        {
+                                            var logPath = System.IO.Path.Combine("/workspace", ".cursor", "debug.log");
+                                            if (!System.IO.File.Exists(logPath))
+                                            {
+                                                logPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".", "..", "..", "..", ".cursor", "debug.log");
+                                                logPath = System.IO.Path.GetFullPath(logPath);
+                                            }
+                                            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath) ?? ".");
+                                            System.IO.File.AppendAllText(logPath, System.Text.Json.JsonSerializer.Serialize(new { sessionId = "debug-session", runId = "doi-matching", hypothesisId = "F", location = "DownloadedBooksImportService.cs:CreateIdentificationOverrides", message = "Set Book and Edition in IdentificationOverrides", data = new { bookId = dbBook.Id, editionId = edition.Id }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }) + "\n");
+                                        }
+                                        catch { }
+                                        // #endregion
+                                    }
+                                    
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return idOverrides;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ using NzbDrone.Core.IndexerSearch;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Validation;
+using NzbDrone.SignalR;
 using Readarr.Http;
 using HttpStatusCode = System.Net.HttpStatusCode;
 
@@ -31,6 +33,8 @@ namespace Readarr.Api.V1.Indexers
         private readonly IAuthorService _authorService;
         private readonly IBookService _bookService;
         private readonly IParsingService _parsingService;
+        private readonly IBroadcastSignalRMessage _signalRBroadcast;
+        private readonly ISearchSessionService _searchSessionService;
         private readonly Logger _logger;
 
         private readonly ICached<RemoteBook> _remoteBookCache;
@@ -43,6 +47,8 @@ namespace Readarr.Api.V1.Indexers
                              IAuthorService authorService,
                              IBookService bookService,
                              IParsingService parsingService,
+                             IBroadcastSignalRMessage signalRBroadcast,
+                             ISearchSessionService searchSessionService,
                              ICacheManager cacheManager,
                              Logger logger)
         {
@@ -54,6 +60,8 @@ namespace Readarr.Api.V1.Indexers
             _authorService = authorService;
             _bookService = bookService;
             _parsingService = parsingService;
+            _signalRBroadcast = signalRBroadcast;
+            _searchSessionService = searchSessionService;
             _logger = logger;
 
             PostValidator.RuleFor(s => s.IndexerId).ValidId();
@@ -190,6 +198,166 @@ namespace Readarr.Api.V1.Indexers
             var prioritizedDecisions = _prioritizeDownloadDecision.PrioritizeDecisions(decisions);
 
             return MapDecisions(prioritizedDecisions);
+        }
+
+        // Streaming search endpoints
+        [HttpPost("search")]
+        public async Task<ActionResult<SearchSessionResource>> StartStreamingSearch([FromBody] StreamingSearchRequest request)
+        {
+            if (!request.BookId.HasValue && !request.AuthorId.HasValue)
+            {
+                return BadRequest("Either bookId or authorId must be provided");
+            }
+
+            try
+            {
+                SearchSession session;
+
+                if (request.BookId.HasValue)
+                {
+                    session = await _releaseSearchService.BookSearchStreaming(
+                        request.BookId.Value,
+                        true,
+                        true,
+                        OnStreamingSearchResults);
+                }
+                else
+                {
+                    session = await _releaseSearchService.AuthorSearchStreaming(
+                        request.AuthorId.Value,
+                        true,
+                        true,
+                        OnStreamingSearchResults);
+                }
+
+                // Broadcast search complete
+                await BroadcastSearchComplete(session);
+
+                return Ok(new SearchSessionResource
+                {
+                    SearchId = session.SearchId,
+                    TotalIndexers = session.TotalIndexers,
+                    CompletedIndexers = session.CompletedCount,
+                    IsComplete = session.IsComplete,
+                    TotalResults = session.BestDecisionByGuid.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Streaming search failed");
+                throw new NzbDroneClientException(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("search/{searchId}")]
+        public ActionResult<SearchSessionResource> GetSearchSession(string searchId)
+        {
+            var session = _searchSessionService.GetSession(searchId);
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new SearchSessionResource
+            {
+                SearchId = session.SearchId,
+                TotalIndexers = session.TotalIndexers,
+                CompletedIndexers = session.CompletedCount,
+                IsComplete = session.IsComplete,
+                TotalResults = session.BestDecisionByGuid.Count,
+                IndexerStatuses = session.IndexerStatuses.Values.Select(s => new IndexerSearchStatusResource
+                {
+                    IndexerId = s.IndexerId,
+                    IndexerName = s.IndexerName,
+                    State = s.State.ToString().ToLowerInvariant(),
+                    ResultCount = s.ResultCount,
+                    ErrorMessage = s.ErrorMessage
+                }).ToList()
+            });
+        }
+
+        [HttpGet("search/{searchId}/results")]
+        public ActionResult<List<ReleaseResource>> GetSearchResults(string searchId)
+        {
+            var decisions = _searchSessionService.GetAllDecisions(searchId);
+            if (decisions == null)
+            {
+                return NotFound();
+            }
+
+            var prioritizedDecisions = _prioritizeDownloadDecision.PrioritizeDecisions(decisions);
+            return Ok(MapDecisions(prioritizedDecisions));
+        }
+
+        private async Task OnStreamingSearchResults(SearchSession session, IIndexer indexer, List<DownloadDecision> decisions)
+        {
+            // Map decisions to resources and cache them
+            var resources = new List<ReleaseResource>();
+            var releaseWeight = session.BestDecisionByGuid.Count;
+
+            foreach (var decision in decisions)
+            {
+                var resource = MapDecision(decision, releaseWeight++);
+                resources.Add(resource);
+            }
+
+            // Get current indexer status
+            var indexerStatus = session.IndexerStatuses.TryGetValue(indexer.Definition.Id, out var status) ? status : null;
+
+            // Broadcast via SignalR
+            var message = new SignalRMessage
+            {
+                Name = "releaseSearch",
+                Body = new SearchResultMessage
+                {
+                    SearchId = session.SearchId,
+                    Action = SearchResultMessage.Actions.Results,
+                    IndexerId = indexer.Definition.Id,
+                    IndexerName = indexer.Definition.Name,
+                    Results = resources.Cast<object>().ToList(),
+                    TotalIndexers = session.TotalIndexers,
+                    CompletedIndexers = session.CompletedCount,
+                    IndexerStatuses = session.IndexerStatuses.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => new IndexerSearchStatusDto
+                        {
+                            IndexerId = kvp.Value.IndexerId,
+                            IndexerName = kvp.Value.IndexerName,
+                            State = kvp.Value.State.ToString().ToLowerInvariant(),
+                            ResultCount = kvp.Value.ResultCount,
+                            ErrorMessage = kvp.Value.ErrorMessage
+                        })
+                }
+            };
+
+            await _signalRBroadcast.BroadcastMessage(message);
+        }
+
+        private async Task BroadcastSearchComplete(SearchSession session)
+        {
+            var message = new SignalRMessage
+            {
+                Name = "releaseSearch",
+                Body = new SearchResultMessage
+                {
+                    SearchId = session.SearchId,
+                    Action = SearchResultMessage.Actions.Complete,
+                    TotalIndexers = session.TotalIndexers,
+                    CompletedIndexers = session.CompletedCount,
+                    IndexerStatuses = session.IndexerStatuses.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => new IndexerSearchStatusDto
+                        {
+                            IndexerId = kvp.Value.IndexerId,
+                            IndexerName = kvp.Value.IndexerName,
+                            State = kvp.Value.State.ToString().ToLowerInvariant(),
+                            ResultCount = kvp.Value.ResultCount,
+                            ErrorMessage = kvp.Value.ErrorMessage
+                        })
+                }
+            };
+
+            await _signalRBroadcast.BroadcastMessage(message);
         }
 
         protected override ReleaseResource MapDecision(DownloadDecision decision, int initialWeight)
