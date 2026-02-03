@@ -3,14 +3,15 @@ import React from 'react';
 import Icon from 'Components/Icon';
 import Link from 'Components/Link/Link';
 import MonitorToggleButton from 'Components/MonitorToggleButton';
-import TableRow from 'Components/Table/TableRow';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
+import TableRow from 'Components/Table/TableRow';
 import { icons } from 'Helpers/Props';
 import styles from './JournalsRow.css';
 
+// ⚡ Bolt: Wrapping JournalsRow in React.memo prevents unnecessary re-renders
+// when the journals table is re-rendered but this specific row's data hasn't changed.
 function JournalsRow(props) {
   const {
-    id,
     name,
     titleSlug,
     paperCount,
@@ -87,4 +88,4 @@ JournalsRow.defaultProps = {
   paperCount: 0
 };
 
-export default JournalsRow;
+export default React.memo(JournalsRow);
