@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import TextInput from 'Components/Form/TextInput';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
 import TablePager from 'Components/Table/TablePager';
-import TextInput from 'Components/Form/TextInput';
 import { sortDirections } from 'Helpers/Props';
 import hasDifferentItemsOrOrder from 'Utilities/Object/hasDifferentItemsOrOrder';
 import getToggledRange from 'Utilities/Table/getToggledRange';
@@ -31,10 +31,6 @@ class AuthorDetailsSeason extends Component {
     this.props.setSelectedState(this.props.items);
   }
 
-  onFilterChange = ({ value }) => {
-    this.setState({ filter: value, page: 1 });
-  };
-
   componentDidUpdate(prevProps) {
     const {
       items,
@@ -55,6 +51,10 @@ class AuthorDetailsSeason extends Component {
       }
     }
   }
+
+  onFilterChange = ({ value }) => {
+    this.setState({ filter: value, page: 1 });
+  };
 
   onFirstPagePress = () => {
     this.setState({ page: 1 });
@@ -111,39 +111,49 @@ class AuthorDetailsSeason extends Component {
     return onSelectedChange(items, id, value, shiftKey);
   };
 
+  // ⚡ Bolt: Memoize filtered and paged items to prevent expensive O(N) operations on every render.
+  getFilteredAndPagedItems(items, filter, page, pageSize) {
+    if (this._lastItems !== items || this._lastFilter !== filter) {
+      const lowerFilter = filter.trim().toLowerCase();
+      this._filteredItems =
+        lowerFilter.length === 0 ?
+          items :
+          items.filter((item) => {
+            const title = item.title?.toLowerCase() || '';
+            const authorName = item.author?.name?.toLowerCase() || '';
+            const topics = (item.topics || item.genres || []).join(' ').toLowerCase();
+            return title.includes(lowerFilter) || authorName.includes(lowerFilter) || topics.includes(lowerFilter);
+          });
+      this._lastItems = items;
+      this._lastFilter = filter;
+      this._lastPage = null;
+    }
+
+    if (this._lastPage !== page || this._lastPageSize !== pageSize) {
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      this._pagedItems = this._filteredItems.slice(start, end);
+      this._lastPage = page;
+      this._lastPageSize = pageSize;
+    }
+
+    return {
+      filteredItems: this._filteredItems,
+      pagedItems: this._pagedItems
+    };
+  }
+
   //
   // Render
 
   render() {
-    const {
-      items,
-      isEditorActive,
-      columns,
-      sortKey,
-      sortDirection,
-      onSortPress,
-      onTableOptionChange,
-      selectedState
-    } = this.props;
+    const { items, isEditorActive, columns, sortKey, sortDirection, onSortPress, onTableOptionChange, selectedState } = this.props;
 
     const { page, pageSize, filter } = this.state;
 
-    const lowerFilter = filter.trim().toLowerCase();
-    const filteredItems = lowerFilter.length === 0
-      ? items
-      : items.filter((item) => {
-          const title = item.title?.toLowerCase() || '';
-          const authorName = item.author?.name?.toLowerCase() || '';
-          const topics = (item.topics || item.genres || []).join(' ').toLowerCase();
-          return title.includes(lowerFilter) ||
-            authorName.includes(lowerFilter) ||
-            topics.includes(lowerFilter);
-        });
+    const { filteredItems, pagedItems } = this.getFilteredAndPagedItems(items, filter, page, pageSize);
 
     const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize));
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    const pagedItems = filteredItems.slice(start, end);
 
     let titleColumns = columns;
     if (!isEditorActive) {

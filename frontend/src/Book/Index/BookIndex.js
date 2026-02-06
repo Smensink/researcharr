@@ -308,7 +308,9 @@ class BookIndex extends Component {
       allUnselected
     } = this.state;
 
-    const selectedBookIds = this.getSelectedIds();
+    // ⚡ Bolt: Only calculate selected IDs if the editor is active,
+    // avoiding unnecessary O(N) calculations on every render.
+    const selectedBookIds = isEditorActive ? this.getSelectedIds() : [];
 
     const ViewComponent = getViewComponent(view);
     const isLoaded = !!(!error && isPopulated && items.length && scroller);
