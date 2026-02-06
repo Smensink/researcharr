@@ -272,7 +272,9 @@ class AuthorDetails extends Component {
       expandIcon = icons.EXPAND;
     }
 
-    const selectedBookIds = this.getSelectedIds();
+    // ⚡ Bolt: Only calculate selected IDs if the editor is active,
+    // avoiding unnecessary O(N) calculations on every render.
+    const selectedBookIds = isEditorActive ? this.getSelectedIds() : [];
 
     return (
       <PageContent title={authorName}>

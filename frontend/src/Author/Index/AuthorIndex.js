@@ -317,7 +317,9 @@ class AuthorIndex extends Component {
       allUnselected
     } = this.state;
 
-    const selectedAuthorIds = this.getSelectedIds();
+    // ⚡ Bolt: Only calculate selected IDs if the editor is active,
+    // avoiding unnecessary O(N) calculations on every render.
+    const selectedAuthorIds = isEditorActive ? this.getSelectedIds() : [];
 
     const ViewComponent = getViewComponent(view);
     const isLoaded = !!(!error && isPopulated && items.length && scroller);
