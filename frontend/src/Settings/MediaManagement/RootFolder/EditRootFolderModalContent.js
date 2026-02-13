@@ -59,9 +59,9 @@ function EditRootFolderModalContent(props) {
     useSsl
   } = item;
 
-  const profileHelpText = outputProfile?.value 
-    ? calibreProfiles.options.find((x) => x.key === outputProfile.value)?.description 
-    : '';
+  const profileHelpText = outputProfile?.value ?
+    calibreProfiles.options.find((x) => x.key === outputProfile.value)?.description :
+    '';
 
   return (
     <ModalContent onModalClose={onModalClose}>
@@ -211,194 +211,194 @@ function EditRootFolderModalContent(props) {
               </FieldSet>
 
               {false && (
-              <FieldSet legend={translate('CalibreSettings')}>
-                <Alert>
-                  {translate('CalibreNotCalibreWeb')}
-                </Alert>
-                <FormGroup>
-                  <FormLabel>
-                    {translate('UseCalibreContentServer')}
-                    <Popover
-                      anchor={
-                        <Icon
-                          className={styles.labelIcon}
-                          name={icons.INFO}
-                        />
-                      }
-                      title={translate('CalibreContentServer')}
-                      body={translate('CalibreContentServerText')}
-                      position={tooltipPositions.RIGHT}
+                <FieldSet legend={translate('CalibreSettings')}>
+                  <Alert>
+                    {translate('CalibreNotCalibreWeb')}
+                  </Alert>
+                  <FormGroup>
+                    <FormLabel>
+                      {translate('UseCalibreContentServer')}
+                      <Popover
+                        anchor={
+                          <Icon
+                            className={styles.labelIcon}
+                            name={icons.INFO}
+                          />
+                        }
+                        title={translate('CalibreContentServer')}
+                        body={translate('CalibreContentServerText')}
+                        position={tooltipPositions.RIGHT}
+                      />
+                    </FormLabel>
+
+                    <FormInputGroup
+                      type={inputTypes.CHECK}
+                      isDisabled={!!id}
+                      name="isCalibreLibrary"
+                      helpText={translate('IsCalibreLibraryHelpText')}
+                      {...isCalibreLibrary}
+                      onChange={onInputChange}
+                      helpLink={'https://manual.calibre-ebook.com/server.html'}
                     />
-                  </FormLabel>
+                  </FormGroup>
 
-                  <FormInputGroup
-                    type={inputTypes.CHECK}
-                    isDisabled={!!id}
-                    name="isCalibreLibrary"
-                    helpText={translate('IsCalibreLibraryHelpText')}
-                    {...isCalibreLibrary}
-                    onChange={onInputChange}
-                    helpLink={'https://manual.calibre-ebook.com/server.html'}
-                  />
-                </FormGroup>
+                  {
+                    isCalibreLibrary !== undefined && isCalibreLibrary.value &&
+                      <div>
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('CalibreHost')}
+                          </FormLabel>
 
-                {
-                  isCalibreLibrary !== undefined && isCalibreLibrary.value &&
-                    <div>
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('CalibreHost')}
-                        </FormLabel>
-
-                        <FormInputGroup
-                          type={inputTypes.TEXT}
-                          name="host"
-                          helpText={translate('HostHelpText')}
-                          {...host}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
-
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('CalibrePort')}
-                        </FormLabel>
-
-                        <FormInputGroup
-                          type={inputTypes.NUMBER}
-                          name="port"
-                          helpText={translate('PortHelpText')}
-                          {...port}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
-
-                      <FormGroup
-                        advancedSettings={advancedSettings}
-                        isAdvanced={true}
-                      >
-                        <FormLabel>
-                          {translate('CalibreUrlBase')}
-                        </FormLabel>
-
-                        <FormInputGroup
-                          type={inputTypes.TEXT}
-                          name="urlBase"
-                          helpText={translate('UrlBaseHelpText')}
-                          {...urlBase}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
-
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('CalibreUsername')}
-                        </FormLabel>
-
-                        <FormInputGroup
-                          type={inputTypes.TEXT}
-                          name="username"
-                          helpText={translate('UsernameHelpText')}
-                          {...username}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
-
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('CalibrePassword')}
-                        </FormLabel>
-
-                        <FormInputGroup
-                          type={inputTypes.PASSWORD}
-                          name="password"
-                          helpText={translate('PasswordHelpText')}
-                          {...password}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
-
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('CalibreLibrary')}
-                        </FormLabel>
-
-                        <FormInputGroup
-                          type={inputTypes.TEXT}
-                          name="library"
-                          helpText={translate('LibraryHelpText')}
-                          {...library}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
-
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('ConvertToFormat')}
-                          <Popover
-                            anchor={
-                              <Icon
-                                className={styles.labelIcon}
-                                name={icons.INFO}
-                              />
-                            }
-                            title={translate('CalibreOutputFormat')}
-                            body={'Specify the output format.  Options are: MOBI, EPUB, AZW3, DOCX, FB2, HTMLZ, LIT, LRF, PDB, PDF, PMLZ, RB, RTF, SNB, TCR, TXT, TXTZ, ZIP'}
-                            position={tooltipPositions.RIGHT}
+                          <FormInputGroup
+                            type={inputTypes.TEXT}
+                            name="host"
+                            helpText={translate('HostHelpText')}
+                            {...host}
+                            onChange={onInputChange}
                           />
-                        </FormLabel>
+                        </FormGroup>
 
-                        <FormInputGroup
-                          type={inputTypes.TEXT}
-                          name="outputFormat"
-                          helpText={translate('OutputFormatHelpText')}
-                          {...outputFormat}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('CalibrePort')}
+                          </FormLabel>
 
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('CalibreOutputProfile')}
-                          <Popover
-                            anchor={
-                              <Icon
-                                className={styles.labelIcon}
-                                name={icons.INFO}
-                              />
-                            }
-                            title={translate('CalibreOutputProfile')}
-                            body={'Specify the output profile. The output profile tells the Calibre conversion system how to optimize the created document for the specified device (such as by resizing images for the device screen size). In some cases, an output profile can be used to optimize the output for a particular device, but this is rarely necessary.'}
-                            position={tooltipPositions.RIGHT}
+                          <FormInputGroup
+                            type={inputTypes.NUMBER}
+                            name="port"
+                            helpText={translate('PortHelpText')}
+                            {...port}
+                            onChange={onInputChange}
                           />
-                        </FormLabel>
+                        </FormGroup>
 
-                        <FormInputGroup
-                          type={inputTypes.SELECT}
-                          name="outputProfile"
-                          values={calibreProfiles.options}
-                          helpText={profileHelpText}
-                          {...outputProfile}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
+                        <FormGroup
+                          advancedSettings={advancedSettings}
+                          isAdvanced={true}
+                        >
+                          <FormLabel>
+                            {translate('CalibreUrlBase')}
+                          </FormLabel>
 
-                      <FormGroup>
-                        <FormLabel>
-                          {translate('UseSSL')}
-                        </FormLabel>
+                          <FormInputGroup
+                            type={inputTypes.TEXT}
+                            name="urlBase"
+                            helpText={translate('UrlBaseHelpText')}
+                            {...urlBase}
+                            onChange={onInputChange}
+                          />
+                        </FormGroup>
 
-                        <FormInputGroup
-                          type={inputTypes.CHECK}
-                          name="useSsl"
-                          helpText={translate('UseSslHelpText')}
-                          {...useSsl}
-                          onChange={onInputChange}
-                        />
-                      </FormGroup>
-                    </div>
-                }
-              </FieldSet>
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('CalibreUsername')}
+                          </FormLabel>
+
+                          <FormInputGroup
+                            type={inputTypes.TEXT}
+                            name="username"
+                            helpText={translate('UsernameHelpText')}
+                            {...username}
+                            onChange={onInputChange}
+                          />
+                        </FormGroup>
+
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('CalibrePassword')}
+                          </FormLabel>
+
+                          <FormInputGroup
+                            type={inputTypes.PASSWORD}
+                            name="password"
+                            helpText={translate('PasswordHelpText')}
+                            {...password}
+                            onChange={onInputChange}
+                          />
+                        </FormGroup>
+
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('CalibreLibrary')}
+                          </FormLabel>
+
+                          <FormInputGroup
+                            type={inputTypes.TEXT}
+                            name="library"
+                            helpText={translate('LibraryHelpText')}
+                            {...library}
+                            onChange={onInputChange}
+                          />
+                        </FormGroup>
+
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('ConvertToFormat')}
+                            <Popover
+                              anchor={
+                                <Icon
+                                  className={styles.labelIcon}
+                                  name={icons.INFO}
+                                />
+                              }
+                              title={translate('CalibreOutputFormat')}
+                              body={'Specify the output format.  Options are: MOBI, EPUB, AZW3, DOCX, FB2, HTMLZ, LIT, LRF, PDB, PDF, PMLZ, RB, RTF, SNB, TCR, TXT, TXTZ, ZIP'}
+                              position={tooltipPositions.RIGHT}
+                            />
+                          </FormLabel>
+
+                          <FormInputGroup
+                            type={inputTypes.TEXT}
+                            name="outputFormat"
+                            helpText={translate('OutputFormatHelpText')}
+                            {...outputFormat}
+                            onChange={onInputChange}
+                          />
+                        </FormGroup>
+
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('CalibreOutputProfile')}
+                            <Popover
+                              anchor={
+                                <Icon
+                                  className={styles.labelIcon}
+                                  name={icons.INFO}
+                                />
+                              }
+                              title={translate('CalibreOutputProfile')}
+                              body={'Specify the output profile. The output profile tells the Calibre conversion system how to optimize the created document for the specified device (such as by resizing images for the device screen size). In some cases, an output profile can be used to optimize the output for a particular device, but this is rarely necessary.'}
+                              position={tooltipPositions.RIGHT}
+                            />
+                          </FormLabel>
+
+                          <FormInputGroup
+                            type={inputTypes.SELECT}
+                            name="outputProfile"
+                            values={calibreProfiles.options}
+                            helpText={profileHelpText}
+                            {...outputProfile}
+                            onChange={onInputChange}
+                          />
+                        </FormGroup>
+
+                        <FormGroup>
+                          <FormLabel>
+                            {translate('UseSSL')}
+                          </FormLabel>
+
+                          <FormInputGroup
+                            type={inputTypes.CHECK}
+                            name="useSsl"
+                            helpText={translate('UseSslHelpText')}
+                            {...useSsl}
+                            onChange={onInputChange}
+                          />
+                        </FormGroup>
+                      </div>
+                  }
+                </FieldSet>
               )}
 
             </Form>

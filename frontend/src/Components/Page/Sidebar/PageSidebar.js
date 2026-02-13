@@ -83,7 +83,7 @@ const links = [
       {
         title: () => translate('Blocklist'),
         to: '/activity/blocklist'
-      },
+      }
       // Search imports and advanced search live under Papers
     ]
   },

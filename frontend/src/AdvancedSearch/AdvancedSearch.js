@@ -742,7 +742,7 @@ function AdvancedSearch() {
       setFetchedCount(fetchedCountRef.current);
       setStreamPagesFetched(streamPagesFetchedRef.current);
       setStreamCursor(next || null);
-      
+
       // Fetch statuses for new results (outside of state update)
       const newIds = pageResults.map((r) => r.openAlexId).filter(Boolean);
       if (newIds.length > 0) {
@@ -812,7 +812,8 @@ function AdvancedSearch() {
                   <Button onPress={() => {
                     setStopStreaming(true);
                     stopStreamingRef.current = true;
-                  }} kind="default">
+                  }} kind="default"
+                  >
                     Stop
                   </Button>
                 )}
@@ -869,11 +870,11 @@ function AdvancedSearch() {
                       ))}
                     </div>
                   )}
-                {selectedConcepts.length > 0 && (
-                  <div className={styles.chips}>
-                    {selectedConcepts.map((c) => (
-                      <div key={c.id} className={styles.chip}>
-                        <div className={styles.chipLabel}>{c.name}</div>
+                  {selectedConcepts.length > 0 && (
+                    <div className={styles.chips}>
+                      {selectedConcepts.map((c) => (
+                        <div key={c.id} className={styles.chip}>
+                          <div className={styles.chipLabel}>{c.name}</div>
                           <div className={styles.chipActions}>
                             <select
                               className={styles.groupSelect}
@@ -900,34 +901,34 @@ function AdvancedSearch() {
                         </div>
                       ))}
                     </div>
-                )}
-                {selectedConcepts.length > 1 && (
-                  <div className={styles.smallControlRow}>
-                    <div className={styles.fieldLabel}>Concept group operators (with previous)</div>
-                    <div className={styles.helperText}>Groups combine left to right. Choose whether each group must also match (AND) or can broaden results (OR).</div>
-                    {[1, 2, 3].map((gid) => (
-                      selectedConcepts.find((c) => (c.groupId || 1) === gid) ? (
-                        <div key={`concept-op-${gid}`} className={styles.groupOperatorRow}>
-                          <span>Group {gid}</span>
-                          <select
-                            className={styles.selectInput}
-                            value={conceptGroupOperators[gid] || 'OR'}
-                            onChange={(e) => setConceptGroupOperator(gid, e.target.value)}
-                            title="Operator used to combine this group with earlier groups"
-                          >
-                            <option value="AND">AND</option>
-                            <option value="OR">OR</option>
-                          </select>
-                        </div>
-                      ) : null
-                    ))}
-                  </div>
-                )}
-              </div>
+                  )}
+                  {selectedConcepts.length > 1 && (
+                    <div className={styles.smallControlRow}>
+                      <div className={styles.fieldLabel}>Concept group operators (with previous)</div>
+                      <div className={styles.helperText}>Groups combine left to right. Choose whether each group must also match (AND) or can broaden results (OR).</div>
+                      {[1, 2, 3].map((gid) => (
+                        selectedConcepts.find((c) => (c.groupId || 1) === gid) ? (
+                          <div key={`concept-op-${gid}`} className={styles.groupOperatorRow}>
+                            <span>Group {gid}</span>
+                            <select
+                              className={styles.selectInput}
+                              value={conceptGroupOperators[gid] || 'OR'}
+                              onChange={(e) => setConceptGroupOperator(gid, e.target.value)}
+                              title="Operator used to combine this group with earlier groups"
+                            >
+                              <option value="AND">AND</option>
+                              <option value="OR">OR</option>
+                            </select>
+                          </div>
+                        ) : null
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-              <div>
-                <div className={styles.fieldLabel}>MeSH terms</div>
-                <input
+                <div>
+                  <div className={styles.fieldLabel}>MeSH terms</div>
+                  <input
                     className={styles.textInput}
                     placeholder="Search MeSH (heart failure, COPD...)"
                     value={meshQuery}
@@ -1012,17 +1013,17 @@ function AdvancedSearch() {
                       ))}
                     </div>
                   )}
-              </div>
+                </div>
 
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionTitle}>Combine pieces</div>
-                <div className={styles.sectionHint}>Controls the boolean logic between keyword/MeSH and concept filters.</div>
-              </div>
-              <ul className={styles.helperList}>
-                <li>Keywords/MeSH logic: AND = all text terms required; OR = any text term allowed.</li>
-                <li>Search + Concepts: AND = must match both text terms and at least one concept group; OR = either is enough.</li>
-              </ul>
-              <div className={styles.filtersGrid}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionTitle}>Combine pieces</div>
+                  <div className={styles.sectionHint}>Controls the boolean logic between keyword/MeSH and concept filters.</div>
+                </div>
+                <ul className={styles.helperList}>
+                  <li>Keywords/MeSH logic: AND = all text terms required; OR = any text term allowed.</li>
+                  <li>Search + Concepts: AND = must match both text terms and at least one concept group; OR = either is enough.</li>
+                </ul>
+                <div className={styles.filtersGrid}>
                   <div>
                     <div className={styles.fieldLabel}>Keywords/MeSH Logic</div>
                     <select
@@ -1049,11 +1050,11 @@ function AdvancedSearch() {
                   </div>
                 </div>
 
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionTitle}>Filter results</div>
-                <div className={styles.sectionHint}>Limit by year, article type, and sort order.</div>
-              </div>
-              <div className={styles.filtersGrid}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionTitle}>Filter results</div>
+                  <div className={styles.sectionHint}>Limit by year, article type, and sort order.</div>
+                </div>
+                <div className={styles.filtersGrid}>
                   <div>
                     <div className={styles.fieldLabel}>Year from</div>
                     <input
@@ -1074,9 +1075,9 @@ function AdvancedSearch() {
                       onChange={(e) => setYearTo(e.target.value)}
                     />
                   </div>
-              </div>
+                </div>
 
-              <div className={styles.filtersGrid}>
+                <div className={styles.filtersGrid}>
                   <div>
                     <div className={styles.fieldLabel}>Type</div>
                     <select
@@ -1101,13 +1102,13 @@ function AdvancedSearch() {
                       ))}
                     </select>
                   </div>
-              </div>
+                </div>
 
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionTitle}>Paging & streaming</div>
-                <div className={styles.sectionHint}>Control how many items are pulled at once and when to stop.</div>
-              </div>
-              <div className={styles.filtersGrid}>
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionTitle}>Paging & streaming</div>
+                  <div className={styles.sectionHint}>Control how many items are pulled at once and when to stop.</div>
+                </div>
+                <div className={styles.filtersGrid}>
                   <div>
                     <div className={styles.fieldLabel}>Per page</div>
                     <select
@@ -1222,7 +1223,9 @@ function AdvancedSearch() {
                         <div className={styles.resultMeta}>
                           {r.year && <span className={styles.badgeMuted}>{r.year}</span>}
                           {r.journal && <span className={styles.badgeMuted}>{r.journal}</span>}
-                          {r.doi && <a className={styles.badgeMuted} href={r.doi} target="_blank" rel="noreferrer">DOI</a>}
+                          {r.doi && <a className={styles.badgeMuted} href={r.doi}
+                            target="_blank" rel="noreferrer"
+                                    >DOI</a>}
                           {r.isOpenAccess && <span className={styles.pill}>Open Access</span>}
                           {r.citedByCount != null && <span className={styles.badgeMuted}>Cited {r.citedByCount}</span>}
                         </div>

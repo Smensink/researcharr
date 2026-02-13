@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import TableRow from 'Components/Table/TableRow';
-import TableRowCell from 'Components/Table/Cells/TableRowCell';
-import { kinds } from 'Helpers/Props';
 import Label from 'Components/Label';
+import TableRowCell from 'Components/Table/Cells/TableRowCell';
+import TableRow from 'Components/Table/TableRow';
+import { kinds } from 'Helpers/Props';
 import formatDateTime from 'Utilities/Date/formatDateTime';
 import styles from './IndexerErrorsRow.css';
 
