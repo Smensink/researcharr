@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { memo } from 'react';
 import IconButton from 'Components/Link/IconButton';
 import Scroller from 'Components/Scroller/Scroller';
 import TableOptionsModalWrapper from 'Components/Table/TableOptions/TableOptionsModalWrapper';
@@ -140,4 +140,4 @@ Table.defaultProps = {
   selectAll: false
 };
 
-export default Table;
+export default memo(Table);
