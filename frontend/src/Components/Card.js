@@ -1,47 +1,39 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React from 'react';
 import Link from 'Components/Link/Link';
 import styles from './Card.css';
 
-class Card extends Component {
-
-  //
-  // Render
-
-  render() {
-    const {
-      className,
-      overlayClassName,
-      overlayContent,
-      children,
-      onPress
-    } = this.props;
-
-    if (overlayContent) {
-      return (
-        <div className={className}>
-          <Link
-            className={styles.underlay}
-            onPress={onPress}
-          />
-
-          <div className={overlayClassName}>
-            {children}
-          </div>
-        </div>
-      );
-    }
-
+const Card = React.memo(({
+  className,
+  overlayClassName,
+  overlayContent,
+  children,
+  onPress
+}) => {
+  if (overlayContent) {
     return (
-      <Link
-        className={className}
-        onPress={onPress}
-      >
-        {children}
-      </Link>
+      <div className={className}>
+        <Link
+          className={styles.underlay}
+          onPress={onPress}
+        />
+
+        <div className={overlayClassName}>
+          {children}
+        </div>
+      </div>
     );
   }
-}
+
+  return (
+    <Link
+      className={className}
+      onPress={onPress}
+    >
+      {children}
+    </Link>
+  );
+});
 
 Card.propTypes = {
   className: PropTypes.string.isRequired,
