@@ -1,27 +1,23 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { kinds } from 'Helpers/Props';
 import styles from './Icon.css';
 
-class Icon extends PureComponent {
-
-  //
-  // Render
-
-  render() {
-    const {
-      containerClassName,
-      className,
-      name,
-      kind,
-      size,
-      title,
-      isSpinning,
-      ...otherProps
-    } = this.props;
-
+// Converted to a functional component with React.memo to prevent unnecessary re-renders.
+// This is a performance optimization for a frequently used component.
+const Icon = React.memo(
+  ({
+    containerClassName,
+    className,
+    name,
+    kind,
+    size,
+    title,
+    isSpinning,
+    ...otherProps
+  }) => {
     const icon = (
       <FontAwesomeIcon
         className={classNames(
@@ -50,7 +46,8 @@ class Icon extends PureComponent {
 
     return icon;
   }
-}
+);
+Icon.displayName = 'Icon';
 
 Icon.propTypes = {
   containerClassName: PropTypes.string,
