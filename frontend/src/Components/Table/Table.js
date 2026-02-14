@@ -41,6 +41,9 @@ function Table(props) {
     ...otherProps
   } = props;
 
+  // Optimization: Hoist props calculation out of the map loop to avoid redundant calls
+  const tableHeaderCellSharedProps = getTableHeaderCellProps(otherProps);
+
   return (
     <Scroller
       className={classNames(
@@ -104,7 +107,7 @@ function Table(props) {
                 <TableHeaderCell
                   key={column.name}
                   onSortPress={onSortPress}
-                  {...getTableHeaderCellProps(otherProps)}
+                  {...tableHeaderCellSharedProps}
                   {...column}
                 >
                   {typeof column.label === 'function' ? column.label() : column.label}

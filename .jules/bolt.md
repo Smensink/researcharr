@@ -1,0 +1,3 @@
+## 2024-07-25 - Rejected PR: Never Commit Build Artifacts
+**Learning:** A pull request was rejected because it included thousands of lines of build artifacts (`_output/`, `_temp/`, `.dll`, `.pdb`, `.cache` files) and unrelated feature changes alongside a single, valid optimization. This bloated the repository, made the actual change impossible to review, and violated fundamental source control best practices.
+**Action:** Always ensure commits are atomic and contain only intentional, focused source code changes. Use `git status` or other tools to check for unintended additions before committing. Never commit build outputs, dependencies, or IDE-generated files. When in doubt, reset the workspace to a clean state and re-apply only the necessary changes.
