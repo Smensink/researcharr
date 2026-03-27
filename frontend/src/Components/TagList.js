@@ -1,14 +1,17 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { kinds } from 'Helpers/Props';
 import Label from './Label';
 import styles from './TagList.css';
 
 function TagList({ tags, tagList }) {
-  const sortedTags = tags
-    .map((tagId) => tagList.find((tag) => tag.id === tagId))
-    .filter((tag) => !!tag)
-    .sort((a, b) => a.label.localeCompare(b.label));
+  // ⚡ Bolt: Memoize the sorted tags calculation to avoid expensive O(N*M) lookups and O(K log K) sorts on every render.
+  const sortedTags = useMemo(() => {
+    return tags
+      .map((tagId) => tagList.find((tag) => tag.id === tagId))
+      .filter((tag) => !!tag)
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [tags, tagList]);
 
   return (
     <div className={styles.tags}>
@@ -33,4 +36,4 @@ TagList.propTypes = {
   tagList: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
-export default TagList;
+export default memo(TagList);
