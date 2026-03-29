@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { memo } from 'react';
 import styles from './TableRow.css';
 
 function TableRow(props) {
@@ -30,4 +30,5 @@ TableRow.defaultProps = {
   className: styles.row
 };
 
-export default TableRow;
+// ⚡ Bolt: Memoizing TableRow to prevent unnecessary re-renders of rows when parent data changes, but this row's data remains the same.
+export default memo(TableRow);
